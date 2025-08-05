@@ -10,31 +10,31 @@ export default function AllEvents() {
     const [events, setEvents] = useState<any[]>([]);
     const { user } = useUserStore();
 
-    const fetchEvents = async () => {
-        let query = supabase
-            .from('events')
-            .select('*')
-            .eq('done', true)
-            .eq('school_id', user.school_id)
-            .neq('host_id', user.id);
-        // Only include events where the RSVP deadline is after now
-        const now = new Date().toISOString();
-        query = query.lte('rsvp_deadline', now);
+    // const fetchEvents = async () => {
+    //     let query = supabase
+    //         .from('events')
+    //         .select('*')
+    //         .eq('done', true)
+    //         .eq('school_id', user.school_id)
+    //         .neq('host_id', user.id);
+    //     // Only include events where the RSVP deadline is after now
+    //     const now = new Date().toISOString();
+    //     query = query.lte('rsvp_deadline', now);
 
-        const { data, error } = await query;
+    //     const { data, error } = await query;
 
-        if (error) {
-            console.log('Yes problem in getting events');
-        } else {
-            setEvents(data);
-        }
-    }
+    //     if (error) {
+    //         console.log('Yes problem in getting events');
+    //     } else {
+    //         setEvents(data);
+    //     }
+    // }
 
-    useEffect(() => {
-        fetchEvents();
-    }, [user]);
+    // useEffect(() => {
+    //     fetchEvents();
+    // }, [user]);
 
-    useFocusEffect(useCallback(() => { fetchEvents() }, []));
+    // useFocusEffect(useCallback(() => { fetchEvents() }, []));
 
     return (
         <ScrollView style={tw`flex-1`} contentContainerStyle={{ paddingBottom: 96 }}>

@@ -15,27 +15,9 @@ export default function SignUp() {
 
     const { setSignupInfo } = useAuthStore();
 
-    const getSchoolFromEmail = async (email: string) => {
-        if (email.indexOf('@') < 0) return '';
-        const domain = email.trim().split('@')[1].toLowerCase();
-        if (!domain) return '';
-
-        const { data, error } = await supabase.from('school')
-            .select('id').eq('domain', domain).single();
-
-        if (error) {
-            console.log('Error fetching school with domain', domain, error);
-            return '';
-        }
-
-        return data.id || '';
-    }
-
     const checkEmail = async () => {
         setAlreadyVerified(false);
-        const newSchool = await getSchoolFromEmail(email);
-        setValid(newSchool !== '');
-        if (newSchool !== '') {
+        if (email.indexOf('@') >= 0) {
             // Always compare emails in lowercase
             const lowerEmail = email.trim().toLowerCase();
             // Fetch all users with the same email, case-insensitive
@@ -50,7 +32,7 @@ export default function SignUp() {
                     return;
                 }
             }
-            setSignupInfo({ email: lowerEmail, school_id: newSchool });
+            setSignupInfo({ email: lowerEmail });
 
             const { error } = await supabase.auth.signInWithOtp({
                 email: lowerEmail,
@@ -90,7 +72,7 @@ export default function SignUp() {
 
                 {/* Form */}
                 <View style={tw`w-full`}>
-                    <Text style={[tw`text-white mb-1.5 text-[15px]`, { fontFamily: 'Nunito-SemiBold' }]}>College email</Text>
+                    <Text style={[tw`text-white mb-1.5 text-[15px]`, { fontFamily: 'Nunito-SemiBold' }]}>User email</Text>
                     <ImageBackground
                         source={require('../../assets/images/galaxy.jpg')}
                         imageStyle={{ borderRadius: 8, opacity: isFocused ? 0.3 : 0 }}
@@ -107,7 +89,7 @@ export default function SignUp() {
                                     borderRadius: 8,
                                 }
                             ]}
-                            placeholder="hello@yourcollege.edu"
+                            placeholder="hello@gmail.com"
                             placeholderTextColor={'#9CA3AF'}
                             value={email}
                             onChangeText={(newVal) => { setEmail(newVal); setValid(true); }}

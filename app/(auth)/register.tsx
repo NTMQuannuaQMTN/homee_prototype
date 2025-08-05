@@ -13,21 +13,19 @@ export default function Register() {
   const allFieldsFilled = () => {
     return (
       registerInfo.username.trim().length > 0 &&
-      registerInfo.firstname.trim().length > 0 &&
-      registerInfo.lastname.trim().length > 0
+      registerInfo.name.trim().length > 0
     );
   };
   const { signupInfo } = useAuthStore();
   const [imagePage, setImagePage] = useState(false);
-  const [focusedField, setFocusedField] = useState<null | 'username' | 'first' | 'last'>(null);
+  const [focusedField, setFocusedField] = useState<null | 'username' | 'name'>(null);
   const [loading, setLoading] = useState(false);
   const [valid, setValid] = useState(true);
   const [showFieldErrors, setShowFieldErrors] = useState(false);
   const [imageInput, setImageInput] = useState('');
   const [registerInfo, setRegisterInfo] = useState({
     username: '',
-    firstname: '',
-    lastname: ''
+    name: ''
   })
 
   const pickImage = async () => {
@@ -64,16 +62,9 @@ export default function Register() {
       return false;
     }
 
-    // First name validation: 2+ characters, letters and spaces only
-    const nameRegex = /^[a-zA-Z\s]{2,}$/;
-    if (!nameRegex.test(registerInfo.firstname.trim())) {
-      setValid(false);
-      setLoading(false);
-      return false;
-    }
-
-    // Last name validation: 2+ characters, letters and spaces only
-    if (!nameRegex.test(registerInfo.lastname.trim())) {
+    // Name validation: 1+ characters, letters and spaces only
+    const nameRegex = /^[a-zA-Z\s]{1,}$/;
+    if (!nameRegex.test(registerInfo.name.trim())) {
       setValid(false);
       setLoading(false);
       return false;
@@ -86,11 +77,10 @@ export default function Register() {
     // TODO: Save user data to database
     console.log('Registration data:', {
       username: registerInfo.username,
-      firstName: registerInfo.firstname.trim(),
-      lastName: registerInfo.lastname.trim()
+      name: registerInfo.name.trim()
     });
 
-    const { error: insertError } = await supabase.from('users').insert({ ...registerInfo, ...signupInfo, createdAt: new Date() }).select().single();
+    const { error: insertError } = await supabase.from('users').insert({ ...registerInfo, ...signupInfo }).select().single();
 
     if (insertError) { console.log("INSERT ERR:", insertError.message) }
 
@@ -110,7 +100,7 @@ export default function Register() {
       const blob = await response.blob();
 
       const { error: uploadError } = await supabase.storage
-        .from('sizzl-profileimg')
+        .from('homee-img')
         .upload(filePath, blob);
 
       if (uploadError) {
@@ -119,7 +109,7 @@ export default function Register() {
       }
 
       const { data: urlData } = await supabase.storage
-        .from('sizzl-profileimg')
+        .from('homee-img')
         .getPublicUrl(filePath);
 
       const publicUrl = urlData?.publicUrl;
@@ -225,7 +215,7 @@ export default function Register() {
                       <View style={{ borderRadius: 8, overflow: 'hidden', width: '100%' }}>
                         <ImageBackground
                           source={require('../../assets/images/galaxy.jpg')}
-                          imageStyle={{ borderRadius: 8, opacity: focusedField === 'first' ? 0.3 : 0 }}
+                          imageStyle={{ borderRadius: 8, opacity: focusedField === 'name' ? 0.3 : 0 }}
                           style={tw`w-full rounded-[2]`}
                         >
                           <TextInput
@@ -235,31 +225,31 @@ export default function Register() {
                                 fontFamily: 'Nunito-Medium',
                                 borderWidth: 1,
                                 borderColor:
-                                  showFieldErrors && !/^[a-zA-Z\s]{2,}$/.test(registerInfo.firstname.trim())
+                                  showFieldErrors && !/^[a-zA-Z\s]{1,}$/.test(registerInfo.name.trim())
                                     ? '#FF1769'
-                                    : focusedField === 'first'
+                                    : focusedField === 'name'
                                       ? '#FFFFFF'
                                       : 'rgba(255, 255, 255, 0.1)',
-                                backgroundColor: focusedField === 'first' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                                backgroundColor: focusedField === 'name' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
                                 borderRadius: 8,
                                 textAlign: 'left',
                                 color:
-                                  showFieldErrors && !/^[a-zA-Z\s]{2,}$/.test(registerInfo.firstname.trim())
+                                  showFieldErrors && !/^[a-zA-Z\s]{1,}$/.test(registerInfo.name.trim())
                                     ? '#FF1769'
                                     : '#FFFFFF',
                               },
                             ]}
-                            value={registerInfo.firstname}
+                            value={registerInfo.name}
                             placeholder="Sizzle"
                             placeholderTextColor={'#9CA3AF'}
                             onChangeText={newName => {
-                              setRegisterInfo(regInfo => ({ ...regInfo, firstname: newName }));
+                              setRegisterInfo(regInfo => ({ ...regInfo, name: newName }));
                               setValid(true);
                               setShowFieldErrors(false);
                             }}
-                            onFocus={() => setFocusedField('first')}
+                            onFocus={() => setFocusedField('name')}
                             onBlur={() => setFocusedField(null)}
-                            caretHidden={focusedField !== 'first'}
+                            caretHidden={focusedField !== 'name'}
                           />
                         </ImageBackground>
                       </View>
@@ -269,71 +259,13 @@ export default function Register() {
                           {
                             fontFamily: 'Nunito-Medium',
                             color:
-                              showFieldErrors && !/^[a-zA-Z\s]{2,}$/.test(registerInfo.firstname.trim())
+                              showFieldErrors && !/^[a-zA-Z\s]{1,}$/.test(registerInfo.name.trim())
                                 ? '#FF1769'
                                 : '#FFFFFF',
                           },
                         ]}
                       >
-                        Must have at least 2 characters
-                      </Text>
-                    </View>
-                    <View style={tw`flex-1 ml-2`}>
-                      <Text style={[tw`text-white mb-1.5 text-[13px]`, { fontFamily: 'Nunito-SemiBold' }]}>Last name</Text>
-                      <View style={{ borderRadius: 8, overflow: 'hidden', width: '100%' }}>
-                        <ImageBackground
-                          source={require('../../assets/images/galaxy.jpg')}
-                          imageStyle={{ borderRadius: 8, opacity: focusedField === 'last' ? 0.3 : 0 }}
-                          style={tw`w-full rounded-[2]`}
-                        >
-                          <TextInput
-                            style={[
-                              tw`h-10 w-full px-3 py-2 text-[13px]`,
-                              {
-                                fontFamily: 'Nunito-Medium',
-                                borderWidth: 1,
-                                borderColor:
-                                  showFieldErrors && !/^[a-zA-Z\s]{2,}$/.test(registerInfo.lastname.trim())
-                                    ? '#FF1769'
-                                    : focusedField === 'last'
-                                      ? '#FFFFFF'
-                                      : 'rgba(255, 255, 255, 0.1)',
-                                backgroundColor: focusedField === 'last' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
-                                borderRadius: 8,
-                                textAlign: 'left',
-                                color:
-                                  showFieldErrors && !/^[a-zA-Z\s]{2,}$/.test(registerInfo.lastname.trim())
-                                    ? '#FF1769'
-                                    : '#FFFFFF',
-                              },
-                            ]}
-                            value={registerInfo.lastname}
-                            placeholder="Mingle"
-                            placeholderTextColor={'#9CA3AF'}
-                            onChangeText={newName => {
-                              setRegisterInfo(regInfo => ({ ...regInfo, lastname: newName }));
-                              setValid(true);
-                              setShowFieldErrors(false);
-                            }}
-                            onFocus={() => setFocusedField('last')}
-                            onBlur={() => setFocusedField(null)}
-                            caretHidden={focusedField !== 'last'}
-                          />
-                        </ImageBackground>
-                      </View>
-                      <Text
-                        style={[
-                          tw`text-[10px] text-left mt-1.5 mb-2 leading-[1.2]`,
-                          {
-                            fontFamily: 'Nunito-Medium',
-                            color:
-                              showFieldErrors && !/^[a-zA-Z\s]{2,}$/.test(registerInfo.lastname.trim())
-                                ? '#FF1769'
-                                : '#FFFFFF',
-                          },
-                        ]}
-                      >
-                        Must have at least 2 characters
+                        Must have at least 1 character
                       </Text>
                     </View>
                   </View>

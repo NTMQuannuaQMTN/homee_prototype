@@ -2,7 +2,7 @@ import { supabase } from "@/utils/supabase";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ImageBackground, Keyboard, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, ImageBackground, Keyboard, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import tw from 'twrnc';
 import { useAuthStore } from "../store/authStore";
 
@@ -14,29 +14,14 @@ export default function Login() {
 
     const { setSignupInfo } = useAuthStore();
 
-    const getSchoolFromEmail = async (email: string) => {
-        if (email.indexOf('@') < 0) return '';
-        const domain = email.trim().split('@')[1].toLowerCase();
-        if (!domain) return '';
-
-        const { data, error } = await supabase.from('school')
-            .select('id').eq('domain', domain).single();
-
-        if (error) {
-            console.log('Error fetching school with domain', domain, error);
-            return '';
-        }
-
-        return data.id || '';
-    }
-
     const checkEmail = async () => {
-        const newSchool = await getSchoolFromEmail(email);
-        setValid(newSchool !== '');
-        if (newSchool !== '') {
+        console.log("Checking email", email);
+        if (email.indexOf('@') >= 0) {
             // Always use lowercase for email
             const lowerEmail = email.trim().toLowerCase();
-            setSignupInfo({ email: lowerEmail, school_id: newSchool });
+            setSignupInfo({ email: lowerEmail });
+
+            console.log("Sending OTP to", lowerEmail);
 
             const { error } = await supabase.auth.signInWithOtp({
                 email: lowerEmail,
@@ -47,7 +32,7 @@ export default function Login() {
             });
 
             if (error) {
-                console.log("OTP send error", error.message);
+                Alert.alert("Error", "This email is not registered with us. Please sign up first.");
                 return;
             }
 
@@ -75,7 +60,7 @@ export default function Login() {
 
                 {/* Form */}
                 <View style={tw`w-full`}>
-                    <Text style={[tw`text-white mb-1.5 text-[15px]`, { fontFamily: 'Nunito-SemiBold' }]}>College email</Text>
+                    <Text style={[tw`text-white mb-1.5 text-[15px]`, { fontFamily: 'Nunito-SemiBold' }]}>User email</Text>
                     <ImageBackground
                       source={require('../../assets/images/galaxy.jpg')}
                       imageStyle={{ borderRadius: 8, opacity: isFocused ? 0.3 : 0 }}
@@ -92,7 +77,7 @@ export default function Login() {
                             borderRadius: 8,
                           }
                         ]}
-                        placeholder="hello@yourcollege.edu"
+                        placeholder="hello@gmail.com"
                         placeholderTextColor={'#9CA3AF'}
                         value={email}
                         onChangeText={(newVal) => { setEmail(newVal); setValid(true); }}

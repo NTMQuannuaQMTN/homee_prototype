@@ -22,37 +22,34 @@ export default function EditProfile() {
   const [showSuccess, setShowSuccess] = useState(false);
   // Focus state for each input
   const [focus, setFocus] = useState({
-    firstname: false,
-    lastname: false,
+    name: false,
     username: false,
     bio: false,
-    instagramurl: false,
-    xurl: false,
-    snapchaturl: false,
-    facebookurl: false,
-    birthdate: false,
+    instagram_url: false,
+    tiktok_url: false,
+    snapchat_url: false,
+    facebook_url: false,
+    birthday: false,
   });
   const router = useRouter();
   const { user, setUser } = useUserStore();
   const [input, setInput] = useState({
-    firstname: user?.firstname || null,
-    lastname: user?.lastname || null,
+    name: user?.name || null,
     username: user?.username || null,
     bio: user?.bio || null,
-    facebookurl: user?.facebookurl || null,
-    instagramurl: user?.instagramurl || null,
-    snapchaturl: user?.snapchaturl || null,
-    xurl: user?.xurl || null,
+    facebook_url: user?.facebook_url || null,
+    instagram_url: user?.instagram_url || null,
+    snapchat_url: user?.snapchat_url || null,
+    tiktok_url: user?.tiktok_url || null,
   });
-  const [dob, setDOB] = useState(user?.birthdate ? new Date(user?.birthdate) : new Date());
-  const [dobInput, setDOBInput] = useState(user?.birthdate ? new Date(user?.birthdate) : new Date());
-  const [dobAvail, setDOBAvail] = useState(user?.birthdate ? true : false);
+  const [dob, setDOB] = useState(user?.birthday ? new Date(user?.birthday) : new Date());
+  const [dobInput, setDOBInput] = useState(user?.birthday ? new Date(user?.birthday) : new Date());
+  const [dobAvail, setDOBAvail] = useState(user?.birthday ? true : false);
   const [dobOpen, setDOBOpen] = useState(false);
-  const [bgInput, setBgInput] = useState(user?.background_url || '');
+  const [bgInput, setBgInput] = useState(user?.background_image || '');
   const [avtInput, setAvtInput] = useState(user?.profile_image || '');
   const [loading, setLoading] = useState(false);
-  const [firstNameError, setFirstNameError] = useState<string | null>(null);
-  const [lastNameError, setLastNameError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
   const [usernameError, setUsernameError] = useState<string | null>(null);
 
   // For modal picker, just set dobInput on change
@@ -124,8 +121,7 @@ export default function EditProfile() {
   const handleSave = async () => {
 
     setLoading(true);
-    setFirstNameError(null);
-    setLastNameError(null);
+    setNameError(null);
     setUsernameError(null);
     try {
       const usernameRegex = /^[a-z0-9_.]{4,}$/;
@@ -144,19 +140,13 @@ export default function EditProfile() {
         }
       }
 
-      const nameRegex = /^[a-zA-Z\s]{2,}$/;
-      let firstNameErr = null;
-      let lastNameErr = null;
-      if (!nameRegex.test(input.firstname.trim())) {
-        firstNameErr = 'The first name must be at least two letters and no other symbols than alphabets.';
+      const nameRegex = /^[a-zA-Z\s]{1,}$/;
+      let nameErr = null;
+      if (!nameRegex.test(input.name.trim())) {
+        nameErr = 'The name must be at least one letters and no other symbols than alphabets.';
         hasError = true;
       }
-      if (!nameRegex.test(input.lastname.trim())) {
-        lastNameErr = 'The last name must be at least two letters and no other symbols than alphabets.';
-        hasError = true;
-      }
-      setFirstNameError(firstNameErr);
-      setLastNameError(lastNameErr);
+      setNameError(nameErr);
       setUsernameError(usernameErr);
       if (hasError) {
         setLoading(false);
@@ -168,7 +158,7 @@ export default function EditProfile() {
 
       // Prepare avatar and background upload promises
       const avatarNeedsUpload = avtInput && avtInput !== user?.profile_image && avtInput.startsWith('file');
-      const backgroundNeedsUpload = bgInput && bgInput !== user?.background_url && bgInput.startsWith('file');
+      const backgroundNeedsUpload = bgInput && bgInput !== user?.background_image && bgInput.startsWith('file');
 
       // Helper for uploading an image
       const uploadImage = async (fileUri: string, type: 'avatar' | 'background') => {
@@ -186,7 +176,7 @@ export default function EditProfile() {
         const uint8Array = new Uint8Array(byteNumbers);
         // Upload to Supabase Storage
         const { error: uploadError } = await supabase.storage
-          .from('sizzl-profileimg')
+          .from('homee-img')
           .upload(fileName, uint8Array, {
             contentType: `image/${fileExtension === 'jpg' ? 'jpeg' : fileExtension}`,
             upsert: true,
@@ -194,7 +184,7 @@ export default function EditProfile() {
         if (uploadError) throw uploadError;
         // Get public URL
         const { data: urlData } = supabase.storage
-          .from('sizzl-profileimg')
+          .from('homee-img')
           .getPublicUrl(fileName);
         if (!urlData?.publicUrl) throw new Error(`Failed to get ${type} public URL`);
         return urlData.publicUrl;
@@ -241,17 +231,16 @@ export default function EditProfile() {
       }
 
       const updateFields = {
-        firstname: input.firstname,
-        lastname: input.lastname,
+        name: input.name,
         username: input.username,
         bio: input.bio,
-        facebookurl: input.facebookurl,
-        instagramurl: input.instagramurl,
-        snapchaturl: input.snapchaturl,
-        xurl: input.xurl,
-        birthdate: birthdate,
+        facebook_url: input.facebook_url,
+        instagram_url: input.instagram_url,
+        snapchat_url: input.snapchat_url,
+        tiktok_url: input.tiktok_url,
+        birthday: birthdate,
         profile_image: profileImageUrl,
-        background_url: backgroundUrl,
+        background_image: backgroundUrl,
       };
       const { data: updateData, error: updateError } = await supabase
         .from('users')
@@ -363,7 +352,7 @@ export default function EditProfile() {
                     <View style={tw`flex-1`}>
                       <ImageBackground
                         source={require('../../assets/images/galaxy.jpg')}
-                        imageStyle={{ borderRadius: 8, opacity: focus.firstname ? 0.3 : 0 }}
+                        imageStyle={{ borderRadius: 8, opacity: focus.name ? 0.3 : 0 }}
                         style={{ borderRadius: 8 }}
                       >
                         <TextInput
@@ -371,60 +360,26 @@ export default function EditProfile() {
                             tw`px-4 py-2.5 text-center text-[14px]`,
                             {
                               fontFamily: 'Nunito-Medium',
-                              color: input.firstname && input.firstname.trim() ? '#fff' : '#fff',
+                              color: input.name && input.name.trim() ? '#fff' : '#fff',
                               borderWidth: 1,
-                              borderColor: focus.firstname ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
-                              backgroundColor: focus.firstname ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                              borderColor: focus.name ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
+                              backgroundColor: focus.name ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
                               borderRadius: 8,
                             }
                           ]}
-                          placeholder='First name'
-                          value={input.firstname}
+                          placeholder='Name'
+                          value={input.name}
                           onChangeText={(newName) => {
-                            setInput(input => ({ ...input, firstname: newName }));
-                            if (firstNameError) setFirstNameError(null);
+                            setInput(input => ({ ...input, name: newName }));
+                            if (nameError) setNameError(null);
                           }}
                           placeholderTextColor={'#9CA3AF'}
-                          onFocus={() => setFocus(f => ({ ...f, firstname: true }))}
-                          onBlur={() => setFocus(f => ({ ...f, firstname: false }))}
+                          onFocus={() => setFocus(f => ({ ...f, name: true }))}
+                          onBlur={() => setFocus(f => ({ ...f, name: false }))}
                         />
                       </ImageBackground>
-                      {firstNameError && (
-                        <Text style={[tw`text-rose-500 text-xs mt-1 leading-1.2`, { fontFamily: 'Nunito-Medium' }]}>{firstNameError}</Text>
-                      )}
-                    </View>
-                    {/* Last name */}
-                    <View style={tw`flex-1 ml-2`}>
-                      <ImageBackground
-                        source={require('../../assets/images/galaxy.jpg')}
-                        imageStyle={{ borderRadius: 8, opacity: focus.lastname ? 0.3 : 0 }}
-                        style={{ borderRadius: 8 }}
-                      >
-                        <TextInput
-                          style={[
-                            tw`px-4 py-2.5 text-center text-[14px]`,
-                            {
-                              fontFamily: 'Nunito-Medium',
-                              color: input.lastname && input.lastname.trim() ? '#fff' : '#fff',
-                              borderWidth: 1,
-                              borderColor: focus.lastname ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
-                              backgroundColor: focus.lastname ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
-                              borderRadius: 8,
-                            }
-                          ]}
-                          placeholder='Last name'
-                          value={input.lastname}
-                          onChangeText={(newName) => {
-                            setInput(input => ({ ...input, lastname: newName }));
-                            if (lastNameError) setLastNameError(null);
-                          }}
-                          placeholderTextColor={'#9CA3AF'}
-                          onFocus={() => setFocus(f => ({ ...f, lastname: true }))}
-                          onBlur={() => setFocus(f => ({ ...f, lastname: false }))}
-                        />
-                      </ImageBackground>
-                      {lastNameError && (
-                        <Text style={[tw`text-rose-500 text-xs mt-1 leading-1.2`, { fontFamily: 'Nunito-Medium' }]}>{lastNameError}</Text>
+                      {nameError && (
+                        <Text style={[tw`text-rose-500 text-xs mt-1 leading-1.2`, { fontFamily: 'Nunito-Medium' }]}>{nameError}</Text>
                       )}
                     </View>
                   </View>
@@ -471,7 +426,7 @@ export default function EditProfile() {
                   >
                     <ImageBackground
                       source={require('../../assets/images/galaxy.jpg')}
-                      imageStyle={{ borderRadius: 8, opacity: focus.birthdate ? 0.3 : 0 }}
+                      imageStyle={{ borderRadius: 8, opacity: focus.birthday ? 0.3 : 0 }}
                       style={{ borderRadius: 8 }}
                     >
                       <TextInput
@@ -481,8 +436,8 @@ export default function EditProfile() {
                             fontFamily: 'Nunito-Medium',
                             color: dobAvail && dob ? '#fff' : '#fff',
                             borderWidth: 1,
-                            borderColor: focus.birthdate ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
-                            backgroundColor: focus.birthdate ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                            borderColor: focus.birthday ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
+                            backgroundColor: focus.birthday ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
                             borderRadius: 8,
                           }
                         ]}
@@ -491,8 +446,8 @@ export default function EditProfile() {
                         editable={false}
                         pointerEvents="none"
                         placeholderTextColor={'#9CA3AF'}
-                        onFocus={() => setFocus(f => ({ ...f, birthdate: true }))}
-                        onBlur={() => setFocus(f => ({ ...f, birthdate: false }))}
+                        onFocus={() => setFocus(f => ({ ...f, birthday: true }))}
+                        onBlur={() => setFocus(f => ({ ...f, birthday: false }))}
                       />
                     </ImageBackground>
                   </TouchableOpacity>
@@ -548,7 +503,7 @@ export default function EditProfile() {
                     {/* Instagram */}
                     <ImageBackground
                       source={require('../../assets/images/galaxy.jpg')}
-                      imageStyle={{ borderRadius: 8, opacity: focus.instagramurl ? 0.3 : 0 }}
+                      imageStyle={{ borderRadius: 8, opacity: focus.instagram_url ? 0.3 : 0 }}
                       style={{ borderRadius: 8, marginBottom: 0 }}
                     >
                       <View
@@ -556,7 +511,7 @@ export default function EditProfile() {
                           tw`flex-row items-center bg-white/5 rounded-lg`,
                           {
                             borderWidth: 1,
-                            borderColor: focus.instagramurl ? '#fff' : 'rgba(255,255,255,0.1)',
+                            borderColor: focus.instagram_url ? '#fff' : 'rgba(255,255,255,0.1)',
                             height: 48,
                             paddingHorizontal: 12,
                             alignItems: 'center',
@@ -569,7 +524,7 @@ export default function EditProfile() {
                             tw`flex-1 text-left px-2 text-[14px]`,
                             {
                               fontFamily: 'Nunito-Medium',
-                              color: input.instagramurl && input.instagramurl.trim() ? '#fff' : '#fff',
+                              color: input.instagram_url && input.instagram_url.trim() ? '#fff' : '#fff',
                               backgroundColor: 'transparent',
                               borderWidth: 0,
                               height: 40,
@@ -579,18 +534,18 @@ export default function EditProfile() {
                             },
                           ]}
                           placeholder="username"
-                          value={input.instagramurl}
-                          onChangeText={(newInp) => setInput(input => ({ ...input, instagramurl: newInp }))}
+                          value={input.instagram_url}
+                          onChangeText={(newInp) => setInput(input => ({ ...input, instagram_url: newInp }))}
                           placeholderTextColor="#9CA3AF"
-                          onFocus={() => setFocus(f => ({ ...f, instagramurl: true }))}
-                          onBlur={() => setFocus(f => ({ ...f, instagramurl: false }))}
+                          onFocus={() => setFocus(f => ({ ...f, instagram_url: true }))}
+                          onBlur={() => setFocus(f => ({ ...f, instagram_url: false }))}
                         />
                       </View>
                     </ImageBackground>
                     {/* X (Twitter) */}
                     <ImageBackground
                       source={require('../../assets/images/galaxy.jpg')}
-                      imageStyle={{ borderRadius: 8, opacity: focus.xurl ? 0.3 : 0 }}
+                      imageStyle={{ borderRadius: 8, opacity: focus.tiktok_url ? 0.3 : 0 }}
                       style={{ borderRadius: 8, marginBottom: 0 }}
                     >
                       <View
@@ -598,7 +553,7 @@ export default function EditProfile() {
                           tw`flex-row items-center bg-white/5 rounded-lg`,
                           {
                             borderWidth: 1,
-                            borderColor: focus.xurl ? '#fff' : 'rgba(255,255,255,0.1)',
+                            borderColor: focus.tiktok_url ? '#fff' : 'rgba(255,255,255,0.1)',
                             height: 48,
                             paddingHorizontal: 12,
                             alignItems: 'center',
@@ -611,7 +566,7 @@ export default function EditProfile() {
                             tw`flex-1 text-left px-2 text-[14px]`,
                             {
                               fontFamily: 'Nunito-Medium',
-                              color: input.xurl && input.xurl.trim() ? '#fff' : '#fff',
+                              color: input.tiktok_url && input.tiktok_url.trim() ? '#fff' : '#fff',
                               backgroundColor: 'transparent',
                               borderWidth: 0,
                               height: 40,
@@ -621,18 +576,18 @@ export default function EditProfile() {
                             },
                           ]}
                           placeholder="username"
-                          value={input.xurl}
-                          onChangeText={(newInp) => setInput(input => ({ ...input, xurl: newInp }))}
+                          value={input.tiktok_url}
+                          onChangeText={(newInp) => setInput(input => ({ ...input, tiktok_url: newInp }))}
                           placeholderTextColor="#9CA3AF"
-                          onFocus={() => setFocus(f => ({ ...f, xurl: true }))}
-                          onBlur={() => setFocus(f => ({ ...f, xurl: false }))}
+                          onFocus={() => setFocus(f => ({ ...f, tiktok_url: true }))}
+                          onBlur={() => setFocus(f => ({ ...f, tiktok_url: false }))}
                         />
                       </View>
                     </ImageBackground>
                     {/* Snapchat */}
                     <ImageBackground
                       source={require('../../assets/images/galaxy.jpg')}
-                      imageStyle={{ borderRadius: 8, opacity: focus.snapchaturl ? 0.3 : 0 }}
+                      imageStyle={{ borderRadius: 8, opacity: focus.snapchat_url ? 0.3 : 0 }}
                       style={{ borderRadius: 8, marginBottom: 0 }}
                     >
                       <View
@@ -640,7 +595,7 @@ export default function EditProfile() {
                           tw`flex-row items-center bg-white/5 rounded-lg`,
                           {
                             borderWidth: 1,
-                            borderColor: focus.snapchaturl ? '#fff' : 'rgba(255,255,255,0.1)',
+                            borderColor: focus.snapchat_url ? '#fff' : 'rgba(255,255,255,0.1)',
                             height: 48,
                             paddingHorizontal: 12,
                             alignItems: 'center',
@@ -653,7 +608,7 @@ export default function EditProfile() {
                             tw`flex-1 text-left px-2 text-[14px]`,
                             {
                               fontFamily: 'Nunito-Medium',
-                              color: input.snapchaturl && input.snapchaturl.trim() ? '#fff' : '#fff',
+                              color: input.snapchat_url && input.snapchat_url.trim() ? '#fff' : '#fff',
                               backgroundColor: 'transparent',
                               borderWidth: 0,
                               height: 40,
@@ -663,18 +618,18 @@ export default function EditProfile() {
                             },
                           ]}
                           placeholder="username"
-                          value={input.snapchaturl}
-                          onChangeText={(newInp) => setInput(input => ({ ...input, snapchaturl: newInp }))}
+                          value={input.snapchat_url}
+                          onChangeText={(newInp) => setInput(input => ({ ...input, snapchat_url: newInp }))}
                           placeholderTextColor="#9CA3AF"
-                          onFocus={() => setFocus(f => ({ ...f, snapchaturl: true }))}
-                          onBlur={() => setFocus(f => ({ ...f, snapchaturl: false }))}
+                          onFocus={() => setFocus(f => ({ ...f, snapchat_url: true }))}
+                          onBlur={() => setFocus(f => ({ ...f, snapchat_url: false }))}
                         />
                       </View>
                     </ImageBackground>
                     {/* Facebook */}
                     <ImageBackground
                       source={require('../../assets/images/galaxy.jpg')}
-                      imageStyle={{ borderRadius: 8, opacity: focus.facebookurl ? 0.3 : 0 }}
+                      imageStyle={{ borderRadius: 8, opacity: focus.facebook_url ? 0.3 : 0 }}
                       style={{ borderRadius: 8, marginBottom: 0 }}
                     >
                       <View
@@ -682,7 +637,7 @@ export default function EditProfile() {
                           tw`flex-row items-center bg-white/5 rounded-lg`,
                           {
                             borderWidth: 1,
-                            borderColor: focus.facebookurl ? '#fff' : 'rgba(255,255,255,0.1)',
+                            borderColor: focus.facebook_url ? '#fff' : 'rgba(255,255,255,0.1)',
                             height: 48,
                             paddingHorizontal: 12,
                             alignItems: 'center',
@@ -695,7 +650,7 @@ export default function EditProfile() {
                             tw`flex-1 text-left px-2 text-[14px]`,
                             {
                               fontFamily: 'Nunito-Medium',
-                              color: input.facebookurl && input.facebookurl.trim() ? '#fff' : '#fff',
+                              color: input.facebook_url && input.facebook_url.trim() ? '#fff' : '#fff',
                               backgroundColor: 'transparent',
                               borderWidth: 0,
                               height: 40,
@@ -705,11 +660,11 @@ export default function EditProfile() {
                             },
                           ]}
                           placeholder="username"
-                          value={input.facebookurl}
-                          onChangeText={(newInp) => setInput(input => ({ ...input, facebookurl: newInp }))}
+                          value={input.facebook_url}
+                          onChangeText={(newInp) => setInput(input => ({ ...input, facebook_url: newInp }))}
                           placeholderTextColor="#9CA3AF"
-                          onFocus={() => setFocus(f => ({ ...f, facebookurl: true }))}
-                          onBlur={() => setFocus(f => ({ ...f, facebookurl: false }))}
+                          onFocus={() => setFocus(f => ({ ...f, facebook_url: true }))}
+                          onBlur={() => setFocus(f => ({ ...f, facebook_url: false }))}
                         />
                       </View>
                     </ImageBackground>
@@ -721,13 +676,13 @@ export default function EditProfile() {
                 <TouchableOpacity
                   style={[
                     tw`bg-white rounded-full py-[10] w-full items-center`,
-                    !(input.firstname && input.firstname.trim() && input.lastname && input.lastname.trim() && input.username && input.username.trim()) && tw`opacity-50`
+                    !(input.name && input.name.trim() && input.username && input.username.trim()) && tw`opacity-50`
                   ]}
                   onPress={handleSave}
-                  activeOpacity={input.firstname && input.firstname.trim() && input.lastname && input.lastname.trim() && input.username && input.username.trim() ? 0.85 : 1}
-                  disabled={!(input.firstname && input.firstname.trim() && input.lastname && input.lastname.trim() && input.username && input.username.trim())}
+                  activeOpacity={input.name && input.name.trim() && input.username && input.username.trim() ? 0.85 : 1}
+                  disabled={!(input.name && input.name.trim() && input.username && input.username.trim())}
                 >
-                  <Text style={[tw`text-black text-[15px]`, { fontFamily: 'Nunito-ExtraBold', opacity: input.firstname && input.firstname.trim() && input.lastname && input.lastname.trim() && input.username && input.username.trim() ? 1 : 0.5 }]}>Save changes</Text>
+                  <Text style={[tw`text-black text-[15px]`, { fontFamily: 'Nunito-ExtraBold', opacity: input.name && input.name.trim() && input.username && input.username.trim() ? 1 : 0.5 }]}>Save changes</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={tw`flex-row items-center justify-center mt-4`}

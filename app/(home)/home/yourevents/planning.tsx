@@ -20,23 +20,23 @@ export default function Planning() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  async function fetchDrafts() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .eq('host_id', user.id)
-      .eq('done', false)
-      .order('created_at', { ascending: false });
-    if (!error) setDrafts((data as DraftEvent[]) || []);
-    setLoading(false);
-  }
+  // async function fetchDrafts() {
+  //   setLoading(true);
+  //   const { data, error } = await supabase
+  //     .from('events')
+  //     .select('*')
+  //     .eq('host_id', user.id)
+  //     .eq('done', false)
+  //     .order('created_at', { ascending: false });
+  //   if (!error) setDrafts((data as DraftEvent[]) || []);
+  //   setLoading(false);
+  // }
 
-  useEffect(() => {
-    fetchDrafts();
-  }, [user.id]);
+  // useEffect(() => {
+  //   fetchDrafts();
+  // }, [user.id]);
 
-  useFocusEffect(useCallback(() => { fetchDrafts() }, []));
+  // useFocusEffect(useCallback(() => { fetchDrafts() }, []));
 
   if (!drafts.length) return (
     <View style={tw`flex-1 justify-center items-center -mt-30`}>

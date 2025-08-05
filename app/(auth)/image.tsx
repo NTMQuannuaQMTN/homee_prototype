@@ -74,7 +74,7 @@ export default function ImagePage() {
 
       // Upload file as binary data
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('sizzl-profileimg')
+        .from('homee-img')
         .upload(fileName, uint8Array, {
           contentType: `image/${fileExtension === 'jpg' ? 'jpeg' : fileExtension}`,
           upsert: true
@@ -87,7 +87,7 @@ export default function ImagePage() {
 
       // Get public URL
       const { data: urlData } = supabase.storage
-        .from('sizzl-profileimg')
+        .from('homee-img')
         .getPublicUrl(fileName);
       
       const publicUrl = urlData?.publicUrl;

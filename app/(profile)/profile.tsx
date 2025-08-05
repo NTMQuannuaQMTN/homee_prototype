@@ -36,16 +36,15 @@ import PfpDefault from '../../assets/icons/pfpdefault.svg';
 type UserView = {
   id: string;
   username?: string;
-  firstname?: string;
-  lastname?: string;
+  name?: string;
   profile_image?: string;
-  background_url?: string;
+  background_image?: string;
   bio?: string;
-  birthdate?: string;
-  instagramurl?: string;
-  xurl?: string;
-  snapchaturl?: string;
-  facebookurl?: string;
+  birthday?: string;
+  instagram_url?: string;
+  tiktok_url?: string;
+  snapchat_url?: string;
+  facebook_url?: string;
   friend_count?: number;
 };
 
@@ -56,8 +55,8 @@ export default function ProfilePage() {
     if (!userView) return;
     try {
       const profileUrl = `https://sizzl.app/profile/${userView.username || userView.id}`;
-      const name = userView.firstname ? userView.firstname : (userView.username || 'Someone');
-      const message = `${name} on Sizzl`;
+      const name = userView.name ? userView.name : 'Someone';
+      const message = `${name} on Homee`;
       await RNShare.share({
         message: `${message}\n${profileUrl}`,
       });
@@ -573,7 +572,7 @@ export default function ProfilePage() {
 
   // Main profile UI
   return (
-    <ProfileBackgroundWrapper imageUrl={userView?.background_url}>
+    <ProfileBackgroundWrapper imageUrl={userView?.background_image}>
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', alignItems: 'center', marginVertical: 16 }}
         refreshControl={
@@ -637,19 +636,7 @@ export default function ProfilePage() {
         </View>
 
         {/* Name, username, friends count */}
-        <Text style={[tw`text-white text-lg`, { fontFamily: 'Nunito-ExtraBold' }]}>{userView?.firstname} {userView?.lastname}</Text>
-        <View style={tw`flex-row items-center mb-2.5`}>
-          <Text style={[tw`text-gray-400 text-[14px]`, { fontFamily: 'Nunito-Medium' }]}>@{userView?.username}</Text>
-          <Text style={[tw`text-gray-400 mx-1.5 text-[10px]`, { fontFamily: 'Nunito-Medium' }]}>•</Text>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => router.push({ pathname: '/(profile)/friendslist', params: { user_id: user_id, relation: (self ? 'Self' : friendStat === 'friend' ? 'Friend' : 'Stranger') } })}
-          >
-            <Text style={[tw`text-gray-400 text-[14px]`, { fontFamily: 'Nunito-Medium' }]}>
-              {userView?.friend_count} {userView?.friend_count === 1 || userView?.friend_count === 0 ? 'friend' : 'friends'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={[tw`text-white text-lg`, { fontFamily: 'Nunito-ExtraBold' }]}>{userView?.name}</Text>
 
         {/* Bio */}
         {userView?.bio && <Text style={[tw`text-white px-3 mb-4`, { fontFamily: 'Nunito-Medium' }]}>{userView?.bio}</Text>}
@@ -703,17 +690,17 @@ export default function ProfilePage() {
         </View>
 
         {/* Birthday and zodiac */}
-        {userView?.birthdate && (
+        {userView?.birthday && (
           <View style={tw`flex-row items-center gap-x-2 mb-3.5`}>
             <Text style={[tw`text-white text-[13px] -mr-0.5`, { fontFamily: 'Nunito-Medium' }]}>
               🎂
             </Text>
             <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>
-              {formatDate(userView?.birthdate)}
+              {formatDate(userView?.birthday)}
             </Text>
             <Text style={[tw`text-white text-[10px]`, { fontFamily: 'Nunito-Medium' }]}>•</Text>
             <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>
-              {dateToZodiac(userView?.birthdate)}
+              {dateToZodiac(userView?.birthday)}
             </Text>
           </View>
         )}
@@ -721,30 +708,30 @@ export default function ProfilePage() {
         {/* Social icons row */}
         <View style={tw`flex-row gap-x-4 items-center justify-center`}>
           {/* Instagram */}
-          {userView?.instagramurl && (
+          {userView?.instagram_url && (
             <TouchableOpacity style={tw``}
-              onPress={() => { Linking.openURL(`https://instagram.com/${userView?.instagramurl}`); }}>
+              onPress={() => { Linking.openURL(`https://instagram.com/${userView?.instagram_url}`); }}>
               <InstagramIcon width={24} height={24} />
             </TouchableOpacity>
           )}
           {/* X (Twitter) */}
-          {userView?.xurl && (
+          {userView?.tiktok_url && (
             <TouchableOpacity style={tw``}
-              onPress={() => { Linking.openURL(`https://x.com/${userView?.xurl}`); }}>
+              onPress={() => { Linking.openURL(`https://x.com/${userView?.tiktok_url}`); }}>
               <XIcon width={24} height={24} />
             </TouchableOpacity>
           )}
           {/* Snapchat */}
-          {userView?.snapchaturl && (
+          {userView?.snapchat_url && (
             <TouchableOpacity style={tw``}
-              onPress={() => { Linking.openURL(`https://snapchat.com/add/${userView?.snapchaturl}`); }}>
+              onPress={() => { Linking.openURL(`https://snapchat.com/add/${userView?.snapchat_url}`); }}>
               <SnapchatIcon width={24} height={24} />
             </TouchableOpacity>
           )}
           {/* Facebook */}
-          {userView?.facebookurl && (
+          {userView?.facebook_url && (
             <TouchableOpacity style={tw``}
-              onPress={() => { Linking.openURL(`https://facebook.com/${userView?.facebookurl}`); }}>
+              onPress={() => { Linking.openURL(`https://facebook.com/${userView?.facebook_url}`); }}>
               <FBIcon width={24} height={24} />
             </TouchableOpacity>
           )}
@@ -852,7 +839,7 @@ export default function ProfilePage() {
               source={require('../../assets/images/shakehandsmeme.jpeg')}
               style={{ width: 120, height: 120, borderRadius: 10, marginBottom: 10, resizeMode: 'cover' }}
             />
-            <Text style={[tw`text-white text-[15px] text-center leading-[1.25]`, { fontFamily: 'Nunito-ExtraBold' }]}>Congrats! Now you and {userView.firstname} are friends 🥳</Text>
+            <Text style={[tw`text-white text-[15px] text-center leading-[1.25]`, { fontFamily: 'Nunito-ExtraBold' }]}>Congrats! Now you and {userView.name} are friends 🥳</Text>
           </View>
         </Animated.View>
       )}
