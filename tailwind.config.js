@@ -1,0 +1,45 @@
+// /** @type {import('tailwindcss').Config} */
+// module.exports = {
+//   content: [
+//     "./App.{js,jsx,ts,tsx}",
+//     "./src/**/*.{js,jsx,ts,tsx}",
+//   ],
+//   theme: {
+//     extend: {
+//       colors: {
+//         'backgroundcolor': 'linear-gradient(to right, #080B32 32%, #0E1241 47%, #291C56 60%, #392465 75%, #51286A 100%)',
+//         'gray-400': '#9CA3AF',
+//         'gradient-1': '#080B32',
+//         'gradient-2': '#0E1241',
+//         'gradient-3': '#291C56',
+//         'gradient-4': '#392465',
+//         'gradient-5': '#51286A',
+//         'red-1': '#FF1769',
+//         'red-2': '#E11D48',
+//         'rsvp': '#7A5CFA',
+//         'going': '#22C55E',
+//         'maybe': '#CA8A04',
+//         'notgoing': '#E11D48',
+//         'viewevent': '#CAE6DF',
+//         'hostevent': '#0A66C2',
+//         'white-5': 'rgba(255, 255, 255, 0.05)',
+//         'white-10': 'rgba(255, 255, 255, 0.1)',
+//       },
+//       fontFamily: {
+//         nunito: ['Nunito-Regular'],
+//         nunitoBold: ['Nunito-Bold'],
+//         nunitoBlack: ['Nunito-Black'],
+//         nunitoLight: ['Nunito-Light'],
+//         nunitoExtraLight: ['Nunito-ExtraLight'],
+//         nunitoSemiBold: ['Nunito-SemiBold'],
+//         nunitoExtraBold: ['Nunito-ExtraBold'],
+//         nunitoMedium: ['Nunito-Medium'],
+//         nunitoMediumItalic: ['Nunito-MediumItalic'],
+//         nunitoSemiBoldItalic: ['Nunito-SemiBoldItalic'],
+//         nunitoExtraBoldItalic: ['Nunito-ExtraBoldItalic'],
+//         nunitoBoldItalic: ['Nunito-BoldItalic'],
+//       },
+//     },
+//   },
+//   plugins: [],
+// }
