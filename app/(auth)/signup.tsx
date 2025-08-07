@@ -64,7 +64,7 @@ export default function SignUp() {
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <View style={tw`mb-8 items-center`}>
                     <IconLogo width={80} height={80} style={tw``} />
-                    <Text style={[tw`text-white text-[22px] text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Join to find out 🚀</Text>
+                    <Text style={[tw`text-white text-[22px] text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Welcome to Homee 🚀</Text>
                 </View>
 
                 {/* Form */}
@@ -86,7 +86,7 @@ export default function SignUp() {
                                     borderRadius: 8,
                                 }
                             ]}
-                            placeholder="hello@gmail.com"
+                            placeholder="hello@example.com"
                             placeholderTextColor={'#9CA3AF'}
                             value={email}
                             onChangeText={(newVal) => { setEmail(newVal); setValid(true); }}
