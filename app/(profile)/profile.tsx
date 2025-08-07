@@ -17,12 +17,10 @@ import AddFriend from '../../assets/icons/add_friend.svg';
 import Edit from '../../assets/icons/edit-icon.svg';
 import FBIcon from '../../assets/icons/fb-icon.svg';
 import Waiting from '../../assets/icons/hourglass.svg';
-import InstagramIcon from '../../assets/icons/insta-icon.svg';
 import SettingIcon from '../../assets/icons/setting.svg';
 import Share from '../../assets/icons/share-icon.svg';
-import SnapchatIcon from '../../assets/icons/snapchat-icon.svg';
-import XIcon from '../../assets/icons/x-icon.svg';
 import BotBar from '../botbar';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useUserStore } from '../store/userStore';
 import ProfileBackgroundWrapper from './background_wrapper';
@@ -691,7 +689,7 @@ export default function ProfilePage() {
         </View>
 
         {/* Bio */}
-        {userView?.bio && <Text style={[tw`text-white px-3 mb-4`, { fontFamily: 'Nunito-Medium' }]}>{userView?.bio}</Text>}
+        {userView?.bio && <Text style={[tw`text-white text-[15px] px-3 mb-4 mt-0.5`, { fontFamily: 'Nunito-Medium' }]}>{userView?.bio}</Text>}
 
         {/* Edit and Share profile buttons (no QR button here) */}
         <View style={tw`flex-row gap-x-2.5 px-10 mb-4`}>
@@ -743,48 +741,48 @@ export default function ProfilePage() {
 
         {/* Birthday and zodiac */}
         {userView?.birthday && (
-          <View style={tw`flex-row items-center gap-x-2 mb-3.5`}>
-            <Text style={[tw`text-white text-[13px] -mr-0.5`, { fontFamily: 'Nunito-Medium' }]}>
+          <View style={tw`flex-row items-center gap-x-2 mb-4`}>
+            <Text style={[tw`text-white text-[14px] -mr-0.5 -mt-0.5`, { fontFamily: 'Nunito-Medium' }]}>
               🎂
             </Text>
-            <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>
+            <Text style={[tw`text-white text-[14px]`, { fontFamily: 'Nunito-Bold' }]}>
               {formatDate(userView?.birthday)}
             </Text>
             <Text style={[tw`text-white text-[10px]`, { fontFamily: 'Nunito-Medium' }]}>•</Text>
-            <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>
+            <Text style={[tw`text-white text-[14px]`, { fontFamily: 'Nunito-Bold' }]}>
               {dateToZodiac(userView?.birthday)}
             </Text>
           </View>
         )}
-
+        
         {/* Social icons row */}
-        <View style={tw`flex-row gap-x-4 items-center justify-center`}>
+        <View style={tw`flex-row gap-x-5 items-center justify-center`}>
           {/* Instagram */}
           {userView?.instagram_url && (
             <TouchableOpacity style={tw``}
               onPress={() => { Linking.openURL(`https://instagram.com/${userView?.instagram_url}`); }}>
-              <InstagramIcon width={24} height={24} />
+              <Ionicons name="logo-instagram" size={24} color="#fff" />
             </TouchableOpacity>
           )}
           {/* X (Twitter) */}
           {userView?.tiktok_url && (
             <TouchableOpacity style={tw``}
               onPress={() => { Linking.openURL(`https://x.com/${userView?.tiktok_url}`); }}>
-              <XIcon width={24} height={24} />
+              <Ionicons name="logo-twitter" size={24} color="#fff" />
             </TouchableOpacity>
           )}
           {/* Snapchat */}
           {userView?.snapchat_url && (
             <TouchableOpacity style={tw``}
               onPress={() => { Linking.openURL(`https://snapchat.com/add/${userView?.snapchat_url}`); }}>
-              <SnapchatIcon width={24} height={24} />
+              <Ionicons name="logo-snapchat" size={24} color="#fff" />
             </TouchableOpacity>
           )}
           {/* Facebook */}
           {userView?.facebook_url && (
             <TouchableOpacity style={tw``}
               onPress={() => { Linking.openURL(`https://facebook.com/${userView?.facebook_url}`); }}>
-              <FBIcon width={24} height={24} />
+              <Ionicons name="logo-facebook" size={24} color="#fff" />
             </TouchableOpacity>
           )}
         </View>
