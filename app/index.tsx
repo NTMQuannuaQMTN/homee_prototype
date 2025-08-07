@@ -83,6 +83,7 @@ export default function Index() {
             justifyContent: 'center',
             gap: 0.05 * width,
             paddingHorizontal: 0.05 * width,
+            marginTop: 0.15 * height,
           }}
           style={{ height: 0.6 * height, width: '100%' }}
           onMomentumScrollEnd={e => {
