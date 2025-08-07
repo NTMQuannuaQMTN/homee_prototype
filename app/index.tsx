@@ -1,8 +1,8 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from 'react';
 import { Animated, Dimensions, Image, PanResponder, Text, TouchableOpacity, useAnimatedValue, View } from "react-native";
 import tw from 'twrnc';
+import GradientBackground from "./components/GradientBackground";
 
 export default function Index() {
   const textLanding = ['get started 1', 'get started 2', 'get started 3'];
@@ -68,12 +68,7 @@ export default function Index() {
   });
 
   return (
-    <LinearGradient
-      colors={['#080B32', '#0E1241', '#291C56', '#392465', '#51286A']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={{ flex: 1, padding: 20 }}
-    >
+    <GradientBackground>
       {/* Center content - takes up most of the screen */}
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <View
@@ -133,33 +128,38 @@ export default function Index() {
       </View>
 
       {/* Bottom button(s) - fixed at bottom */}
-      {slide < 2 ? (
-        <TouchableOpacity onPress={() => setSlide(slide + 1)}
-          style={tw`bg-white rounded-full py-[10] w-full items-center mb-8`}>
-          <Text
-            style={[tw`text-black text-[16px]`,
-            { fontFamily: 'Nunito-ExtraBold' }]}>Next
-          </Text>
-        </TouchableOpacity>
-      ) : (
-        <>
-
-          <View style={tw`flex-row w-full justify-between mb-8`}>
-            <TouchableOpacity
-              onPress={() => router.replace('/(auth)/signup')}
-              style={tw`bg-white rounded-full py-[10] w-[48.5%] items-center`}
-            >
-              <Text style={[tw`text-black text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Signup</Text>
-            </TouchableOpacity>
+      <View style={tw`h-20 justify-center`}>
+        {slide < 2 ? (
+          <TouchableOpacity onPress={() => setSlide(slide + 1)}
+            activeOpacity={0.7}
+            style={tw`bg-white rounded-full py-2.5 w-full items-center`}>
+            <Text
+              style={[tw`text-black text-[16px]`,
+              { fontFamily: 'Nunito-ExtraBold' }]}>Next
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <>
             <TouchableOpacity
               onPress={() => router.replace('/(auth)/login')}
-              style={tw`bg-white rounded-full py-[10] w-[48.5%] items-center`}
+              activeOpacity={0.7}
+              style={[tw`rounded-full py-2.5 w-full items-center mb-3 -mt-4`, { backgroundColor: '#7A5CFA' }]}
             >
-              <Text style={[tw`text-black text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Login</Text>
+              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Login</Text>
             </TouchableOpacity>
-          </View>
-        </>
-      )}
-    </LinearGradient>
+            
+            <TouchableOpacity
+              onPress={() => router.replace('/(auth)/signup')}
+              activeOpacity={0.7}
+              style={tw`w-full items-center`}
+            >
+              <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>
+                First time to Homee? <Text style={[tw`text-white text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Sign up</Text>
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+    </GradientBackground>
   );
 }

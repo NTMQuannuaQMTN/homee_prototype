@@ -40,6 +40,7 @@ export const theme = {
     extraBold: 'Nunito-ExtraBold',
     semiBold: 'Nunito-SemiBold',
     medium: 'Nunito-Medium',
+    black: 'Nunito-Black',
   },
   gradients: {
     background: ['#080B32', '#0E1241', '#291C56', '#392465', '#51286A'],
