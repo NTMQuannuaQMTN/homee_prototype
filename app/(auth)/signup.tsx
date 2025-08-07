@@ -13,11 +13,13 @@ export default function SignUp() {
     const [alreadyVerified, setAlreadyVerified] = useState(false);
     const [mode, setMode] = useState<'phone' | 'email'>('phone');
     const [loginInfo, setLoginInfo] = useState('');
+    const [password, setPassword] = useState('');
     const [phoneCode, setPhoneCode] = useState('');
     const [isFocused, setIsFocused] = useState(false);
     const [isFocusedCode, setIsFocusedCode] = useState(false);
+    const [isFocusedPass, setIsFocusedPass] = useState(false);
 
-    const { setSignupInfo } = useAuthStore();
+    const { setSignupInfo, setPass } = useAuthStore();
 
     const checkEmail = async (email: string) => {
         setAlreadyVerified(false);
@@ -27,16 +29,15 @@ export default function SignUp() {
             // Fetch all users with the same email, case-insensitive
             const { data: users, error: userError } = await supabase
                 .from('users')
-                .select('email');
+                .select('email')
+                .eq('email', lowerEmail).single();
             if (users && !userError) {
                 // Check if any user email matches input, case-insensitive
-                const match = users.find((u: any) => (u.email || '').toLowerCase() === lowerEmail);
-                if (match) {
-                    setAlreadyVerified(true);
-                    return;
-                }
+                setAlreadyVerified(true);
+                return;
             }
-            setSignupInfo({ email: lowerEmail });
+            setSignupInfo({ email: lowerEmail});
+            setPass(password);
 
             const { error } = await supabase.auth.signInWithOtp({
                 email: lowerEmail,
@@ -57,7 +58,7 @@ export default function SignUp() {
 
     const checkPhone = async (phone: string) => {
         setAlreadyVerified(false);
-        if (/^\d+$/.test(phone)) {
+        if (/^\d+$/.test(phone) && /^\d+$/.test(phoneCode)) {
             Alert.alert('Good phone, but update later');
             // Always compare emails in lowercase
             // const lowerEmail = email.trim().toLowerCase();
@@ -100,6 +101,7 @@ export default function SignUp() {
                 Keyboard.dismiss();
                 setIsFocused(false);
                 setIsFocusedCode(false);
+                setIsFocusedPass(false);
             }}>
                 <View style={{ flex: 1 }}>
                     {/* Center content - takes up most of the screen */}
@@ -137,6 +139,33 @@ export default function SignUp() {
                                     caretHidden={!isFocused}
                                 />
                             </ImageBackground>
+
+                            <Text style={[tw`text-white mb-2 mt-4 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Create a password</Text>
+                            <ImageBackground
+                                source={require('../../assets/images/galaxy.jpg')}
+                                imageStyle={{ borderRadius: 8, opacity: isFocusedPass ? 0.3 : 0 }}
+                                style={tw`w-full rounded-[2]`}
+                            >
+                                <TextInput
+                                    style={[
+                                        tw`w-full px-3 py-3 text-white text-[15px]`,
+                                        {
+                                            fontFamily: 'Nunito-Medium',
+                                            borderWidth: 1,
+                                            borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
+                                            backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                                            borderRadius: 8,
+                                        }
+                                    ]}
+                                    placeholder="Password"
+                                    placeholderTextColor={'#9CA3AF'}
+                                    value={password}
+                                    onChangeText={(newVal) => { setPassword(newVal); setValid(true); }}
+                                    onFocus={() => setIsFocusedPass(true)}
+                                    onBlur={() => setIsFocusedPass(false)}
+                                    secureTextEntry={true}
+                                />
+                            </ImageBackground>
                         </View>}
 
                         {/* Form */}
@@ -167,7 +196,7 @@ export default function SignUp() {
                                     onBlur={() => setIsFocusedCode(false)}
                                     caretHidden={!isFocused}
                                 />
-                                <Text style={[{fontFamily: 'Nunito-Medium'},tw`text-white text-[15px] absolute top-3 left-3`]}>+</Text>
+                                <Text style={[{ fontFamily: 'Nunito-Medium' }, tw`text-white text-[15px] absolute top-3 left-3`]}>+</Text>
                             </ImageBackground>
 
                             <Text style={[tw`text-white mb-2 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Enter your phone number</Text>
@@ -196,6 +225,33 @@ export default function SignUp() {
                                     caretHidden={!isFocused}
                                 />
                             </ImageBackground>
+
+                            <Text style={[tw`text-white mb-2 mt-4 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Create a password</Text>
+                            <ImageBackground
+                                source={require('../../assets/images/galaxy.jpg')}
+                                imageStyle={{ borderRadius: 8, opacity: isFocusedPass ? 0.3 : 0 }}
+                                style={tw`w-full rounded-[2]`}
+                            >
+                                <TextInput
+                                    style={[
+                                        tw`w-full px-3 py-3 text-white text-[15px]`,
+                                        {
+                                            fontFamily: 'Nunito-Medium',
+                                            borderWidth: 1,
+                                            borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
+                                            backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                                            borderRadius: 8,
+                                        }
+                                    ]}
+                                    placeholder="Password"
+                                    placeholderTextColor={'#9CA3AF'}
+                                    value={password}
+                                    onChangeText={(newVal) => { setPassword(newVal); setValid(true); }}
+                                    onFocus={() => setIsFocusedPass(true)}
+                                    onBlur={() => setIsFocusedPass(false)}
+                                    secureTextEntry={true}
+                                />
+                            </ImageBackground>
                         </View>}
 
                         {/* Error */}
@@ -209,7 +265,7 @@ export default function SignUp() {
                             </View>}
 
                         <View style={tw`w-full py-2 mt-1.5 items-center justify-center`}>
-                            <Text style={[tw`text-[12px] text-white`, { fontFamily: 'Nunito-Medium' }]}>... <Text style={{ fontFamily: 'Nunito-ExtraBold' }} onPress={() => { setMode(mode === 'email' ? 'phone' : 'email'); setLoginInfo('') }}>Sign up using {mode === 'email' ? 'phone number' : 'email'}</Text></Text>
+                            <Text style={[tw`text-[12px] text-white`, { fontFamily: 'Nunito-Medium' }]}>... <Text style={{ fontFamily: 'Nunito-ExtraBold' }} onPress={() => { setMode(mode === 'email' ? 'phone' : 'email'); setLoginInfo(''); setPassword('') }}>Sign up using {mode === 'email' ? 'phone number' : 'email'}</Text></Text>
                         </View>
                     </View>
 
