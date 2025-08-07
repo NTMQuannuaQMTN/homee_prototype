@@ -71,10 +71,10 @@ export default function Login() {
                             borderWidth: 1,
                             borderColor: isFocused ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
                             backgroundColor: isFocused ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
-                            borderRadius: 8,
+                            borderRadius: 10,
                           }
                         ]}
-                        placeholder="hello@gmail.com"
+                        placeholder="hello@example.com"
                         placeholderTextColor={'#9CA3AF'}
                         value={email}
                         onChangeText={(newVal) => { setEmail(newVal); setValid(true); }}

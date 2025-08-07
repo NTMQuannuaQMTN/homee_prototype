@@ -143,9 +143,9 @@ export default function Index() {
             <TouchableOpacity
               onPress={() => router.replace('/(auth)/login')}
               activeOpacity={0.7}
-              style={[tw`rounded-full py-2.5 w-full items-center mb-3 -mt-4`, { backgroundColor: '#7A5CFA' }]}
+              style={[tw`rounded-full py-2.5 w-full items-center mb-3 -mt-8`, { backgroundColor: '#ffffff' }]}
             >
-              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Login</Text>
+              <Text style={[tw`text-black text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Login</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
