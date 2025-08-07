@@ -275,6 +275,12 @@ export default function SignUp() {
                     </Text>
                     <TouchableOpacity
                         onPress={() => {
+                            // Password must have at least 1 lowercase, 1 uppercase, 1 number, and be at least 6 characters
+                            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+                            if (!passwordRegex.test(password)) {
+                                setValid(false);
+                                return;
+                            }
                             if (mode === 'email') {
                                 checkEmail(loginInfo);
                             } else {
