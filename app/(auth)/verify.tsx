@@ -1,10 +1,11 @@
 import { supabase } from "@/utils/supabase";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from 'react';
 import { ImageBackground, Keyboard, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import tw from 'twrnc';
 import { useAuthStore } from "../store/authStore";
+import GradientBackground from "../components/GradientBackground";
+import IconLogo from "../../assets/logo/icon.svg";
 
 export default function Verify() {
     const [code, setCode] = useState('');
@@ -101,26 +102,23 @@ export default function Verify() {
     };
 
     return (
-        <TouchableWithoutFeedback onPress={() => {
-            Keyboard.dismiss();
-            setIsFocused(false);
-        }}>
-            <LinearGradient
-                colors={['#080B32', '#0E1241', '#291C56', '#392465', '#51286A']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={{ flex: 1, padding: 20 }}
-            >
-            {/* Center content - takes up most of the screen */}
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <View style={tw`mb-8`}>
-                    <Text style={[tw`text-white text-sm text-center mb-2`, { fontFamily: 'Nunito-Medium' }]}>Check your email inbox!</Text>
-                    <Text style={[tw`text-white text-lg text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Type in the code 🙌</Text>
+        <GradientBackground>
+            <TouchableWithoutFeedback onPress={() => {
+                Keyboard.dismiss();
+                setIsFocused(false);
+            }}>
+                <View style={{ flex: 1 }}>
+                    {/* Center content - takes up most of the screen */}
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={tw`mb-8 items-center`}>
+                    <IconLogo width={80} height={80} style={tw`mb-4`} />
+                    <Text style={[tw`text-white text-[15px] text-center mb-2`, { fontFamily: 'Nunito-Medium' }]}>Check your inbox</Text>
+                    <Text style={[tw`text-white text-[22px] text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Type in the code 🙌</Text>
                 </View>
 
                 {/* Form */}
                 <View style={tw`w-full`}>
-                    <Text style={[tw`text-white mb-1.5 text-[15px]`, { fontFamily: 'Nunito-SemiBold' }]}>Verification code</Text>
+                    <Text style={[tw`text-white mb-2 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Verification code</Text>
                     <ImageBackground
                         source={require('../../assets/images/galaxy.jpg')}
                         imageStyle={{ borderRadius: 8, opacity: isFocused ? 0.3 : 0 }}
@@ -129,7 +127,7 @@ export default function Verify() {
                         <View style={tw`w-full relative items-center`}>
                             <TextInput 
                                 style={[
-                                    tw`text-center h-10 w-full px-3 py-2 text-[14px]`,
+                                    tw`text-center w-full px-3 pb-3 pt-2 text-[15px]`,
                                     {
                                         fontFamily: 'Nunito-Medium',
                                         borderWidth: 1,
@@ -156,7 +154,7 @@ export default function Verify() {
                                 autoComplete="one-time-code"
                                 selectionColor="transparent" // Hide text selection
                             />
-                            <View style={tw`w-full h-10 py-2 items-center justify-center absolute top-0`}>
+                            <View style={tw`w-full py-3 items-center justify-center absolute top-0`}>
                                 <Text style={[tw`${code.length > 0 ? 'text-white' : 'text-gray-400'} text-md tracking-[2]`, { fontFamily: 'Nunito-Medium' }]}> 
                                     {code + '_'.repeat(MAXLENGTH - code.length)}
                                 </Text>
@@ -167,16 +165,16 @@ export default function Verify() {
 
                 {/* Error */}
                 {valid || 
-                <View style={tw`w-full py-2 mt-1.5 items-center justify-center bg-[#FF1769] rounded-[2]`}>
-                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-Medium' }]}>Oops, the code doesn't match 😭</Text>
+                <View style={tw`w-full py-2 mt-2 items-center justify-center bg-[#FF1769] rounded-lg`}>
+                    <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-Bold' }]}>Oops, the code doesn't match 😭</Text>
                 </View>}
 
                 {/* Resend section */}
                 <View style={tw`mt-4 items-center flex-row`}>
-                    <Text style={[tw`text-white text-[12px]`, { fontFamily: 'Nunito-Medium' }]}>Haven't seen the code? </Text>
+                    <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>Haven't seen the code? </Text>
                     {canResend ? (
                         <TouchableOpacity onPress={resendOTP}>
-                            <Text style={[tw`text-white underline text-[12px]`, { fontFamily: 'Nunito-Medium' }]}>Resend code</Text>
+                            <Text style={[tw`text-white underline text-[12px]`, { fontFamily: 'Nunito-Bold' }]}>Resend code</Text>
                         </TouchableOpacity>
                     ) : (
                         <Text style={[tw`text-gray-400 text-[12px]`, { fontFamily: 'Nunito-Medium' }]}>
@@ -186,17 +184,24 @@ export default function Verify() {
                 </View>
             </View>
 
-            {/* Bottom button - fixed at bottom */}
+            {/* Bottom content - fixed at bottom */}
             <TouchableOpacity
-                style={tw`bg-white rounded-full py-[10] w-full items-center mb-8 ${loading ? 'opacity-50' : ''}`}
                 onPress={() => checkCode()}
-                disabled={loading}
+                disabled={loading || code.length !== MAXLENGTH}
+                style={[
+                    tw`rounded-full py-[10] w-full items-center mt-20 mb-8`,
+                    {
+                        backgroundColor: (code.length === MAXLENGTH && !loading) ? '#FFFFFF' : '#FFFFFF',
+                        opacity: (code.length === MAXLENGTH && !loading) ? 1 : 0.3
+                    }
+                ]}
             >
-                <Text style={[tw`text-black text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>
+                <Text style={[tw`text-black text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>
                     {loading ? 'Verifying...' : 'Continue'}
                 </Text>
             </TouchableOpacity>
-        </LinearGradient>
-        </TouchableWithoutFeedback>
+                </View>
+            </TouchableWithoutFeedback>
+        </GradientBackground>
     );
 }
