@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect, useState } from 'react';
-import { Animated, Dimensions, Image, PanResponder, Text, TouchableOpacity, useAnimatedValue, View } from "react-native";
+import { Animated, Dimensions, Image, PanResponder, ScrollView, Text, TouchableOpacity, useAnimatedValue, View } from "react-native";
 import tw from 'twrnc';
 import GradientBackground from "./components/GradientBackground";
 
@@ -18,7 +18,7 @@ export default function Index() {
     Animated.sequence([
       Animated.timing(windowAnimationValue, {
         toValue: slide,
-        duration: 500,
+        duration: 100,
         useNativeDriver: false,
       }),
     ]).start();
@@ -71,60 +71,63 @@ export default function Index() {
     <GradientBackground>
       {/* Center content - takes up most of the screen */}
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <View
-          style={{ height: 0.6 * height, width: '100%', justifyContent: 'center', alignItems: 'center' }}
-          {...PanResponder.create({
-            onMoveShouldSetPanResponder: (evt, gestureState) => {
-              // Only respond to horizontal swipes
-              return Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && Math.abs(gestureState.dx) > 10;
-            },
-            onPanResponderRelease: (evt, gestureState) => {
-              if (gestureState.dx < -50) {
-                // Swiped left
-                if (slide < 2) setSlide(slide + 1);
-              } else if (gestureState.dx > 50) {
-                // Swiped right
-                if (slide > 0) setSlide(slide - 1);
-              }
-            }
-          }).panHandlers}
+        <ScrollView
+          horizontal
+          pagingEnabled
+          snapToInterval={0.85 * width}
+          decelerationRate="fast"
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            height: 0.6 * height,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 0.05 * width,
+            paddingHorizontal: 0.05 * width,
+          }}
+          style={{ height: 0.6 * height, width: '100%' }}
+          onMomentumScrollEnd={e => {
+            const newIndex = Math.round(e.nativeEvent.contentOffset.x / (0.85 * width));
+            setSlide(newIndex);
+          }}
+          scrollEventThrottle={16}
         >
-          <Animated.View style={[{ height: '100%', transform: [{ translateX: windowMoving }] }, tw`flex-row items-center`]}>
-            <TouchableOpacity
-              onPress={() => { setSlide(0); }}
-              activeOpacity={1}
-            >
-              <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale: firstSlideScaling }, { translateX: firstSlideMoving }] }]}>
-                <Image source={require('@/assets/images/default_1.png')} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
-                <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
-                  <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{textLanding[0]}</Text>
-                </View>
-              </Animated.View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => { setSlide(1); }}
-              activeOpacity={1}
-            >
-              <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale: secondSlideScaling }, { translateX: secondSlideMoving }] }]}>
-                <Image source={require('@/assets/images/default_2.png')} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
-                <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
-                  <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{textLanding[1]}</Text>
-                </View>
-              </Animated.View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => { setSlide(2); }}
-              activeOpacity={1}
-            >
-              <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale: thirdSlideScaling }, { translateX: thirdSlideMoving }] }]}>
-                <Image source={require('@/assets/images/default_3.png')} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
-                <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
-                  <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{textLanding[2]}</Text>
-                </View>
-              </Animated.View>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+          <TouchableOpacity
+            onPress={() => { setSlide(0); }}
+            activeOpacity={1}
+            style={{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center' }}
+          >
+            <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale: firstSlideScaling }] }]}>
+              <Image source={require('@/assets/images/default_1.png')} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
+              <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{textLanding[0]}</Text>
+              </View>
+            </Animated.View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => { setSlide(1); }}
+            activeOpacity={1}
+            style={{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center' }}
+          >
+            <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale: secondSlideScaling }] }]}>
+              <Image source={require('@/assets/images/default_2.png')} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
+              <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{textLanding[1]}</Text>
+              </View>
+            </Animated.View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => { setSlide(2); }}
+            activeOpacity={1}
+            style={{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center' }}
+          >
+            <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale: thirdSlideScaling }] }]}>
+              <Image source={require('@/assets/images/default_3.png')} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
+              <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{textLanding[2]}</Text>
+              </View>
+            </Animated.View>
+          </TouchableOpacity>
+        </ScrollView>
       </View>
 
       {/* Bottom button(s) - fixed at bottom */}
@@ -147,7 +150,7 @@ export default function Index() {
             >
               <Text style={[tw`text-black text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Login</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               onPress={() => router.replace('/(auth)/signup')}
               activeOpacity={0.7}
