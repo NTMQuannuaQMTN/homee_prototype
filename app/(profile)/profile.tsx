@@ -591,8 +591,8 @@ export default function ProfilePage() {
         style={tw`mt-6`}
       >
         {/* Top bar: username, settings icon, and QR icon */}
-        <View style={tw`w-full left-0 right-0 flex-row justify-between items-center px-6 pt-3`}>
-          <Text style={[tw`text-white text-[15px] ${self ? '' : 'mt-2'}`, { fontFamily: 'Nunito-ExtraBold' }]}>@{userView?.username}</Text>
+        <View style={tw`w-full left-0 right-0 flex-row justify-between items-center px-6 pt-4`}>
+          <Text style={[tw`text-white text-[16px] ${self ? '' : 'mt-2'}`, { fontFamily: 'Nunito-ExtraBold' }]}>@{userView?.username}</Text>
           {self && (
             <View style={tw`flex-row items-center`}>
               <TouchableOpacity
@@ -620,33 +620,85 @@ export default function ProfilePage() {
         </View>
 
         {/* Profile picture: show image if present, otherwise SVG fallback, fast like BotBar */}
-        <View style={tw`mt-4 mb-2`}>
-          <View style={[tw`rounded-full border-2 border-white items-center justify-center bg-white/10`, { width: 120, height: 120, overflow: 'hidden' }]}>
+        <View style={tw`mt-4 mb-3`}>
+          <View style={[tw`rounded-full border-2 border-white items-center justify-center bg-white/10`, { width: 130, height: 130, overflow: 'hidden' }]}>
             {userView?.profile_image ? (
               <Image
                 source={{ uri: userView.profile_image }}
-                style={{ width: 120, height: 120, borderRadius: 60 }}
+                style={{ width: 130, height: 130, borderRadius: 90 }}
                 defaultSource={require('../../assets/icons/pfpdefault.svg')}
                 onError={() => { }}
               />
             ) : (
-              <PfpDefault width={120} height={120} />
+              <PfpDefault width={130} height={130} />
             )}
           </View>
         </View>
 
-        {/* Name, username, friends count */}
-        <Text style={[tw`text-white text-lg`, { fontFamily: 'Nunito-ExtraBold' }]}>{userView?.name}</Text>
+
+        {/* Name */}
+        <Text style={[tw`text-white text-[24px] mb-1.5`, { fontFamily: 'Nunito-ExtraBold' }]}>{userView?.name}</Text>
+
+        {/* Metrics row: Friends, Albums, Photos */}
+        <View style={tw`flex-row items-center justify-center mb-3 gap-x-10`}>
+          {/* Friends count (clickable) */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => {
+              if (userView?.id) {
+                router.push({
+                  pathname: '/(profile)/friendslist',
+                  params: { userId: userView.id },
+                });
+              }
+            }}
+          >
+            <View style={tw`items-center`}>
+              <Text style={[tw`text-white text-[22px]`, { fontFamily: 'Nunito-ExtraBold' }]}> 
+                {typeof userView?.friend_count === 'number' ? userView.friend_count : 0}
+              </Text>
+              <Text style={[tw`text-white text-[14px] -mt-0.5`, { fontFamily: 'Nunito-Medium' }]}>Friend{(userView?.friend_count === 1) ? '' : 's'}</Text>
+            </View>
+          </TouchableOpacity>
+          {/* Albums metric (placeholder) */}
+          <View style={tw`items-center`}>
+            {(() => {
+              let albumCount: number = 0;
+              return (
+                <>
+                  <Text style={[tw`text-white text-[22px]`, { fontFamily: 'Nunito-ExtraBold' }]}>
+                    {albumCount}
+                  </Text>
+                  <Text style={[tw`text-white text-[14px] -mt-0.5`, { fontFamily: 'Nunito-Medium' }]}>Album{albumCount === 1 ? '' : 's'}</Text>
+                </>
+              );
+            })()}
+          </View>
+          {/* Photos uploaded metric (placeholder) */}
+          <View style={tw`items-center`}>
+            {(() => {
+              let photoCount: number = 0;
+              return (
+                <>
+                  <Text style={[tw`text-white text-[22px]`, { fontFamily: 'Nunito-ExtraBold' }]}>
+                    {photoCount}
+                  </Text>
+                  <Text style={[tw`text-white text-[14px] -mt-0.5`, { fontFamily: 'Nunito-Medium' }]}>Photo{photoCount === 1 ? '' : 's'}</Text>
+                </>
+              );
+            })()}
+          </View>
+        </View>
 
         {/* Bio */}
         {userView?.bio && <Text style={[tw`text-white px-3 mb-4`, { fontFamily: 'Nunito-Medium' }]}>{userView?.bio}</Text>}
 
         {/* Edit and Share profile buttons (no QR button here) */}
         <View style={tw`flex-row gap-x-2.5 px-10 mb-4`}>
-          {self && <TouchableOpacity style={tw`flex-row justify-center gap-2 bg-white/5 border border-white/10 flex-1 py-2 rounded-xl`}
+          {self && <TouchableOpacity style={tw`flex-row justify-center gap-2.5 bg-white/5 border border-white/10 flex-1 py-2 rounded-xl`}
             onPress={() => { router.replace('/(profile)/editprofile') }}>
-            <Edit width={18} height={18} />
-            <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit profile</Text>
+            <Edit width={18} height={18} style={tw`mt-0.2`} />
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit profile</Text>
           </TouchableOpacity>}
           {(!self && friendStat === '') && <TouchableOpacity style={tw`flex-row justify-center gap-2 bg-black border border-white/10 flex-1 rounded-xl`}
             onPress={() => {
@@ -658,7 +710,7 @@ export default function ProfilePage() {
               style={[tw`flex-row justify-center gap-2 py-2 flex-1 rounded-xl`, { overflow: 'hidden' }]}
             >
               <AddFriend width={20} height={20} />
-              <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Add friend</Text>
+              <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Add friend</Text>
             </ImageBackground>
           </TouchableOpacity>}
           {(!self && friendStat === 'requesting') && <TouchableOpacity style={tw`flex-row justify-center gap-2 bg-white/5 border border-white/10 flex-1 py-2 rounded-xl`}
@@ -668,24 +720,24 @@ export default function ProfilePage() {
               }
             }}>
             <Waiting width={20} height={20} />
-            <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
           </TouchableOpacity>}
           {(!self && friendStat === 'requested') && <TouchableOpacity style={tw`flex-row justify-center gap-2 bg-yellow-600 border border-white/10 flex-1 py-2 rounded-xl`}
             onPress={() => { setFriendRequest(1) }}>
             <Requested width={20} height={20} />
-            <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Accept?</Text>
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Accept?</Text>
           </TouchableOpacity>}
           {(!self && friendStat === 'friend') && <TouchableOpacity style={tw`flex-row justify-center gap-2 bg-[#7A5CFA] border border-white/10 flex-1 py-2 rounded-xl`}
             onPress={() => { setFriendRequest(-1) }}>
             <Friend width={20} height={20} />
-            <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Friends</Text>
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Friends</Text>
           </TouchableOpacity>}
           <TouchableOpacity
             style={tw`flex-row justify-center gap-2 bg-white/5 border border-white/10 flex-1 py-2 rounded-xl`}
             onPress={handleShareProfile}
           >
             <Share width={18} height={18} style={tw`mt-0.5`} />
-            <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Share profile</Text>
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Share profile</Text>
           </TouchableOpacity>
         </View>
 
