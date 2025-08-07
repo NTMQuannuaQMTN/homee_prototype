@@ -2,7 +2,8 @@ import { supabase } from '@/utils/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import { LinearGradient } from 'expo-linear-gradient';
+import GradientBackground from '../components/GradientBackground';
+import IconLogo from '../../assets/logo/icon.svg';
 import { useRouter } from 'expo-router';
 import { useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
@@ -127,51 +128,51 @@ export default function ImagePage() {
   };
 
   return (
-    <LinearGradient
-      colors={['#080B32', '#0E1241', '#291C56', '#392465', '#51286A']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={{ flex: 1, padding: 24 }}
-    >
-      {/* Center content */}
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <View style={tw`mb-20`}>
-            <Text style={[tw`text-white text-sm text-center mb-2`, { fontFamily: 'Nunito-Medium' }]}>Add your profile image</Text>
-            <Text style={[tw`text-white text-lg text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Make it easier to find your friends 💛</Text>
+    <GradientBackground>
+      <View style={{ flex: 1 }}>
+        {/* Center content - similar to signup.tsx */}
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={tw`mb-8 items-center`}>
+            <IconLogo width={80} height={80} />
+            <Text style={[tw`text-white text-[22px] text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Add your profile image</Text>
+            <Text style={[tw`text-white text-[15px] text-center mt-2`, { fontFamily: 'Nunito-Bold' }]}>Make it easier for friends to find you 💛</Text>
+          </View>
+          <TouchableOpacity
+            style={tw`mt-5 w-32 h-32 items-center justify-center rounded-full mb-6 relative bg-white/10 border-2 border-white/20`}
+            onPress={pickImage}
+            activeOpacity={0.7}
+          >
+            {imageInput ? (
+              <Image style={[tw`rounded-full border border-[#7A5CFA]`, { width: 160, height: 160 }]} resizeMode="cover" source={{ uri: imageInput }} />
+            ) : (
+              <DefaultProfileSVG width={160} height={160} style={tw`rounded-full`} />
+            )}
+            <View style={tw`absolute bottom--4 right--2 bg-[#7A5CFA] rounded-full w-10 h-10 items-center justify-center shadow-xl`}>
+              <Ionicons name="camera" size={20} color="#ffffff" />
+            </View>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={tw`w-32 h-32 items-center justify-center rounded-full mb-6 relative`}
-          onPress={pickImage}>
-          {imageInput ? (
-            <Image style={tw`w-full h-full rounded-full`} resizeMode="contain" source={{ uri: imageInput }} />
-          ) : (
-            <>
-              <DefaultProfileSVG width={150} height={150} style={tw`rounded-full`} />
-              <View style={tw`absolute bottom--2 right-0 bg-white rounded-full w-8 h-8 items-center justify-center shadow-lg`}>
-                <Ionicons name="camera" size={16} color="#080B32" />
-              </View>
-            </>
-          )}
-        </TouchableOpacity>
+        {/* Bottom content - similar to signup.tsx */}
+        <View style={tw`items-center`}>
+          <TouchableOpacity
+            style={tw`rounded-full py-3 w-full items-center mb-4 bg-white`}
+            onPress={imageInput ? confirmImage : pickImage}
+            disabled={loading}
+            activeOpacity={0.7}
+          >
+            <Text style={[tw`text-black text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}> 
+              {loading ? 'Uploading...' : imageInput ? "Let’s start!" : "Add image"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={tw`mb-10`}
+            onPress={() => router.replace('/')}
+            activeOpacity={0.7}
+          >
+            <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>I’ll do this later</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      
-      {/* Bottom buttons */}
-      <View style={tw`items-center`}>
-        <TouchableOpacity
-          style={tw`bg-white rounded-full py-3 w-full items-center mb-4`}
-          onPress={imageInput ? confirmImage : pickImage}
-          disabled={loading}
-        >
-          <Text style={[tw`text-black`, { fontFamily: 'Nunito-ExtraBold' }]}>
-            {loading ? 'Uploading...' : imageInput ? "Let's start!" : "Add image"}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={tw`mb-10`}
-          onPress={() => router.replace('/')}
-        >
-          <Text style={[tw`text-gray-400 text-[12px]`, { fontFamily: 'Nunito-Medium' }]}>Hmm... I'll do this later</Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
+    </GradientBackground>
   );
 }
