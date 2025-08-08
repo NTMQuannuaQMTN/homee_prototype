@@ -4,7 +4,7 @@
     "slug": "homee",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo/icon.svg",
+    "icon": "./assets/logo/icon.png",
     "scheme": "homee",
     "extra": {
       "SUPABASE_URL": "https://qzscwitzosfsxajwcdwu.supabase.co",
