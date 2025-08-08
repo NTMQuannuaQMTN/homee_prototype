@@ -18,11 +18,11 @@ export default function Index() {
     Animated.sequence([
       Animated.timing(windowAnimationValue, {
         toValue: slide,
-        duration: 100,
+        duration: 0,
         useNativeDriver: false,
       }),
     ]).start();
-    setTimeout(() => windowAnimationValue.setValue(slide), 500);
+    setTimeout(() => windowAnimationValue.setValue(slide), 0);
   }, [slide])
 
   const windowMoving = windowAnimationValue.interpolate({
@@ -33,19 +33,19 @@ export default function Index() {
 
   const firstSlideScaling = windowAnimationValue.interpolate({
     inputRange: [0, 1, 2],
-    outputRange: [1, 0.8, 0.8],
+    outputRange: [1, 0.9, 0.8],
     extrapolate: 'clamp'
   });
 
   const firstSlideMoving = windowAnimationValue.interpolate({
     inputRange: [0, 1, 2],
-    outputRange: [0, 0.05 * width, 0.05 * width],
+    outputRange: [0, 0.05 * width, 0.1 * width],
     extrapolate: 'clamp'
   });
 
   const secondSlideScaling = windowAnimationValue.interpolate({
     inputRange: [0, 1, 2],
-    outputRange: [0.8, 1, 0.8],
+    outputRange: [0.9, 1, 0.9],
     extrapolate: 'clamp'
   });
 
@@ -57,13 +57,13 @@ export default function Index() {
 
   const thirdSlideScaling = windowAnimationValue.interpolate({
     inputRange: [0, 1, 2],
-    outputRange: [0.8, 0.8, 1],
+    outputRange: [0.8, 0.9, 1],
     extrapolate: 'clamp'
   });
 
   const thirdSlideMoving = windowAnimationValue.interpolate({
     inputRange: [0, 1, 2],
-    outputRange: [-0.05 * width, -0.05 * width, 0],
+    outputRange: [-0.1 * width, -0.05 * width, 0],
     extrapolate: 'clamp'
   });
 
@@ -71,78 +71,66 @@ export default function Index() {
     <GradientBackground>
       {/* Center content - takes up most of the screen */}
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ScrollView
+        <Animated.FlatList
+          data={[0, 1, 2]}
+          keyExtractor={item => item.toString()}
           horizontal
           pagingEnabled
-          snapToInterval={0.85 * width}
+          snapToInterval={0.8 * width}
           decelerationRate="fast"
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             height: 0.6 * height,
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 0.05 * width,
-            paddingHorizontal: 0.05 * width,
-            marginTop: 0.15 * height,
+            gap: 0 * width,
+            paddingHorizontal: 0.1 * width,
+            marginTop: slide < 2 ? 0.2 * height : 0.15 * height,
           }}
-          style={{ height: 0.6 * height, width: '100%' }}
-          onMomentumScrollEnd={e => {
-            const newIndex = Math.round(e.nativeEvent.contentOffset.x / (0.85 * width));
-            setSlide(newIndex);
+          style={{ height: 0.6 * height, width: width }}
+          onScroll={e => {
+            // Optionally, update slide index for UI logic (not for animation)
+            const x = e.nativeEvent.contentOffset.x;
+            setSlide(x / (0.8 * width));
           }}
           scrollEventThrottle={16}
-        >
-          <TouchableOpacity
-            onPress={() => { setSlide(0); }}
-            activeOpacity={1}
-            style={{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center' }}
-          >
-            <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale: firstSlideScaling }] }]}>
-              <Image source={require('@/assets/images/default_1.png')} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
-              <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
-                <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{textLanding[0]}</Text>
-              </View>
-            </Animated.View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => { setSlide(1); }}
-            activeOpacity={1}
-            style={{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center' }}
-          >
-            <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale: secondSlideScaling }] }]}>
-              <Image source={require('@/assets/images/default_2.png')} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
-              <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
-                <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{textLanding[1]}</Text>
-              </View>
-            </Animated.View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => { setSlide(2); }}
-            activeOpacity={1}
-            style={{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center' }}
-          >
-            <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale: thirdSlideScaling }] }]}>
-              <Image source={require('@/assets/images/default_3.png')} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
-              <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
-                <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{textLanding[2]}</Text>
-              </View>
-            </Animated.View>
-          </TouchableOpacity>
-        </ScrollView>
+          renderItem={({ item }) => {
+            // Choose scaling and image for each slide
+            let scale, img, text;
+            if (item === 0) {
+              scale = firstSlideScaling;
+              img = require('@/assets/images/default_1.png');
+              text = textLanding[0];
+            } else if (item === 1) {
+              scale = secondSlideScaling;
+              img = require('@/assets/images/default_2.png');
+              text = textLanding[1];
+            } else {
+              scale = thirdSlideScaling;
+              img = require('@/assets/images/default_3.png');
+              text = textLanding[2];
+            }
+            return (
+              <TouchableOpacity
+                onPress={() => { setSlide(item); }}
+                activeOpacity={1}
+                style={{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center' }}
+              >
+                <Animated.View style={[{ width: 0.8 * width, height: '100%', justifyContent: 'center', alignItems: 'center', transform: [{ scale }] }]}>
+                  <Image source={img} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, borderRadius: 20 }} />
+                  <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 20 }}>
+                    <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>{text}</Text>
+                  </View>
+                </Animated.View>
+              </TouchableOpacity>
+            );
+          }}
+        />
       </View>
 
       {/* Bottom button(s) - fixed at bottom */}
       <View style={tw`h-20 justify-center`}>
-        {slide < 2 ? (
-          <TouchableOpacity onPress={() => setSlide(slide + 1)}
-            activeOpacity={0.7}
-            style={tw`bg-white rounded-full py-2.5 w-full items-center`}>
-            <Text
-              style={[tw`text-black text-[16px]`,
-              { fontFamily: 'Nunito-ExtraBold' }]}>Next
-            </Text>
-          </TouchableOpacity>
-        ) : (
+        {slide >= 2 && (
           <>
             <TouchableOpacity
               onPress={() => router.replace('/(auth)/login')}

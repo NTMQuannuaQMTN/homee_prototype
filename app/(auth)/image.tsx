@@ -166,7 +166,7 @@ export default function ImagePage() {
           </TouchableOpacity>
           <TouchableOpacity
             style={tw`mb-10`}
-            onPress={() => router.replace('/')}
+            onPress={() => router.replace('/home/homepage')}
             activeOpacity={0.7}
           >
             <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>I’ll do this later</Text>
