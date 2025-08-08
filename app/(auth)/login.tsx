@@ -171,7 +171,7 @@ export default function Login() {
 
                         {/* Form */}
                         {mode === 'phone' && <View style={tw`w-full`}>
-                            <Text style={[tw`text-white mb-2 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Phone number</Text>
+                            <Text style={[tw`text-white mb-2 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Enter your phone number</Text>
                             <View style={[tw`flex-row items-center mb-2`]}>
                                 <TouchableOpacity
                                     style={[tw`flex-row items-center px-3 py-3 justify-center`, {
@@ -224,7 +224,7 @@ export default function Login() {
                                 />
                             </View>
                             
-                            <Text style={[tw`text-white mb-2 mt-4 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Enter password</Text>
+                            <Text style={[tw`text-white mb-2 mt-2 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Enter password</Text>
                             <ImageBackground
                                 source={require('../../assets/images/galaxy.jpg')}
                                 imageStyle={{ borderRadius: 8, opacity: isFocusedPass ? 0.3 : 0 }}
@@ -258,8 +258,11 @@ export default function Login() {
                                 <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>Oops, you gotta use a proper .edu email 😭</Text>
                             </View>}
 
-                        <View style={tw`w-full py-2 mt-1.5 items-center justify-center`}>
-                            <Text style={[tw`text-[12px] text-white`, { fontFamily: 'Nunito-Medium' }]}>... <Text style={{ fontFamily: 'Nunito-ExtraBold' }} onPress={() => { setMode(mode === 'email' ? 'phone' : 'email'); setLoginInfo('') }}>Sign up using {mode === 'email' ? 'phone number' : 'email'}</Text></Text>
+                        <View style={tw`w-full py-2 mt-1.5 justify-start items-start`}>
+                            <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-Medium' }]}>Don't want to use {mode === 'email' ? 'email' : 'phone number'}?{' '}</Text>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => { setMode(mode === 'email' ? 'phone' : 'email'); setLoginInfo('') }}>
+                                <Text style={{ fontFamily: 'Nunito-ExtraBold', color: '#fff', fontSize: 13 }}>Sign up with {mode === 'email' ? 'phone number' : 'email'} instead</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
 
