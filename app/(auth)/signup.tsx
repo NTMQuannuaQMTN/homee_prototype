@@ -12,6 +12,7 @@ import IconLogo from "../../assets/logo/icon.svg";
 export default function SignUp() {
     const router = useRouter();
     const [valid, setValid] = useState(true);
+    const [passRule, setPassRule] = useState([false, false, false, false]);
     const [alreadyVerified, setAlreadyVerified] = useState(false);
     const [mode, setMode] = useState<'phone' | 'email'>('phone');
     const [loginInfo, setLoginInfo] = useState('');
@@ -40,7 +41,7 @@ export default function SignUp() {
                 setAlreadyVerified(true);
                 return;
             }
-            setSignupInfo({ email: lowerEmail});
+            setSignupInfo({ email: lowerEmail });
             setPass(password);
 
             const { error } = await supabase.auth.signInWithOtp({
@@ -164,7 +165,15 @@ export default function SignUp() {
                                     placeholder="Password"
                                     placeholderTextColor={'#9CA3AF'}
                                     value={password}
-                                    onChangeText={(newVal) => { setPassword(newVal); setValid(true); }}
+                                    onChangeText={(newVal) => {
+                                        setPassword(newVal); setValid(true);
+                                        setPassRule([
+                                            /[A-Z]/.test(newVal),      // At least one uppercase letter
+                                            /[a-z]/.test(newVal),      // At least one lowercase letter
+                                            /[0-9]/.test(newVal),      // At least one number
+                                            newVal.length >= 6         // At least 6 characters
+                                        ])
+                                    }}
                                     onFocus={() => setIsFocusedPass(true)}
                                     onBlur={() => setIsFocusedPass(false)}
                                     secureTextEntry={true}
@@ -219,7 +228,12 @@ export default function SignUp() {
                                     placeholder="123456789"
                                     placeholderTextColor={'#9CA3AF'}
                                     value={loginInfo}
-                                    onChangeText={(newVal) => { setLoginInfo(newVal); setValid(true); }}
+                                    onChangeText={(newVal) => {
+                                        setLoginInfo(newVal); setValid(true);
+                                        setPassRule([
+                                            
+                                        ])
+                                    }}
                                     onFocus={() => setIsFocused(true)}
                                     onBlur={() => setIsFocused(false)}
                                     caretHidden={!isFocused}
@@ -246,18 +260,30 @@ export default function SignUp() {
                                     placeholder="Password"
                                     placeholderTextColor={'#9CA3AF'}
                                     value={password}
-                                    onChangeText={(newVal) => { setPassword(newVal); setValid(true); }}
+                                    onChangeText={(newVal) => { setPassword(newVal); setValid(true);
+                                        setPassRule([
+                                            /[A-Z]/.test(newVal),      // At least one uppercase letter
+                                            /[a-z]/.test(newVal),      // At least one lowercase letter
+                                            /[0-9]/.test(newVal),      // At least one number
+                                            newVal.length >= 6         // At least 6 characters
+                                        ])
+                                    }}
                                     onFocus={() => setIsFocusedPass(true)}
                                     onBlur={() => setIsFocusedPass(false)}
                                     secureTextEntry={true}
                                 />
                             </ImageBackground>
                         </View>}
+                        
+                        {passRule[0] || <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>At least one uppercase please...</Text>}
+                        {passRule[1] || <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>At least one lowercase please...</Text>}
+                        {passRule[2] || <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>At least one number please...</Text>}
+                        {passRule[3] || <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>At least six characters please...</Text>}
 
                         {/* Error */}
                         {valid ||
                             <View style={tw`w-full py-2 mt-1.5 items-center justify-center bg-[#FF1769] rounded-[2]`}>
-                                <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>Oops, you gotta use a proper .edu email 😭</Text>
+                                <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>Oops, your password don't match our rules 😭</Text>
                             </View>}
                         {alreadyVerified &&
                             <View style={tw`w-full py-2 mt-1.5 items-center justify-center`}>
@@ -279,9 +305,9 @@ export default function SignUp() {
                     <TouchableOpacity
                         onPress={() => {
                             // Password must have at least 1 lowercase, 1 uppercase, 1 number, and be at least 6 characters
-                            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-                            if (!passwordRegex.test(password)) {
+                            if (passRule.indexOf(false) >= 0) {
                                 setValid(false);
+                                console.log(passRule.indexOf(false))
                                 return;
                             }
                             if (mode === 'email') {
@@ -299,11 +325,11 @@ export default function SignUp() {
                             {
                                 backgroundColor:
                                     (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
-                                    (mode === 'phone' && loginInfo.trim())
+                                        (mode === 'phone' && loginInfo.trim())
                                         ? '#FFFFFF' : '#FFFFFF',
                                 opacity:
                                     (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
-                                    (mode === 'phone' && loginInfo.trim())
+                                        (mode === 'phone' && loginInfo.trim())
                                         ? 1 : 0.3
                             }
                         ]}
