@@ -52,7 +52,7 @@ export default function ProfilePage() {
   const handleShareProfile = async () => {
     if (!userView) return;
     try {
-      const profileUrl = `https://sizzl.app/profile/${userView.username || userView.id}`;
+      const profileUrl = `https://homee.app/profile/${userView.username || userView.id}`;
       const name = userView.name ? userView.name : 'Someone';
       const message = `${name} on Homee`;
       await RNShare.share({
