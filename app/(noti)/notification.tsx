@@ -86,14 +86,6 @@ const MaybeReminderCard = ({ notif, isRead, notifId, markAsRead, router, eventTi
           <Text style={[tw`text-gray-400 text-xs mt-2`, { fontFamily: 'Nunito-Regular' }]}>{timeString}</Text>
         )}
       </TouchableOpacity>
-      {/* Decision modal (reusing from (home)/home/eventDecision.tsx) */}
-      <DecisionModal
-        visible={showDecisionModal}
-        onClose={() => setShowDecisionModal(false)}
-        eventTitle={eventTitle}
-        maybe={true}
-        onSelect={(d) => {handleDecisionChange(d)}}
-      />
     </View>
   );
 };
@@ -124,7 +116,6 @@ import tw from 'twrnc';
 import BackIcon from '../../assets/icons/back.svg';
 import PfpDefault from '../../assets/icons/pfpdefault.svg';
 
-import DecisionModal from '../(home)/home/eventDecision';
 import BotBar from '../botbar';
 import { useUserStore } from '../store/userStore';
 import { fetchEventRSVPNotifications, fetchFriendRequestNotifications, fetchInviteNotifications } from '../utils/notificationsUtils';

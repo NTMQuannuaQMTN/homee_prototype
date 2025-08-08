@@ -3,8 +3,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import tw from 'twrnc';
-import Explore from './explore';
-import YourEvents from './yourevents';
 
 export default function Homepage() {
     const [activeTab, setActiveTab] = useState<'explore' | 'yourevents'>('explore');
@@ -17,26 +15,7 @@ export default function Homepage() {
             style={[{ flex: 1 }, tw`px-4 pt-8`]}
         >
             <TopBar />
-            {/* Tab Switcher */}
-            <View style={tw`flex-row justify-around mt-4 mb-2`}>
-                <TouchableOpacity
-                    style={tw`flex-1 items-center py-2 ${activeTab === 'explore' ? 'bg-[#7A5CFA] rounded-full' : ''}`}
-                    onPress={() => setActiveTab('explore')}
-                >
-                    <Text style={[tw`text-[15px] text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Explore</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={tw`flex-1 items-center py-2 ${activeTab === 'yourevents' ? 'bg-[#7A5CFA] rounded-full' : ''}`}
-                    onPress={() => setActiveTab('yourevents')}
-                >
-                    <Text style={[tw`text-[15px] text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Your events</Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* Tab Content */}
-            <View style={tw`flex-1 h-full`}>
-                {activeTab === 'explore' ? <Explore /> : <YourEvents />}
-            </View>
+            <Text>Homepage</Text>
         </LinearGradient>
     );
 }
