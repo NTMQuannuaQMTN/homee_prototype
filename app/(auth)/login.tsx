@@ -2,6 +2,8 @@ import { supabase } from "@/utils/supabase";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, ImageBackground, Keyboard, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import CountryPicker, { Country } from 'react-native-country-picker-modal';
 import tw from 'twrnc';
 import { useAuthStore } from "../store/authStore";
 import GradientBackground from "../components/GradientBackground";
@@ -13,6 +15,8 @@ export default function Login() {
     const [mode, setMode] = useState<'phone' | 'email'>('phone');
     const [loginInfo, setLoginInfo] = useState('');
     const [phoneCode, setPhoneCode] = useState('');
+    const [country, setCountry] = useState({ cca2: 'US', callingCode: ['1'] });
+    const [showCountryPicker, setShowCountryPicker] = useState(false);
     const [password, setPassword] = useState('');
     const [isFocused, setIsFocused] = useState(false);
     const [isFocusedCode, setIsFocusedCode] = useState(false);
@@ -167,52 +171,48 @@ export default function Login() {
 
                         {/* Form */}
                         {mode === 'phone' && <View style={tw`w-full`}>
-                            <Text style={[tw`text-white mb-2 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Enter your country code</Text>
-                            <ImageBackground
-                                source={require('../../assets/images/galaxy.jpg')}
-                                imageStyle={{ borderRadius: 8, opacity: isFocusedCode ? 0.3 : 0 }}
-                                style={tw`w-full rounded-[2]`}
-                            >
-                                <TextInput
-                                    style={[
-                                        tw`w-full px-3 py-3 text-white text-[15px]`,
-                                        {
-                                            fontFamily: 'Nunito-Medium',
-                                            borderWidth: 1,
-                                            borderColor: isFocusedCode ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
-                                            backgroundColor: isFocusedCode ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
-                                            borderRadius: 8,
-                                            paddingLeft: 24,
-                                        }
-                                    ]}
-                                    placeholder="123456789"
-                                    placeholderTextColor={'#9CA3AF'}
-                                    value={phoneCode}
-                                    onChangeText={(newVal) => { setPhoneCode(newVal); setValid(true); }}
+                            <Text style={[tw`text-white mb-2 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Phone number</Text>
+                            <View style={[tw`flex-row items-center mb-2`]}>
+                                <TouchableOpacity
+                                    style={[tw`flex-row items-center px-3 py-3 justify-center`, {
+                                        minWidth: 70,
+                                        borderWidth: 1,
+                                        borderColor: isFocusedCode ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
+                                        backgroundColor: isFocusedCode ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                                        borderRadius: 8,
+                                        marginRight: 8,
+                                    }]}
+                                    onPress={() => setShowCountryPicker(true)}
+                                    activeOpacity={0.8}
                                     onFocus={() => setIsFocusedCode(true)}
                                     onBlur={() => setIsFocusedCode(false)}
-                                    caretHidden={!isFocused}
+                                >
+                                    <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-Bold', marginRight: 6 }]}>+{country.callingCode[0]}</Text>
+                                    <Ionicons name="chevron-down" size={14} color="#fff" />
+                                </TouchableOpacity>
+                                <CountryPicker
+                                    withFilter
+                                    withFlag
+                                    withCallingCode
+                                    withEmoji
+                                    withAlphaFilter
+                                    countryCode={country.cca2 as any}
+                                    visible={showCountryPicker}
+                                    onSelect={(c: Country) => {
+                                        setCountry(c);
+                                        setPhoneCode(c.callingCode[0] || '');
+                                        setShowCountryPicker(false);
+                                    }}
+                                    onClose={() => setShowCountryPicker(false)}
                                 />
-                                <Text style={[{ fontFamily: 'Nunito-Medium' }, tw`text-white text-[15px] absolute top-3 left-3`]}>+</Text>
-                            </ImageBackground>
-
-                            <Text style={[tw`text-white mb-2 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Enter your phone number</Text>
-                            <ImageBackground
-                                source={require('../../assets/images/galaxy.jpg')}
-                                imageStyle={{ borderRadius: 8, opacity: isFocused ? 0.3 : 0 }}
-                                style={tw`w-full rounded-[2]`}
-                            >
                                 <TextInput
-                                    style={[
-                                        tw`w-full px-3 py-3 text-white text-[15px]`,
-                                        {
-                                            fontFamily: 'Nunito-Medium',
-                                            borderWidth: 1,
-                                            borderColor: isFocused ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
-                                            backgroundColor: isFocused ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
-                                            borderRadius: 8,
-                                        }
-                                    ]}
+                                    style={[tw`flex-1 px-3 py-3 text-white text-[15px]`, {
+                                        fontFamily: 'Nunito-Medium',
+                                        borderWidth: 1,
+                                        borderColor: isFocused ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
+                                        backgroundColor: isFocused ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                                        borderRadius: 8,
+                                    }]}
                                     placeholder="123456789"
                                     placeholderTextColor={'#9CA3AF'}
                                     value={loginInfo}
@@ -220,8 +220,9 @@ export default function Login() {
                                     onFocus={() => setIsFocused(true)}
                                     onBlur={() => setIsFocused(false)}
                                     caretHidden={!isFocused}
+                                    keyboardType="phone-pad"
                                 />
-                            </ImageBackground>
+                            </View>
                             
                             <Text style={[tw`text-white mb-2 mt-4 text-[16px]`, { fontFamily: 'Nunito-Bold' }]}>Enter password</Text>
                             <ImageBackground
@@ -263,7 +264,7 @@ export default function Login() {
                     </View>
 
                     {/* Bottom content - fixed at bottom */}
-                    <Text style={[tw`text-white text-[11px] text-center mb-4`, { fontFamily: 'Nunito-Regular' }]}>
+                    <Text style={[tw`text-white text-[11px] text-center mt-5 mb-4`, { fontFamily: 'Nunito-Regular' }]}>
                         By tapping SEND CODE, you are agreeing to our <Text style={{ fontFamily: 'Nunito-Bold' }}>Community Guidelines</Text>, <Text style={{ fontFamily: 'Nunito-Bold' }}>Terms of Service</Text>, and <Text style={{ fontFamily: 'Nunito-Bold' }}>Privacy Policy</Text>.
                     </Text>
                     <TouchableOpacity
