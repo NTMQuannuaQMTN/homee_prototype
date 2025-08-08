@@ -17,7 +17,7 @@ export default function ProfileBackgroundWrapper({
         source={{ uri: imageUrl }}
         style={{ flex: 1, overflow: 'hidden' }}
         blurRadius={2}
-        // imageStyle={{ borderRadius }}
+        imageStyle={{ borderRadius }}
       >
         {/* Black overlay */}
         <View

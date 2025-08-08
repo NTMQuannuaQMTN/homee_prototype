@@ -10,6 +10,7 @@ import { captureRef } from 'react-native-view-shot';
 import tw from 'twrnc';
 import BackIcon from '../../assets/icons/back.svg';
 import DownloadIcon from '../../assets/icons/download-icon.svg';
+import IconLogo from '../../assets/logo/icon.svg';
 import { useUserStore } from '../store/userStore';
 import ProfileBackgroundWrapper from './background_wrapper';
 
@@ -30,6 +31,29 @@ const QRProfile: React.FC = () => {
   const [tab, setTab] = useState<'qr' | 'scan'>('qr');
   const router = useRouter();
   const { user } = useUserStore();
+  const [backgroundUrl, setBackgroundUrl] = useState<string | undefined>(user?.background_image);
+
+  // Fetch user background if not present
+  useEffect(() => {
+    async function fetchBackground() {
+      if ((!user?.background_image || user.background_image === '') && (username || userId)) {
+        // Try to fetch user profile by username or userId
+        let query = supabase.from('users').select('background_url').limit(1);
+        if (username) {
+          query = query.eq('username', username);
+        } else if (userId) {
+          query = query.eq('id', userId);
+        }
+        const { data, error } = await query.single();
+        if (data && data.background_url) {
+          setBackgroundUrl(data.background_url);
+        }
+      } else if (user?.background_url) {
+        setBackgroundUrl(user.background_url);
+      }
+    }
+    fetchBackground();
+  }, [user, username, userId]);
   const qrRef = useRef<any>(null);
   const cardRef = useRef<any>(null);
   const [saving, setSaving] = useState(false);
@@ -92,10 +116,10 @@ const QRProfile: React.FC = () => {
   const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
     setScanned(true);
 
-    // Only allow scanning Sizzl profile QR codes
-    const sizzlProfileRegex = /^https?:\/\/(www\.)?sizzl\.app\/profile\/[\w-]+$/i;
-    if (sizzlProfileRegex.test(data)) {
-      const profileIdentifier = data.split('sizzl.app/profile/')[1];
+    // Only allow scanning Homee profile QR codes
+    const homeeProfileRegex = /^https?:\/\/(www\.)?homee\.app\/profile\/[\w-]+$/i;
+    if (homeeProfileRegex.test(data)) {
+      const profileIdentifier = data.split('homee.app/profile/')[1];
       try {
         // Check if the identifier is a username or user ID
         let userId = profileIdentifier;
@@ -130,7 +154,7 @@ const QRProfile: React.FC = () => {
       }
     } else {
       setQrErrorTitle('Invalid QR Code 😢');
-      setQrErrorMessage('This QR code is not a valid Sizzl profile link. Scan a valid one to connect!');
+      setQrErrorMessage('This QR code is not a valid Homee profile link. Scan a valid one to connect!');
       setShowQrErrorModal(true);
       setScanned(false);
     }
@@ -166,13 +190,19 @@ const QRProfile: React.FC = () => {
         style={{ flex: 1 }}
       >
         <View style={[tw`flex-1 items-center justify-center px-8`]}>
-          <Text style={[tw`text-white text-lg text-center mb-4`, { fontFamily: 'Nunito-Bold' }]}>Camera access denied</Text>
-          <Text style={[tw`text-white text-center mb-6`, { fontFamily: 'Nunito-Medium' }]}>Please enable camera permission in your device settings to scan QR codes.</Text>
+          <Text style={[tw`text-white text-lg text-center mb-4`, { fontFamily: 'Nunito-ExtraBold' }]}>Camera access denied 🥺</Text>
+          <Text style={[tw`text-white text-[15px] text-center mb-6`, { fontFamily: 'Nunito-Medium' }]}>Please enable camera permission in your device settings to scan QR codes.</Text>
           <TouchableOpacity
             style={[tw`bg-white/10 border border-white/20 rounded-xl px-6 py-3`]}
             onPress={requestPermission}
           >
-            <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Grant Permission</Text>
+            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Grant permission</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[tw`mt-3`]} 
+            onPress={() => router.back()}
+          >
+            <Text style={[tw`text-white text-[14px]`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Back</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -212,13 +242,13 @@ const QRProfile: React.FC = () => {
               style={{ backgroundColor: '#222', borderRadius: 16, padding: 24, alignItems: 'center', maxWidth: 320, width: '80%' }}
               onPress={e => e.stopPropagation()}
             >
-              <Text style={[tw`text-white text-[16px] mb-2`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>{qrErrorTitle}</Text>
-              <Text style={[tw`text-white mb-4`, { fontFamily: 'Nunito-Medium', textAlign: 'center', fontSize: 14 }]}>{qrErrorMessage}</Text>
+              <Text style={[tw`text-white text-[17px] mb-2`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>{qrErrorTitle}</Text>
+              <Text style={[tw`text-white mb-4`, { fontFamily: 'Nunito-Medium', textAlign: 'center', fontSize: 15 }]}>{qrErrorMessage}</Text>
               <TouchableOpacity
                 style={[tw`flex-row items-center justify-center bg-white/10 border border-white/20 rounded-xl px-6 py-1.5`]}
                 onPress={resetScanner}
               >
-                <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold', fontSize: 13 }]}>OK</Text>
+                <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold', fontSize: 16 }]}>OK</Text>
               </TouchableOpacity>
             </TouchableOpacity>
           </Animated.View>
@@ -233,7 +263,7 @@ const QRProfile: React.FC = () => {
           >
             <BackIcon width={24} height={24} />
           </TouchableOpacity>
-          <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Sizzl QR</Text>
+          <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Homee QR</Text>
         </View>
 
         {/* Tabs */}
@@ -242,22 +272,22 @@ const QRProfile: React.FC = () => {
             <TouchableOpacity
               style={[
                 tw`rounded-xl items-center justify-center`,
-                { backgroundColor: tab === 'qr' ? tabActive : tabInactive, height: 36 },
+                { backgroundColor: tab === 'qr' ? tabActive : tabInactive, height: 40 },
               ]}
               onPress={() => setTab('qr')}
             >
-              <Text style={{ color: tab === 'qr' ? tabTextActive : tabTextInactive, fontFamily: 'Nunito-ExtraBold', fontSize: 14 }}>My code</Text>
+              <Text style={{ color: tab === 'qr' ? tabTextActive : tabTextInactive, fontFamily: 'Nunito-ExtraBold', fontSize: 16 }}>My code</Text>
             </TouchableOpacity>
           </View>
           <View style={{ flex: 1 }}>
             <TouchableOpacity
               style={[
                 tw`rounded-xl items-center justify-center`,
-                { backgroundColor: tab === 'scan' ? tabActive : tabInactive, height: 36 },
+                { backgroundColor: tab === 'scan' ? tabActive : tabInactive, height: 40 },
               ]}
               onPress={() => setTab('scan')}
             >
-              <Text style={{ color: tab === 'scan' ? tabTextActive : tabTextInactive, fontFamily: 'Nunito-ExtraBold', fontSize: 14 }}>Scan</Text>
+              <Text style={{ color: tab === 'scan' ? tabTextActive : tabTextInactive, fontFamily: 'Nunito-ExtraBold', fontSize: 16 }}>Scan</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -265,18 +295,31 @@ const QRProfile: React.FC = () => {
         {/* Tab content */}
         {tab === 'qr' && (
           <>
-            <View ref={cardRef} collapsable={false} style={{ width: '100%', alignItems: 'center', marginTop: 20, minHeight: 500 }}>
-              <ProfileBackgroundWrapper imageUrl={user?.background_url} borderRadius={14}>
-                <View style={[tw`flex-1 justify-center items-center p-10`, { backgroundColor: user?.background_url ? '' : bgpopup }]}> 
-                  <Text style={[tw`text-white text-[15px] mb-8`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Add me on Sizzl 🔥</Text>
+            <View
+              ref={cardRef}
+              collapsable={false}
+              style={{
+                width: 340,
+                maxWidth: '90%',
+                alignItems: 'center',
+                marginTop: 20,
+                minHeight: 520,
+                borderRadius: 14,
+                overflow: 'hidden',
+              }}
+            >
+              <ProfileBackgroundWrapper imageUrl={backgroundUrl} borderRadius={14}>
+                <View style={[tw`justify-center items-center p-10`, { backgroundColor: backgroundUrl ? '' : bgpopup }]}> 
+                  <IconLogo width={60} height={60} style={tw``} />
+                  <Text style={[tw`text-white text-[17px] mb-8`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Add me on Homee 🔥</Text>
                   <QRCode
-                    value={`https://sizzl.app/profile/${username || userId}`}
+                    value={`https://homee.app/profile/${username || userId}`}
                     size={240}
                     color="#fff"
                     backgroundColor="transparent"
                     getRef={c => { qrRef.current = c; }}
                   />
-                  <Text style={[tw`text-white mt-8`, { fontFamily: 'Nunito-Bold', fontSize: 13, textAlign: 'center' }]}>@{username}</Text>
+                  <Text style={[tw`text-white mt-8`, { fontFamily: 'Nunito-ExtraBold', fontSize: 14, textAlign: 'center' }]}>@{username}</Text>
                 </View>
               </ProfileBackgroundWrapper>
             </View>
@@ -286,7 +329,7 @@ const QRProfile: React.FC = () => {
               disabled={saving}
             >
               <DownloadIcon width={20} height={20} style={{ marginRight: 6 }} />
-              <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold', fontSize: 13 }]}>Save your QR Card</Text>
+              <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold', fontSize: 15 }]}>Save your QR Card</Text>
             </TouchableOpacity>
 
             {/* Custom Saved Modal */}
@@ -316,7 +359,7 @@ const QRProfile: React.FC = () => {
                   onPress={e => e.stopPropagation()}
                 >
                   <Text style={[tw`text-white text-[16px] mb-2`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Your QR Card is saved 🥳</Text>
-                  <Text style={[tw`text-white mb-4`, { fontFamily: 'Nunito-Medium', textAlign: 'center', fontSize: 14 }]}>You can now find your QR card in your Photos/Gallery. Share it with friends to connect on Sizzl! 🎉</Text>
+                  <Text style={[tw`text-white mb-4`, { fontFamily: 'Nunito-Medium', textAlign: 'center', fontSize: 14 }]}>You can now find your QR card in your Photos/Gallery. Share it with friends to connect on Homee! 🎉</Text>
                   <TouchableOpacity
                     style={[tw`flex-row items-center justify-center bg-white/10 border border-white/20 rounded-xl px-6 py-2`]}
                     onPress={closeModal}
@@ -330,8 +373,8 @@ const QRProfile: React.FC = () => {
         )}
         {tab === 'scan' && (
           <View style={[tw`flex-1 w-full items-center`, { marginTop: 24 }]}> 
-            <Text style={[tw`text-white text-[15px] mb-3`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Scan QR Code 📷</Text>
-            <Text style={[tw`text-white text-[13px] mb-6 px-10 leading-[1.25]`, { fontFamily: 'Nunito-Medium', textAlign: 'center' }]}>Point your camera at your friend's QR Card to connect with them 🤝</Text>
+            <Text style={[tw`text-white text-[16px] mb-3`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Scan QR Code 📷</Text>
+            <Text style={[tw`text-white text-[15px] mb-6 px-10 leading-[1.25]`, { fontFamily: 'Nunito-Medium', textAlign: 'center' }]}>Point your camera at your friend's QR Card to connect with them on Homee 🤝</Text>
             
             <View style={[styles.cameraContainer]}>
               <CameraView
