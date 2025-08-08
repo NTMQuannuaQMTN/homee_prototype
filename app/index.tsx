@@ -4,6 +4,8 @@ import { Animated, Dimensions, Image, PanResponder, ScrollView, Text, TouchableO
 import tw from 'twrnc';
 import GradientBackground from "./components/GradientBackground";
 
+import Logo from '@/assets/logo/icon.svg';
+
 export default function Index() {
   const textLanding = ['get started 1', 'get started 2', 'get started 3'];
   const [slide, setSlide] = useState(0);
@@ -12,7 +14,17 @@ export default function Index() {
   const height = Dimensions.get('window').height;
 
   // Animations
+  const splashAnimationValue = useAnimatedValue(1);
   const windowAnimationValue = useAnimatedValue(0);
+
+  useEffect(() => {
+    Animated.timing(splashAnimationValue, {
+      toValue: 0,
+      duration: 500,
+      delay: 1000,
+      useNativeDriver: false,
+    }).start();
+  }, []);
 
   useEffect(() => {
     Animated.sequence([
@@ -69,6 +81,13 @@ export default function Index() {
 
   return (
     <GradientBackground>
+      <Animated.View style={{width: width, height: height, position: 'absolute', top: 0, left: 0, zIndex: 2, opacity: splashAnimationValue }}>
+        <GradientBackground>
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <Logo width={0.3 * width}></Logo>
+          </View>
+        </GradientBackground>
+      </Animated.View>
       {/* Center content - takes up most of the screen */}
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Animated.FlatList
