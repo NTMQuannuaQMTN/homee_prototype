@@ -49,33 +49,15 @@ export default function Index() {
     extrapolate: 'clamp'
   });
 
-  const firstSlideMoving = windowAnimationValue.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: [0, 0.05 * width, 0.1 * width],
-    extrapolate: 'clamp'
-  });
-
   const secondSlideScaling = windowAnimationValue.interpolate({
     inputRange: [0, 1, 2],
     outputRange: [0.9, 1, 0.9],
     extrapolate: 'clamp'
   });
 
-  const secondSlideMoving = windowAnimationValue.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: [-0.05 * width, 0, 0.05 * width],
-    extrapolate: 'clamp'
-  });
-
   const thirdSlideScaling = windowAnimationValue.interpolate({
     inputRange: [0, 1, 2],
     outputRange: [0.8, 0.9, 1],
-    extrapolate: 'clamp'
-  });
-
-  const thirdSlideMoving = windowAnimationValue.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: [-0.1 * width, -0.05 * width, 0],
     extrapolate: 'clamp'
   });
 
@@ -102,7 +84,6 @@ export default function Index() {
             height: 0.6 * height,
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 0 * width,
             paddingHorizontal: 0.1 * width,
             marginTop: slide < 2 ? 0.2 * height : 0.15 * height,
           }}
