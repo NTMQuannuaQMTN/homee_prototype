@@ -761,28 +761,28 @@ export default function ProfilePage() {
           {userView?.instagram_url && (
             <TouchableOpacity style={tw``}
               onPress={() => { Linking.openURL(`https://instagram.com/${userView?.instagram_url}`); }}>
-              <Ionicons name="logo-instagram" size={24} color="#fff" />
+              <Ionicons name="logo-instagram" size={22} color="#fff" />
             </TouchableOpacity>
           )}
-          {/* X (Twitter) */}
+          {/* TikTok */}
           {userView?.tiktok_url && (
             <TouchableOpacity style={tw``}
-              onPress={() => { Linking.openURL(`https://x.com/${userView?.tiktok_url}`); }}>
-              <Ionicons name="logo-twitter" size={24} color="#fff" />
+              onPress={() => { Linking.openURL(`https://tiktok.com/@${userView?.tiktok_url}`); }}>
+              <Ionicons name="logo-tiktok" size={22} color="#fff" />
             </TouchableOpacity>
           )}
           {/* Snapchat */}
           {userView?.snapchat_url && (
             <TouchableOpacity style={tw``}
               onPress={() => { Linking.openURL(`https://snapchat.com/add/${userView?.snapchat_url}`); }}>
-              <Ionicons name="logo-snapchat" size={24} color="#fff" />
+              <Ionicons name="logo-snapchat" size={22} color="#fff" />
             </TouchableOpacity>
           )}
           {/* Facebook */}
           {userView?.facebook_url && (
             <TouchableOpacity style={tw``}
               onPress={() => { Linking.openURL(`https://facebook.com/${userView?.facebook_url}`); }}>
-              <Ionicons name="logo-facebook" size={24} color="#fff" />
+              <Ionicons name="logo-facebook" size={22} color="#fff" />
             </TouchableOpacity>
           )}
         </View>
