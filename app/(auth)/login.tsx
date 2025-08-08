@@ -261,7 +261,7 @@ export default function Login() {
                         <View style={tw`w-full py-2 mt-1.5 justify-start items-start`}>
                             <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-Medium' }]}>Don't want to use {mode === 'email' ? 'email' : 'phone number'}?{' '}</Text>
                             <TouchableOpacity activeOpacity={0.8} onPress={() => { setMode(mode === 'email' ? 'phone' : 'email'); setLoginInfo('') }}>
-                                <Text style={{ fontFamily: 'Nunito-ExtraBold', color: '#fff', fontSize: 13 }}>Sign up with {mode === 'email' ? 'phone number' : 'email'} instead</Text>
+                                <Text style={{ fontFamily: 'Nunito-ExtraBold', color: '#fff', fontSize: 13 }}>Log in with {mode === 'email' ? 'phone number' : 'email'} instead</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
