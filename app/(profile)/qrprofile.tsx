@@ -358,13 +358,13 @@ const QRProfile: React.FC = () => {
                   style={{ backgroundColor: bggreenmodal, borderRadius: 16, padding: 24, alignItems: 'center', maxWidth: 320, width: '80%' }}
                   onPress={e => e.stopPropagation()}
                 >
-                  <Text style={[tw`text-white text-[16px] mb-2`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Your QR Card is saved 🥳</Text>
-                  <Text style={[tw`text-white mb-4`, { fontFamily: 'Nunito-Medium', textAlign: 'center', fontSize: 14 }]}>You can now find your QR card in your Photos/Gallery. Share it with friends to connect on Homee! 🎉</Text>
+                  <Text style={[tw`text-white text-[17px] mb-2`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Your QR Card is saved 🥳</Text>
+                  <Text style={[tw`text-white text-[15px] mb-4`, { fontFamily: 'Nunito-Medium', textAlign: 'center' }]}>You can now find your QR card in your Photos/Gallery. Share it with friends to connect on Homee!</Text>
                   <TouchableOpacity
                     style={[tw`flex-row items-center justify-center bg-white/10 border border-white/20 rounded-xl px-6 py-2`]}
                     onPress={closeModal}
                   >
-                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold', fontSize: 14 }]}>Got it</Text>
+                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold', fontSize: 16 }]}>Got it</Text>
                   </TouchableOpacity>
                 </TouchableOpacity>
               </Animated.View>
