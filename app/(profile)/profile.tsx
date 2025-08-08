@@ -15,7 +15,6 @@ import Requested from '../../assets/icons/accept_question.svg';
 import Friend from '../../assets/icons/accepted.svg';
 import AddFriend from '../../assets/icons/add_friend.svg';
 import Edit from '../../assets/icons/edit-icon.svg';
-import FBIcon from '../../assets/icons/fb-icon.svg';
 import Waiting from '../../assets/icons/hourglass.svg';
 import SettingIcon from '../../assets/icons/setting.svg';
 import Share from '../../assets/icons/share-icon.svg';
