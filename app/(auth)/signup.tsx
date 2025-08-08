@@ -290,12 +290,21 @@ export default function SignUp() {
                                 checkPhone(loginInfo);
                             }
                         }}
-                        disabled={!loginInfo.trim()}
+                        disabled={
+                            (mode === 'email' && (!loginInfo.trim() || !loginInfo.includes('@')))
+                            || (mode === 'phone' && !loginInfo.trim())
+                        }
                         style={[
                             tw`rounded-full py-[10] w-full items-center mb-4`,
                             {
-                                backgroundColor: loginInfo.trim() ? '#FFFFFF' : '#FFFFFF',
-                                opacity: loginInfo.trim() ? 1 : 0.3
+                                backgroundColor:
+                                    (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
+                                    (mode === 'phone' && loginInfo.trim())
+                                        ? '#FFFFFF' : '#FFFFFF',
+                                opacity:
+                                    (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
+                                    (mode === 'phone' && loginInfo.trim())
+                                        ? 1 : 0.3
                             }
                         ]}
                     >

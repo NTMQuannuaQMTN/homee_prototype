@@ -12,6 +12,7 @@ import IconLogo from "../../assets/logo/icon.svg";
 export default function Login() {
     const router = useRouter();
     const [valid, setValid] = useState(true);
+    const [notRegistered, setNotRegistered] = useState(false);
     const [mode, setMode] = useState<'phone' | 'email'>('phone');
     const [loginInfo, setLoginInfo] = useState('');
     const [phoneCode, setPhoneCode] = useState('');
@@ -37,7 +38,8 @@ export default function Login() {
                 .eq('email', lowerEmail).single();
 
             if (userError) {
-                Alert.alert('Not reged');
+                setNotRegistered(true);
+                setValid(true);
                 return;
             }
 
@@ -50,7 +52,8 @@ export default function Login() {
             });
 
             if (error) {
-                Alert.alert("Error", "Login error");
+                setValid(false);
+                setNotRegistered(false);
                 return;
             }
 
@@ -134,7 +137,11 @@ export default function Login() {
                                     placeholder="hello@example.com"
                                     placeholderTextColor={'#9CA3AF'}
                                     value={loginInfo}
-                                    onChangeText={(newVal) => { setLoginInfo(newVal); setValid(true); }}
+                                    onChangeText={(newVal) => {
+                                        setLoginInfo(newVal);
+                                        setValid(true);
+                                        setNotRegistered(false);
+                                    }}
                                     onFocus={() => setIsFocused(true)}
                                     onBlur={() => setIsFocused(false)}
                                     caretHidden={!isFocused}
@@ -253,10 +260,23 @@ export default function Login() {
                         </View>}
 
                         {/* Error */}
-                        {valid ||
+                        {notRegistered && (
+                            <View style={tw`w-full py-2.5 mt-2 items-center justify-center bg-[#FF1769] rounded-[2]`}>
+                                <Text style={[tw`text-white text-[14px]`, { fontFamily: 'Nunito-Medium' }]}>This email is not registered yet.{' '}
+                                    <Text
+                                        style={{ fontFamily: 'Nunito-ExtraBold', textDecorationLine: 'underline' }}
+                                        onPress={() => router.replace('/(auth)/signup')}
+                                    >
+                                        Create an account?
+                                    </Text>
+                                </Text>
+                            </View>
+                        )}
+                        {(!valid && !notRegistered) && (
                             <View style={tw`w-full py-2 mt-1.5 items-center justify-center bg-[#FF1769] rounded-[2]`}>
                                 <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>Oops, you gotta use a proper .edu email 😭</Text>
-                            </View>}
+                            </View>
+                        )}
 
                         <View style={tw`w-full py-2 mt-1.5 justify-start items-start`}>
                             <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-Medium' }]}>Don't want to use {mode === 'email' ? 'email' : 'phone number'}?{' '}</Text>
@@ -278,12 +298,21 @@ export default function Login() {
                                 checkPhone(loginInfo);
                             }
                         }}
-                        disabled={!loginInfo.trim()}
+                        disabled={
+                            (mode === 'email' && (!loginInfo.trim() || !loginInfo.includes('@')))
+                            || (mode === 'phone' && !loginInfo.trim())
+                        }
                         style={[
                             tw`rounded-full py-[10] w-full items-center mb-4`,
                             {
-                                backgroundColor: loginInfo.trim() ? '#FFFFFF' : '#FFFFFF',
-                                opacity: loginInfo.trim() ? 1 : 0.3
+                                backgroundColor:
+                                    (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
+                                    (mode === 'phone' && loginInfo.trim())
+                                        ? '#FFFFFF' : '#FFFFFF',
+                                opacity:
+                                    (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
+                                    (mode === 'phone' && loginInfo.trim())
+                                        ? 1 : 0.3
                             }
                         ]}
                     >
