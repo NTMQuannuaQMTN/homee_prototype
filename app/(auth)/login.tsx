@@ -273,8 +273,8 @@ export default function Login() {
                             </View>
                         )}
                         {(!valid && !notRegistered) && (
-                            <View style={tw`w-full py-2 mt-1.5 items-center justify-center bg-[#FF1769] rounded-[2]`}>
-                                <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>Oops, you gotta use a proper .edu email 😭</Text>
+                            <View style={tw`w-full py-2 mt-2 items-center justify-center bg-[#FF1769] rounded-[2]`}>
+                                <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Bold' }]}>Oops, wrong password or email 😭</Text>
                             </View>
                         )}
 
@@ -316,7 +316,7 @@ export default function Login() {
                             }
                         ]}
                     >
-                        <Text style={[tw`text-black text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Send code</Text>
+                        <Text style={[tw`text-black text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Log in</Text>
                     </TouchableOpacity>
                     <View style={tw`flex-row items-center justify-center mb-8`}>
                         <TouchableOpacity onPress={() => router.replace('/(auth)/signup')}>
