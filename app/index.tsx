@@ -4,6 +4,8 @@ import { Animated, Dimensions, Image, PanResponder, ScrollView, Text, TouchableO
 import tw from 'twrnc';
 import GradientBackground from "./components/GradientBackground";
 
+import Logo from '@/assets/logo/icon.svg';
+
 export default function Index() {
   const textLanding = ['get started 1', 'get started 2', 'get started 3'];
   const [slide, setSlide] = useState(0);
@@ -12,7 +14,17 @@ export default function Index() {
   const height = Dimensions.get('window').height;
 
   // Animations
+  const splashAnimationValue = useAnimatedValue(1);
   const windowAnimationValue = useAnimatedValue(0);
+
+  useEffect(() => {
+    Animated.timing(splashAnimationValue, {
+      toValue: 0,
+      duration: 500,
+      delay: 1000,
+      useNativeDriver: false,
+    }).start();
+  }, []);
 
   useEffect(() => {
     Animated.sequence([
@@ -37,21 +49,9 @@ export default function Index() {
     extrapolate: 'clamp'
   });
 
-  const firstSlideMoving = windowAnimationValue.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: [0, 0.05 * width, 0.1 * width],
-    extrapolate: 'clamp'
-  });
-
   const secondSlideScaling = windowAnimationValue.interpolate({
     inputRange: [0, 1, 2],
     outputRange: [0.9, 1, 0.9],
-    extrapolate: 'clamp'
-  });
-
-  const secondSlideMoving = windowAnimationValue.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: [-0.05 * width, 0, 0.05 * width],
     extrapolate: 'clamp'
   });
 
@@ -61,14 +61,15 @@ export default function Index() {
     extrapolate: 'clamp'
   });
 
-  const thirdSlideMoving = windowAnimationValue.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: [-0.1 * width, -0.05 * width, 0],
-    extrapolate: 'clamp'
-  });
-
   return (
     <GradientBackground>
+      <Animated.View style={{width: width, height: height, position: 'absolute', top: 0, left: 0, zIndex: 2, opacity: splashAnimationValue }}>
+        <GradientBackground>
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <Logo width={0.3 * width}></Logo>
+          </View>
+        </GradientBackground>
+      </Animated.View>
       {/* Center content - takes up most of the screen */}
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Animated.FlatList
@@ -83,7 +84,6 @@ export default function Index() {
             height: 0.6 * height,
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 0 * width,
             paddingHorizontal: 0.1 * width,
             marginTop: slide < 2 ? 0.2 * height : 0.15 * height,
           }}
