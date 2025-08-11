@@ -10,7 +10,8 @@ interface Group {
     title: string;
     bio?: string;
     creator: string;
-  //   created: string;
+    //   created: string;
+    public: boolean;
     group_image: string;
     member_count: number;
     onPress?: () => void;
@@ -70,17 +71,24 @@ export default function GroupList() {
 
     return (
         <View>
-            <Text style={[tw`text-white text-2xl mt-1`, { fontFamily: 'Nunito-ExtraBold' }]}>Groups</Text>
-            <ScrollView horizontal style={tw`h-32 flex-row mt-2`} contentContainerStyle={tw`gap-4`}>
+            <Text style={[tw`text-white text-2xl mt-1 px-4`, { fontFamily: 'Nunito-ExtraBold' }]}>Groups</Text>
+            <ScrollView horizontal style={tw`h-32 flex-row mt-2`} showsHorizontalScrollIndicator={false} contentContainerStyle={tw`gap-4 px-4`}>
                 {groups.map((group) => (
                     <GroupCard key={group.id}
                         id={group.id}
                         title={group.title}
                         bio={group.bio}
+                        publicGroup={group.public}
                         creator={group.creator}
                         group_image={group.group_image}
                         member_count={group.member_count}
-                        onPress={() => {}}
+                        onPress={() => {
+                            router.navigate({
+                                pathname: '/(group)/groupview', params: {
+                                    id: group.id
+                                }
+                            })
+                        }}
                     />
                 ))}
 

@@ -6,13 +6,14 @@ interface GroupCardProps {
   title: string;
   bio?: string;
   creator: string;
+  publicGroup: boolean;
 //   created: string;
   group_image: string;
   member_count: number;
   onPress?: () => void;
 }
 
-export default function GroupCard({ id, title, bio, creator, group_image, member_count, onPress }: GroupCardProps) {
+export default function GroupCard({ id, title, bio, creator, group_image, publicGroup, member_count, onPress }: GroupCardProps) {
   const isDefault = group_image === "default";
   return (
     <TouchableOpacity
