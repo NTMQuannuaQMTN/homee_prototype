@@ -10,7 +10,7 @@ export default function Homepage() {
 
     return (
         <GradientBackground>
-            <View style={tw`flex-1 px-4 pt-8`}>
+            <View style={tw`flex-1 pt-8`}>
                 <TopBar />
                 <GroupList />
             </View>
