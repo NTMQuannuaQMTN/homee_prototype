@@ -5,13 +5,12 @@ interface EventDoneModalProps {
   visible: boolean;
   onClose: () => void;
   onPublish: () => void;
-  onSaveDraft: () => void;
   onContinueEdit: () => void;
 }
 
 const MODAL_HEIGHT = 290;
 
-export default function EventDoneModal({ visible, onClose, onPublish, onSaveDraft, onContinueEdit }: EventDoneModalProps) {
+export default function EventDoneModal({ visible, onClose, onPublish, onContinueEdit }: EventDoneModalProps) {
   const slideAnim = useRef(new Animated.Value(MODAL_HEIGHT)).current;
   const pan = useRef(new Animated.ValueXY()).current;
   const [isModalMounted, setIsModalMounted] = useState(false);
@@ -111,13 +110,6 @@ export default function EventDoneModal({ visible, onClose, onPublish, onSaveDraf
                   activeOpacity={0.85}
                 >
                   <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Publish event</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={tw`bg-yellow-600 rounded-full py-3 items-center`}
-                  onPress={onSaveDraft}
-                  activeOpacity={0.85}
-                >
-                  <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Save draft</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={tw`bg-white/10 rounded-full py-3 items-center`}

@@ -18,18 +18,9 @@ import EventDoneModal from './eventdonemodal';
 import ImageModal from './imageModal';
 
 export default function CreateGroup() {
-    const [draftLoaded, setDraftLoaded] = useState(false);
     const params = useLocalSearchParams();
     const [title, setTitle] = useState('');
     const [publicEvent, setPublic] = useState(true);
-    const [date, setDate] = useState({
-        start: new Date(),
-        end: new Date(),
-        startTime: '12:00am',
-        endTime: '12:00am',
-        endSet: false,
-        dateChosen: false,
-    });
     const imageOptions = defaultImages;
     const [image, setImage] = useState(imageOptions[Math.floor(Math.random() * imageOptions.length)]);
     const [id, setID] = useState('');
@@ -39,208 +30,129 @@ export default function CreateGroup() {
     const [bio, setBio] = useState('');
     const [showImageModal, setShowImageModal] = useState(false);
 
-    // const addEvent = async () => {
-    //     console.log('adding');
-    //     // Check if event title, date, RSVP deadline, and location are available
-    //     if (!title || !date.dateChosen || !rsvpDL || !(location.name || location.selected)) {
-    //         Alert.alert('Please fill in all required fields, including location.');
-    //         return null;
-    //     }
-    //     // Combine start date and start time into a single Date object for 'start'
-    //     const startDateTime = new Date(
-    //         date.start.getFullYear(),
-    //         date.start.getMonth(),
-    //         date.start.getDate(),
-    //         (() => {
-    //             // Parse hour and minute from date.startTime (e.g., "7:15pm")
-    //             const match = /^(\d{1,2}):(\d{2})(am|pm)$/i.exec(date.startTime);
-    //             if (!match) return 0;
-    //             let hour = parseInt(match[1], 10);
-    //             const ampm = match[3];
-    //             if (ampm.toLowerCase() === 'pm' && hour !== 12) hour += 12;
-    //             if (ampm.toLowerCase() === 'am' && hour === 12) hour = 0;
-    //             return hour;
-    //         })(),
-    //         (() => {
-    //             const match = /^(\d{1,2}):(\d{2})(am|pm)$/i.exec(date.startTime);
-    //             if (!match) return 0;
-    //             return parseInt(match[2], 10);
-    //         })(),
-    //         0,
-    //         0
-    //     );
+    const addGroup = async () => {
+        console.log('adding');
+        // Check if event title, date, RSVP deadline, and location are available
+        if (!title) {
+            Alert.alert('Please fill in all required fields, including location.');
+            return null;
+        }
 
-    //     // Combine end date and end time into a single Date object for 'end'
-    //     const endDateTime = new Date(
-    //         date.end.getFullYear(),
-    //         date.end.getMonth(),
-    //         date.end.getDate(),
-    //         (() => {
-    //             // Parse hour and minute from date.endTime (e.g., "7:15pm")
-    //             const match = /^(\d{1,2}):(\d{2})(am|pm)$/i.exec(date.endTime);
-    //             if (!match) return 0;
-    //             let hour = parseInt(match[1], 10);
-    //             const ampm = match[3];
-    //             if (ampm.toLowerCase() === 'pm' && hour !== 12) hour += 12;
-    //             if (ampm.toLowerCase() === 'am' && hour === 12) hour = 0;
-    //             return hour;
-    //         })(),
-    //         (() => {
-    //             const match = /^(\d{1,2}):(\d{2})(am|pm)$/i.exec(date.endTime);
-    //             if (!match) return 0;
-    //             return parseInt(match[2], 10);
-    //         })(),
-    //         0,
-    //         0
-    //     );
+        let draftErr;
+        let dataEvent;
 
-    //     console.log(startDateTime, endDateTime);
+        if (id === '') {
+            // Insert new event if id is empty
+            ({ data: dataEvent, error: draftErr } = await supabase.from('groups')
+                .insert([{
+                    title: title, public: publicEvent,
+                    creator: user.id, bio: bio,
+                }])
+                .select('id') // Request the id of the inserted event
+            );
+        } else {
+            // Update existing event if id is not empty
+            ({ error: draftErr } = await supabase.from('groups')
+                .update({
+                    title: title, public: publicEvent,
+                    creator: user.id, bio: bio,
+                })
+                .eq('id', id));
+        }
 
-    //     let draftErr;
-    //     let dataEvent;
+        // Check if event meets all conditions
+        const isValid = title !== '';
+        if (isValid && !draftErr) {
+            setShowSuccessToast(true);
+            if (dataEvent) {
+                setID(dataEvent[0].id);
+                console.log(dataEvent[0].id);
+                return dataEvent[0].id; // <-- return the new id
+            }
+            return id;
+        } else {
+            Alert.alert('error bitch');
+            return null;
+        }
+    }
 
-    //     if (id === '') {
-    //         // Insert new event if id is empty
-    //         ({ data: dataEvent, error: draftErr } = await supabase.from('events')
-    //             .insert([{
-    //                 title: title, public: publicEvent,
-    //                 start: (date.dateChosen ? startDateTime : null),
-    //                 end: (date.endSet ? endDateTime : null),
-    //                 location_add: location.selected || '',
-    //                 location_name: location.name || location.selected || '',
-    //                 location_more: location.aptSuite || '',
-    //                 location_note: location.notes || '',
-    //                 rsvpfirst: location.rsvpFirst, rsvp_deadline: rsvpDL,
-    //                 bio: bio, cash_prize: specialBox.cash ? special.cash : null,
-    //                 free_food: specialBox.food ? special.food : null,
-    //                 free_merch: specialBox.merch ? special.merch : null,
-    //                 cool_prize: specialBox.coolPrize ? special.coolPrize : null,
-    //                 host_id: user.id, public_list: list.public, maybe: list.maybe,
-    //                 done: !(title === '' || !date.dateChosen || !rsvpDL || !(location.name || location.selected)),
-    //                 school_id: user.school_id
-    //             }])
-    //             .select('id') // Request the id of the inserted event
-    //         );
-    //     } else {
-    //         // Update existing event if id is not empty
-    //         ({ error: draftErr } = await supabase.from('events')
-    //             .update({
-    //                 title: title, public: publicEvent,
-    //                 start: (date.dateChosen ? startDateTime : null),
-    //                 end: (date.endSet ? endDateTime : null),
-    //                 location_add: location.selected || '',
-    //                 location_name: location.name || location.selected || '',
-    //                 location_more: location.aptSuite || '',
-    //                 location_note: location.notes || '',
-    //                 rsvpfirst: location.rsvpFirst, rsvp_deadline: rsvpDL,
-    //                 bio: bio, cash_prize: specialBox.cash ? special.cash : null,
-    //                 free_food: specialBox.food ? special.food : null,
-    //                 free_merch: specialBox.merch ? special.merch : null,
-    //                 cool_prize: specialBox.coolPrize ? special.coolPrize : null,
-    //                 done: !(title === '' || !date.dateChosen || !rsvpDL || !(location.name || location.selected)),
-    //             })
-    //             .eq('id', id));
-    //     }
+    const updateImage = async (eventId: string) => {
+        console.log('updating');
+        let imgURL = '';
+        if (image && typeof image !== 'number') {
+            // If image is already a URL, just use it
+            if (typeof image === 'string' && (image.startsWith('http://') || image.startsWith('https://'))) {
+                setImageURL(image);
+                imgURL = image;
+            } else {
+                try {
+                    // Get file info and determine file extension
+                    const fileUri = image;
+                    const fileExtension = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
+                    const fileName = `group/${eventId}.${fileExtension}`;
 
-    //     // Check if event meets all conditions
-    //     const isValid = title !== '' && date.dateChosen && rsvpDL;
-    //     if (isValid && !draftErr) {
-    //         setShowSuccessToast(true);
-    //         if (dataEvent) {
-    //             setID(dataEvent[0].id);
-    //             console.log(dataEvent[0].id);
-    //             return dataEvent[0].id; // <-- return the new id
-    //         }
-    //         return id;
-    //     } else {
-    //         Alert.alert('error bitch');
-    //         return null;
-    //     }
-    // }
+                    // Read file as ArrayBuffer for proper binary upload
+                    const fileArrayBuffer = await FileSystem.readAsStringAsync(fileUri, {
+                        encoding: FileSystem.EncodingType.Base64,
+                    });
 
-    // const updateImage = async (eventId: string) => {
-    //     console.log('updating');
-    //     let imgURL = '';
-    //     if (image && typeof image !== 'number') {
-    //         // If image is already a URL, just use it
-    //         if (typeof image === 'string' && (image.startsWith('http://') || image.startsWith('https://'))) {
-    //             setImageURL(image);
-    //             imgURL = image;
-    //         } else {
-    //             try {
-    //                 // Get file info and determine file extension
-    //                 const fileUri = image;
-    //                 const fileExtension = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
-    //                 const fileName = `event_cover/${eventId}.${fileExtension}`;
+                    // Convert base64 to Uint8Array
+                    const byteCharacters = atob(fileArrayBuffer);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const uint8Array = new Uint8Array(byteNumbers);
 
-    //                 // Read file as ArrayBuffer for proper binary upload
-    //                 const fileArrayBuffer = await FileSystem.readAsStringAsync(fileUri, {
-    //                     encoding: FileSystem.EncodingType.Base64,
-    //                 });
+                    const { error: uploadError } = await supabase.storage
+                        .from('homee-img')
+                        .upload(fileName, uint8Array, {
+                            contentType: `image/${fileExtension === 'jpg' ? 'jpeg' : fileExtension}`,
+                            upsert: true
+                        });
 
-    //                 // Convert base64 to Uint8Array
-    //                 const byteCharacters = atob(fileArrayBuffer);
-    //                 const byteNumbers = new Array(byteCharacters.length);
-    //                 for (let i = 0; i < byteCharacters.length; i++) {
-    //                     byteNumbers[i] = byteCharacters.charCodeAt(i);
-    //                 }
-    //                 const uint8Array = new Uint8Array(byteNumbers);
+                    if (uploadError) {
+                        console.error('Upload error:', uploadError);
+                        return;
+                    }
 
-    //                 const { error: uploadError } = await supabase.storage
-    //                     .from('sizzl-profileimg')
-    //                     .upload(fileName, uint8Array, {
-    //                         contentType: `image/${fileExtension === 'jpg' ? 'jpeg' : fileExtension}`,
-    //                         upsert: true
-    //                     });
+                    const { data: urlData } = await supabase.storage
+                        .from('homee-img')
+                        .getPublicUrl(fileName);
 
-    //                 if (uploadError) {
-    //                     console.error('Upload error:', uploadError);
-    //                     return;
-    //                 }
+                    const publicUrl = urlData?.publicUrl;
+                    setImageURL(publicUrl);
+                    imgURL = publicUrl;
+                } catch (err) {
+                    console.error('Image upload exception:', err);
+                    Alert.alert('Image upload failed');
+                }
+            }
+        } else {
+            setImageURL(`default`);
+            imgURL = `default`;
+        }
 
-    //                 const { data: urlData } = await supabase.storage
-    //                     .from('sizzl-profileimg')
-    //                     .getPublicUrl(fileName);
+        console.log("Attempting to update event image", { eventId, imgURL });
 
-    //                 const publicUrl = urlData?.publicUrl;
-    //                 setImageURL(publicUrl);
-    //                 imgURL = publicUrl;
-    //             } catch (err) {
-    //                 console.error('Image upload exception:', err);
-    //                 Alert.alert('Image upload failed');
-    //             }
-    //         }
-    //     } else {
-    //         setImageURL(`default_${image - 28}`);
-    //         imgURL = `default_${image - 28}`;
-    //     }
+        if (!eventId) {
+            console.error("No event id provided for update.");
+        } else if (!imgURL) {
+            console.error("No imageURL provided for update.");
+        } else {
+            const { error: setAvatarError } = await supabase
+                .from('groups')
+                .update({ group_image: imgURL })
+                .eq('id', eventId)
+                .select();
 
-    //     // Now, after all awaits above, update the event image
-    //     // Why I check and there is no update?
-    //     // The update may not happen if imageURL is undefined/null, or if the id is wrong, or if the value is the same as before.
-    //     // Let's log more details for debugging:
-    //     console.log("Attempting to update event image", { eventId, imageURL });
-
-    //     if (!eventId) {
-    //         console.error("No event id provided for update.");
-    //     } else if (!imgURL) {
-    //         console.error("No imageURL provided for update.");
-    //     } else {
-    //         const { data: checkData, error: setAvatarError } = await supabase
-    //             .from('events')
-    //             .update({ image: imgURL })
-    //             .eq('id', eventId)
-    //             .select();
-
-    //         if (setAvatarError) {
-    //             console.error("Set error:", setAvatarError);
-    //         } else if (!checkData || checkData.length === 0) {
-    //             console.warn("Update succeeded but no rows returned. Possible reasons: id not found, or image value unchanged.");
-    //         } else {
-    //             console.log("Update result:", checkData);
-    //         }
-    //     }
-    // }
+            if (setAvatarError) {
+                console.error("Set error:", setAvatarError);
+            } else {
+                console.log("Update result");
+            }
+        }
+    }
 
     const [showEventDoneModal, setShowEventDoneModal] = useState(false);
     const [showSuccessToast, setShowSuccessToast] = useState(false);
@@ -264,9 +176,7 @@ export default function CreateGroup() {
                 <Image
                     source={
                         typeof image === 'string'
-                            ? (image.startsWith('file://') || image.startsWith('content://')
-                                ? { uri: image }
-                                : { uri: image })
+                            ? { uri: image }
                             : image && image.uri
                                 ? { uri: image.uri }
                                 : image
@@ -300,26 +210,23 @@ export default function CreateGroup() {
                         {/* Centered title */}
                         <View style={tw`flex-1 items-center justify-center`}>
                             <Text style={[tw`text-white text-base`, { fontFamily: 'Nunito-ExtraBold' }]}>
-                                {id && draftLoaded ? 'Update event' : 'Create event'}
+                                {id ? 'Update group' : 'Create group'}
                             </Text>
                         </View>
                         {/* Done button - absolute right */}
                         {/* Determine if all required fields are filled and if editing */}
                         {(() => {
-                            const requiredFilled = title && date.dateChosen;
-                            const isEditing = id && draftLoaded;
+                            const requiredFilled = title;
+                            const isEditing = id;
                             return requiredFilled ? (
                                 <TouchableOpacity
                                     style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7b61ff]`, { zIndex: 2 }]}
                                     onPress={async () => {
                                         if (isEditing) {
-                                            // Directly publish the updated event
                                             setToastVisible(true);
-                                            // const newId = await addEvent();
-                                            if (true 
-                                                // newId
-                                            ) {
-                                                // await updateImage(newId);
+                                            const newId = await addGroup();
+                                            if (newId) {
+                                                await updateImage(newId);
                                                 setTimeout(() => {
                                                     router.replace('/home/homepage');
                                                 }, 250);
@@ -334,9 +241,9 @@ export default function CreateGroup() {
                             ) : (
                                 <TouchableOpacity
                                     style={[tw`absolute right-4 rounded-full px-4 py-1 bg-gray-500/60`, { zIndex: 2 }]}
-                                    // onPress={() => setShowDraftModal(true)}
+                                    disabled
                                 >
-                                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Draft</Text>
+                                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Done</Text>
                                 </TouchableOpacity>
                             );
                         })()}
@@ -357,7 +264,7 @@ export default function CreateGroup() {
                             ]}
                             value={title}
                             onChangeText={setTitle}
-                            placeholder='your event title'
+                            placeholder='your group title'
                             placeholderTextColor={'#9ca3af'}
                             multiline={false}
                             maxLength={60}
@@ -417,7 +324,7 @@ export default function CreateGroup() {
                                         textAlignVertical: 'top'
                                     }
                                 ]}
-                                placeholder="About this event..."
+                                placeholder="About this group..."
                                 placeholderTextColor="#9ca3af"
                                 multiline={true}
                                 value={bio}
@@ -463,77 +370,13 @@ export default function CreateGroup() {
                         onPublish={async () => {
                             setShowEventDoneModal(false);
                             setToastVisible(true);
-                            // const newId = await addEvent();
-                            // if (newId) {
-                            //     await updateImage(newId);
+                            const newId = await addGroup();
+                            if (newId) {
+                                await updateImage(newId);
 
-                            //     setTimeout(() => {
-                            //         router.replace('/home/homepage');
-                            //     }, 500);
-                            // }
-                        }}
-                        onSaveDraft={async () => {
-                            setShowEventDoneModal(false);
-                            // Save as draft (done: false)
-                            let draftErr, dataEvent;
-                            let draftImage = null;
-                            if (typeof image === 'string') {
-                                if (image.startsWith('file://') || image.startsWith('content://') || image.startsWith('http://') || image.startsWith('https://')) {
-                                    draftImage = image;
-                                } else if (image.startsWith('default_')) {
-                                    draftImage = image;
-                                } else {
-                                    draftImage = image;
-                                }
-                            } else if (typeof image === 'number') {
-                                const idx = imageOptions.findIndex(opt => opt === image);
-                                draftImage = idx >= 0 ? `default_${idx + 1}` : 'default_1';
-                            } else if (image && image.uri) {
-                                draftImage = image.uri;
-                            }
-                            if (id) {
-                                ({ data: dataEvent, error: draftErr } = await supabase.from('events')
-                                    .update({
-                                        title: title,
-                                        public: publicEvent,
-                                        start: (date.dateChosen ? date.start : null),
-                                        end: (date.endSet ? date.end : null),
-                                        done: false,
-                                        school_id: user.school_id,
-                                        image: draftImage
-                                    })
-                                    .eq('id', id)
-                                    .select('id'));
-                                if (!draftErr && dataEvent && dataEvent[0]?.id) {
-                                    setID(dataEvent[0].id);
-                                    Alert.alert('Draft updated!');
-                                    setTimeout(() => {
-                                        router.replace('/home/homepage');
-                                    }, 250);
-                                } else {
-                                    Alert.alert('Failed to update draft');
-                                }
-                            } else {
-                                ({ data: dataEvent, error: draftErr } = await supabase.from('events')
-                                    .insert([{
-                                        title: title,
-                                        public: publicEvent,
-                                        start: (date.dateChosen ? date.start : null),
-                                        end: (date.endSet ? date.end : null),
-                                        done: false,
-                                        school_id: user.school_id,
-                                        image: draftImage
-                                    }])
-                                    .select('id'));
-                                if (!draftErr && dataEvent && dataEvent[0]?.id) {
-                                    setID(dataEvent[0].id);
-                                    Alert.alert('Draft saved!');
-                                    setTimeout(() => {
-                                        router.replace('/home/homepage');
-                                    }, 250);
-                                } else {
-                                    Alert.alert('Failed to save draft');
-                                }
+                                setTimeout(() => {
+                                    router.replace('/home/homepage');
+                                }, 500);
                             }
                         }}
                         onContinueEdit={() => setShowEventDoneModal(false)}
