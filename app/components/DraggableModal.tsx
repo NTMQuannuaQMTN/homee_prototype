@@ -140,7 +140,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
           }}
         >
           {/* Drag handle */}
-          <View style={tw`w-12 h-1.5 bg-gray-500 rounded-full self-center mb-3`} />
+          <View style={tw`w-12 h-1.5 bg-white/20 rounded-full self-center mb-3`} />
           {title && (
             <Text style={[tw`text-white text-[16px] mb-5 text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>{title}</Text>
           )}

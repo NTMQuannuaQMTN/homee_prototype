@@ -126,7 +126,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ visible, onLogout, onCancel }
                                     <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Log out</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={tw`bg-white/10 rounded-full py-3 items-center`}
+                                    style={tw`bg-white/5 rounded-full py-3 items-center`}
                                     onPress={onCancel}
                                     activeOpacity={0.8}
                                 >

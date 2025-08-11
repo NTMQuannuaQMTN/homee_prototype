@@ -200,7 +200,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
     >
       {/* Draggable bar/header - only this area is draggable */}
       <View style={{ alignItems: 'center', marginBottom: 12 }} {...(panHandlers ? panHandlers : {})}>
-        <View style={tw`w-12 h-1.5 bg-gray-500 rounded-full self-center mb-3`} />
+        <View style={tw`w-12 h-1.5 bg-white/20 rounded-full self-center mb-3`} />
         <Text style={[tw`text-white text-[16px] mb-3 text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Set your birthday</Text>
       </View>
       <View style={tw`flex-row justify-between px-10`}>
