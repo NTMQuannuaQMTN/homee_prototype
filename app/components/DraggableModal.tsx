@@ -1,11 +1,25 @@
+
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Modal, PanResponder, TouchableOpacity, View, StyleSheet, ViewStyle } from 'react-native';
+import { Animated, Easing, Modal, PanResponder, TouchableOpacity, View, Text, ViewStyle } from 'react-native';
 import tw from 'twrnc';
+
+
+export interface DraggableModalButton {
+  label: string;
+  onPress: () => void | Promise<void>;
+  icon?: React.ReactNode;
+  color?: string; // tailwind or hex
+  textColor?: string; // tailwind or hex
+  style?: any;
+  testID?: string;
+}
 
 interface DraggableModalProps {
   visible: boolean;
   onClose: () => void;
-  children: React.ReactNode;
+  title?: string;
+  buttons?: DraggableModalButton[];
+  children?: React.ReactNode;
   containerStyle?: ViewStyle;
   modalStyle?: ViewStyle;
   backdropStyle?: ViewStyle;
@@ -14,6 +28,8 @@ interface DraggableModalProps {
 const DraggableModal: React.FC<DraggableModalProps> = ({
   visible,
   onClose,
+  title,
+  buttons,
   children,
   containerStyle,
   modalStyle,
@@ -110,7 +126,7 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
         />
         <Animated.View
           style={[
-            tw`w-full px-0 pt-6 pb-10 rounded-t-2xl`,
+            tw`w-full px-0 py-6 rounded-t-2xl`,
             { backgroundColor: '#080B32' },
             modalStyle,
             {
@@ -125,6 +141,31 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
         >
           {/* Drag handle */}
           <View style={tw`w-12 h-1.5 bg-gray-500 rounded-full self-center mb-3`} />
+          {title && (
+            <Text style={[tw`text-white text-[16px] mb-5 text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>{title}</Text>
+          )}
+          {buttons && (
+            <View style={tw`px-6`}>
+              {buttons.map((btn, idx) => (
+                <TouchableOpacity
+                  key={btn.label + idx}
+                  style={[
+                    tw`${btn.color || 'bg-white/5'} rounded-xl py-3 mb-2.5 items-center flex-row justify-center`,
+                    btn.style,
+                  ]}
+                  onPress={btn.onPress}
+                  activeOpacity={0.7}
+                  testID={btn.testID}
+                >
+                  {btn.icon && <View style={tw`mr-1.5`}>{btn.icon}</View>}
+                  <Text style={[
+                    tw`${btn.textColor || 'text-white'} text-[15px]`,
+                    { fontFamily: 'Nunito-ExtraBold' },
+                  ]}>{btn.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
           {children}
         </Animated.View>
       </View>

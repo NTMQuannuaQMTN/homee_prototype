@@ -319,40 +319,42 @@ export default function EditProfile() {
                   </View>
                 </TouchableOpacity>
       {/* Draggable Modal for background actions */}
-      <DraggableModal visible={showBgModal} onClose={() => setShowBgModal(false)}>
-        <Text style={[tw`text-white text-[16px] mb-5 text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Background options</Text>
-        <View style={tw`px-6`}>
-          <TouchableOpacity
-            style={[tw`bg-green-500 rounded-xl py-3 mb-2.5 items-center flex-row justify-center`]} // flex-row for icon
-            onPress={async () => {
+      <DraggableModal
+        visible={showBgModal}
+        onClose={() => setShowBgModal(false)}
+        title="Background options"
+        buttons={[
+          {
+            label: 'Upload new background',
+            onPress: async () => {
               await pickBackground();
               setShowBgModal(false);
-            }}
-            activeOpacity={0.7}
-          >
-            <UploadIcon width={20} height={20} style={tw`mr-1.5`} />
-            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold', marginRight: 8 }]}>Upload new background</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[tw`bg-rose-600 rounded-xl py-3 mb-2.5 items-center flex-row justify-center`]}
-            onPress={() => {
+            },
+            icon: <UploadIcon width={20} height={20} style={tw`mr-1.5`} />,
+            color: 'bg-green-500',
+            textColor: 'text-white',
+            testID: 'upload-bg-btn',
+          },
+          {
+            label: 'Remove background',
+            onPress: () => {
               setBgInput('');
               setShowBgModal(false);
-            }}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="trash-outline" size={20} color="white" style={tw`mr-1.5`} />
-            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Remove background</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[tw`bg-white/5 rounded-xl py-3 items-center`]}
-            onPress={() => setShowBgModal(false)}
-            activeOpacity={0.7}
-          >
-            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Not now</Text>
-          </TouchableOpacity>
-        </View>
-      </DraggableModal>
+            },
+            icon: <Ionicons name="trash-outline" size={20} color="white" style={tw`mr-1.5`} />,
+            color: 'bg-rose-600',
+            textColor: 'text-white',
+            testID: 'remove-bg-btn',
+          },
+          {
+            label: 'Not now',
+            onPress: () => setShowBgModal(false),
+            color: 'bg-white/5',
+            textColor: 'text-white',
+            testID: 'notnow-bg-btn',
+          },
+        ]}
+      />
                 {/* Profile picture */}
                 <View style={{ alignItems: 'center', marginBottom: 12 }}>
                   <View style={{ width: 100, height: 100, position: 'relative' }}>
@@ -719,13 +721,15 @@ export default function EditProfile() {
                 <TouchableOpacity
                   style={[
                     tw`bg-white rounded-full py-[10] w-full items-center`,
-                    !(input.name && input.name.trim() && input.username && input.username.trim()) && tw`opacity-50`
+                    (!(input.name && input.name.trim() && input.username && input.username.trim()) || loading) && tw`opacity-50`
                   ]}
                   onPress={handleSave}
-                  activeOpacity={input.name && input.name.trim() && input.username && input.username.trim() ? 0.85 : 1}
-                  disabled={!(input.name && input.name.trim() && input.username && input.username.trim())}
+                  activeOpacity={input.name && input.name.trim() && input.username && input.username.trim() && !loading ? 0.85 : 1}
+                  disabled={!(input.name && input.name.trim() && input.username && input.username.trim()) || loading}
                 >
-                  <Text style={[tw`text-black text-[15px]`, { fontFamily: 'Nunito-ExtraBold', opacity: input.name && input.name.trim() && input.username && input.username.trim() ? 1 : 0.5 }]}>Save changes</Text>
+                  <Text style={[tw`text-black text-[15px]`, { fontFamily: 'Nunito-ExtraBold', opacity: input.name && input.name.trim() && input.username && input.username.trim() && !loading ? 1 : 0.5 }]}>
+                    {loading ? 'Saving...' : 'Save changes'}
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={tw`flex-row items-center justify-center mt-4`}
