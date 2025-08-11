@@ -3,12 +3,17 @@ import { View, Text, Touchable, TouchableOpacity, ScrollView } from "react-nativ
 import tw from "twrnc";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
+import GroupCard from "@/app/(group)/groupcard";
 
 interface Group {
     id: string;
-    name: string;
-    description?: string;
-    created_at: string;
+    title: string;
+    bio?: string;
+    creator: string;
+  //   created: string;
+    group_image: string;
+    member_count: number;
+    onPress?: () => void;
 }
 
 export default function GroupList() {
@@ -25,7 +30,7 @@ export default function GroupList() {
 
             const { data, error } = await supabase
                 .from('groups')
-                .select('*')
+                .select('id, title, bio, creator, group_image, public, member_count')
                 .range(currentOffset, currentOffset + limit - 1)
                 .eq('public', true)
                 .order('member_count', { ascending: false })
@@ -68,20 +73,15 @@ export default function GroupList() {
             <Text style={[tw`text-white text-2xl mt-1`, { fontFamily: 'Nunito-ExtraBold' }]}>Groups</Text>
             <ScrollView horizontal style={tw`h-32 flex-row mt-2`} contentContainerStyle={tw`gap-4`}>
                 {groups.map((group) => (
-                    <TouchableOpacity
-                        key={group.id}
-                        style={tw`h-32 w-32 bg-gray-500 rounded-lg justify-center items-center p-2`}
-                    // onPress={() => router.navigate(`/(group)/${group.id}`)}
-                    >
-                        <Text style={tw`text-white text-center font-bold`} numberOfLines={2}>
-                            {group.name}
-                        </Text>
-                        {group.description && (
-                            <Text style={tw`text-white text-xs text-center mt-1`} numberOfLines={2}>
-                                {group.description}
-                            </Text>
-                        )}
-                    </TouchableOpacity>
+                    <GroupCard key={group.id}
+                        id={group.id}
+                        title={group.title}
+                        bio={group.bio}
+                        creator={group.creator}
+                        group_image={group.group_image}
+                        member_count={group.member_count}
+                        onPress={() => {}}
+                    />
                 ))}
 
                 <TouchableOpacity
