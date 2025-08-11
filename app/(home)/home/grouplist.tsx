@@ -22,12 +22,13 @@ export default function GroupList() {
         setLoading(true);
         try {
             const currentOffset = isLoadMore ? offset : 0;
-            
+
             const { data, error } = await supabase
                 .from('groups')
                 .select('*')
                 .range(currentOffset, currentOffset + limit - 1)
                 .eq('public', true)
+                .order('member_count', { ascending: false })
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -41,7 +42,7 @@ export default function GroupList() {
                 } else {
                     setGroups(data);
                 }
-                
+
                 setOffset(currentOffset + limit);
                 setHasMore(data.length === limit);
             }
@@ -67,10 +68,10 @@ export default function GroupList() {
             <Text style={[tw`text-white text-2xl mt-1`, { fontFamily: 'Nunito-ExtraBold' }]}>Groups</Text>
             <ScrollView horizontal style={tw`h-32 flex-row mt-2`} contentContainerStyle={tw`gap-4`}>
                 {groups.map((group) => (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         key={group.id}
                         style={tw`h-32 w-32 bg-gray-500 rounded-lg justify-center items-center p-2`}
-                        // onPress={() => router.navigate(`/(group)/${group.id}`)}
+                    // onPress={() => router.navigate(`/(group)/${group.id}`)}
                     >
                         <Text style={tw`text-white text-center font-bold`} numberOfLines={2}>
                             {group.name}
@@ -82,17 +83,17 @@ export default function GroupList() {
                         )}
                     </TouchableOpacity>
                 ))}
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                     style={tw`h-32 w-32 bg-gray-500 rounded-lg justify-center items-center`}
                     onPress={() => router.navigate('/(create)/group')}
                 >
                     <Text style={tw`text-white text-2xl`}>+</Text>
                 </TouchableOpacity>
             </ScrollView>
-            
+
             {hasMore && (
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={tw`mt-2 bg-blue-500 rounded-lg py-2 px-4 self-center`}
                     onPress={handleSeeMore}
                     disabled={loading}
