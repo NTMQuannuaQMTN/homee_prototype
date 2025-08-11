@@ -18,6 +18,7 @@ export default function ImageModal({ visible, onClose, imageOptions, onSelect }:
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: 'images',
             allowsEditing: true,
+            aspect: [1, 1],
             quality: 1
         });
         if (!result.canceled) {
