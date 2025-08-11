@@ -85,7 +85,7 @@ export default function Index() {
             alignItems: 'center',
             justifyContent: 'center',
             paddingHorizontal: 0.1 * width,
-            marginTop: slide < 2 ? 0.2 * height : 0.15 * height,
+            marginTop: 0.2 * height,
           }}
           style={{ height: 0.6 * height, width: width }}
           onScroll={e => {
@@ -129,7 +129,7 @@ export default function Index() {
       </View>
 
       {/* Bottom button(s) - fixed at bottom */}
-      <View style={tw`h-20 justify-center`}>
+      <View style={tw`mx-6 mb-6 h-20 justify-center`}>
         {slide >= 2 && (
           <>
             <TouchableOpacity
