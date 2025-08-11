@@ -1,6 +1,6 @@
 import { supabase } from '@/utils/supabase';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { LinearGradient } from 'expo-linear-gradient';
+import GradientBackground from '@/app/components/GradientBackground';
 import * as MediaLibrary from 'expo-media-library';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -168,27 +168,17 @@ const QRProfile: React.FC = () => {
   if (!permission) {
     // Camera permissions are still loading
     return (
-      <LinearGradient
-        colors={['#080B32', '#0E1241', '#291C56', '#392465', '#51286A']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={{ flex: 1 }}
-      >
+      <GradientBackground>
         <View style={[tw`flex-1 items-center justify-center`]}>
           <Text style={[tw`text-white text-lg`, { fontFamily: 'Nunito-Medium' }]}>Loading camera...</Text>
         </View>
-      </LinearGradient>
+      </GradientBackground>
     );
   }
 
   if (!permission.granted) {
     return (
-      <LinearGradient
-        colors={['#080B32', '#0E1241', '#291C56', '#392465', '#51286A']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={{ flex: 1 }}
-      >
+      <GradientBackground>
         <View style={[tw`flex-1 items-center justify-center px-8`]}>
           <Text style={[tw`text-white text-lg text-center mb-4`, { fontFamily: 'Nunito-ExtraBold' }]}>Camera access denied 🥺</Text>
           <Text style={[tw`text-white text-[15px] text-center mb-6`, { fontFamily: 'Nunito-Medium' }]}>Please enable camera permission in your device settings to scan QR codes.</Text>
@@ -205,17 +195,12 @@ const QRProfile: React.FC = () => {
             <Text style={[tw`text-white text-[14px]`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Back</Text>
           </TouchableOpacity>
         </View>
-      </LinearGradient>
+      </GradientBackground>
     );
   }
 
   return (
-    <LinearGradient
-      colors={['#080B32', '#0E1241', '#291C56', '#392465', '#51286A']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={{ flex: 1 }}
-    >
+    <GradientBackground>
       <View style={[tw`flex-1 items-center pt-13 justify-start`]}> 
         {/* Customizable QR Error Modal (always rendered at root) */}
         {showQrErrorModal && (
@@ -413,7 +398,7 @@ const QRProfile: React.FC = () => {
           </View>
         )}
       </View>
-    </LinearGradient>
+    </GradientBackground>
   );
 };
 

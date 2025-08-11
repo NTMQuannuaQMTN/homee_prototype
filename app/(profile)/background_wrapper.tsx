@@ -1,4 +1,4 @@
-import { LinearGradient } from 'expo-linear-gradient';
+import GradientBackground from '@/app/components/GradientBackground';
 import React from 'react';
 import { ImageBackground, StyleSheet, View } from 'react-native';
 
@@ -31,15 +31,12 @@ export default function ProfileBackgroundWrapper({
       </ImageBackground>
     );
   }
-  // Fallback to linear gradient
+  // Fallback to shared gradient background
   return (
-    <LinearGradient
-      colors={['#080B32', '#0E1241', '#291C56', '#392465', '#51286A']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={{ flex: 1, borderRadius }}
-    >
-      {children}
-    </LinearGradient>
+    <View style={{ flex: 1, borderRadius, overflow: 'hidden' }}>
+      <GradientBackground>
+        <View style={{ flex: 1 }}>{children}</View>
+      </GradientBackground>
+    </View>
   );
 }
