@@ -4,7 +4,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Animated, Easing, Image, ImageBackground, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+// No fixed modal height; will measure content dynamically
+let BG_MODAL_HEIGHT = 0;
 import tw from 'twrnc';
+import DraggableModal from '../components/DraggableModal';
+import { Ionicons } from '@expo/vector-icons';
+import UploadIcon from '../../assets/icons/uploadwhite-icon.svg';
 import { useUserStore } from '../store/userStore';
 import CustomDatePicker from './customdatepicker';
 
@@ -19,6 +24,9 @@ import ProfileBackgroundWrapper from './background_wrapper';
 const bggreenmodal = '#22C55E';
 
 export default function EditProfile() {
+  // Draggable modal state
+  const [showBgModal, setShowBgModal] = useState(false);
+
   const [showSuccess, setShowSuccess] = useState(false);
   // Focus state for each input
   const [focus, setFocus] = useState({
@@ -299,17 +307,52 @@ export default function EditProfile() {
                 <Text style={[tw`w-full text-center text-white text-[16px] mb-4`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit profile</Text>
                 {/* Change background button */}
                 <TouchableOpacity
-                  style={[
+                  style={[ 
                     tw`flex-row rounded-xl items-center justify-center mb-4 bg-white p-2.5`
                   ]}
-                  onPress={pickBackground} // Placeholder for background change logic
+                  onPress={() => setShowBgModal(true)}
                   activeOpacity={0.7}
                 >
                   <View style={tw`flex-row gap-2 items-center`}>
-                    <Camera></Camera>
-                    <Text style={[tw`text-black`, { fontFamily: 'Nunito-ExtraBold', fontSize: 14 }]}>Change background</Text>
+                    <Camera />
+                    <Text style={[tw`text-black`, { fontFamily: 'Nunito-ExtraBold', fontSize: 15 }]}>Change background</Text>
                   </View>
                 </TouchableOpacity>
+      {/* Draggable Modal for background actions */}
+      <DraggableModal visible={showBgModal} onClose={() => setShowBgModal(false)}>
+        <Text style={[tw`text-white text-[16px] mb-5 text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Background options</Text>
+        <View style={tw`px-6`}>
+          <TouchableOpacity
+            style={[tw`bg-green-500 rounded-xl py-3 mb-2.5 items-center flex-row justify-center`]} // flex-row for icon
+            onPress={async () => {
+              await pickBackground();
+              setShowBgModal(false);
+            }}
+            activeOpacity={0.7}
+          >
+            <UploadIcon width={20} height={20} style={tw`mr-1.5`} />
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold', marginRight: 8 }]}>Upload new background</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[tw`bg-rose-600 rounded-xl py-3 mb-2.5 items-center flex-row justify-center`]}
+            onPress={() => {
+              setBgInput('');
+              setShowBgModal(false);
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="trash-outline" size={20} color="white" style={tw`mr-1.5`} />
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Remove background</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[tw`bg-white/5 rounded-xl py-3 items-center`]}
+            onPress={() => setShowBgModal(false)}
+            activeOpacity={0.7}
+          >
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Not now</Text>
+          </TouchableOpacity>
+        </View>
+      </DraggableModal>
                 {/* Profile picture */}
                 <View style={{ alignItems: 'center', marginBottom: 12 }}>
                   <View style={{ width: 100, height: 100, position: 'relative' }}>
