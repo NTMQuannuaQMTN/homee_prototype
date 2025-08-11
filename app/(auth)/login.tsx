@@ -22,6 +22,7 @@ export default function Login() {
     const [isFocused, setIsFocused] = useState(false);
     const [isFocusedCode, setIsFocusedCode] = useState(false);
     const [isFocusedPass, setIsFocusedPass] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const { setSignupInfo, setPass } = useAuthStore();
 
@@ -107,7 +108,7 @@ export default function Login() {
                 setIsFocusedCode(false);
                 setIsFocusedPass(false);
             }}>
-                <View style={{ flex: 1 }}>
+                <View style={tw`flex-1 mx-4`}> 
                     {/* Center content - takes up most of the screen */}
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <View style={tw`mb-8 items-center`}>
@@ -154,25 +155,38 @@ export default function Login() {
                                 imageStyle={{ borderRadius: 8, opacity: isFocusedPass ? 0.3 : 0 }}
                                 style={tw`w-full rounded-[2]`}
                             >
-                                <TextInput
-                                    style={[
-                                        tw`w-full px-3 py-3 text-white text-[15px]`,
-                                        {
-                                            fontFamily: 'Nunito-Medium',
-                                            borderWidth: 1,
-                                            borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
-                                            backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
-                                            borderRadius: 8,
-                                        }
-                                    ]}
-                                    placeholder="Password"
-                                    placeholderTextColor={'#9CA3AF'}
-                                    value={password}
-                                    onChangeText={(newVal) => { setPassword(newVal); setValid(true); }}
-                                    onFocus={() => setIsFocusedPass(true)}
-                                    onBlur={() => setIsFocusedPass(false)}
-                                    secureTextEntry={true}
-                                />
+                                <View style={tw`flex-row items-center`}>
+                                    <TextInput
+                                        style={[
+                                            tw`flex-1 px-3 py-3 text-white text-[15px]`,
+                                            {
+                                                fontFamily: 'Nunito-Medium',
+                                                borderWidth: 1,
+                                                borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
+                                                backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                                                borderRadius: 8,
+                                            }
+                                        ]}
+                                        placeholder="Password"
+                                        placeholderTextColor={'#9CA3AF'}
+                                        value={password}
+                                        onChangeText={(newVal) => { setPassword(newVal); setValid(true); }}
+                                        onFocus={() => setIsFocusedPass(true)}
+                                        onBlur={() => setIsFocusedPass(false)}
+                                        secureTextEntry={!showPassword}
+                                    />
+                                    <TouchableOpacity
+                                        onPress={() => setShowPassword((prev) => !prev)}
+                                        style={tw`absolute right-0 px-3 py-3`}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Ionicons
+                                            name={showPassword ? 'eye-off' : 'eye'}
+                                            size={18}
+                                            color="#fff"
+                                        />
+                                    </TouchableOpacity>
+                                </View>
                             </ImageBackground>
                         </View>}
 
@@ -237,25 +251,38 @@ export default function Login() {
                                 imageStyle={{ borderRadius: 8, opacity: isFocusedPass ? 0.3 : 0 }}
                                 style={tw`w-full rounded-[2]`}
                             >
-                                <TextInput
-                                    style={[
-                                        tw`w-full px-3 py-3 text-white text-[15px]`,
-                                        {
-                                            fontFamily: 'Nunito-Medium',
-                                            borderWidth: 1,
-                                            borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
-                                            backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
-                                            borderRadius: 8,
-                                        }
-                                    ]}
-                                    placeholder="Password"
-                                    placeholderTextColor={'#9CA3AF'}
-                                    value={password}
-                                    onChangeText={(newVal) => { setPassword(newVal); setValid(true); }}
-                                    onFocus={() => setIsFocusedPass(true)}
-                                    onBlur={() => setIsFocusedPass(false)}
-                                    secureTextEntry={true}
-                                />
+                                <View style={tw`flex-row items-center`}>
+                                    <TextInput
+                                        style={[
+                                            tw`flex-1 px-3 py-3 text-white text-[15px]`,
+                                            {
+                                                fontFamily: 'Nunito-Medium',
+                                                borderWidth: 1,
+                                                borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
+                                                backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                                                borderRadius: 8,
+                                            }
+                                        ]}
+                                        placeholder="Password"
+                                        placeholderTextColor={'#9CA3AF'}
+                                        value={password}
+                                        onChangeText={(newVal) => { setPassword(newVal); setValid(true); }}
+                                        onFocus={() => setIsFocusedPass(true)}
+                                        onBlur={() => setIsFocusedPass(false)}
+                                        secureTextEntry={!showPassword}
+                                    />
+                                    <TouchableOpacity
+                                        onPress={() => setShowPassword((prev) => !prev)}
+                                        style={tw`absolute right-0 px-3 py-3`}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Ionicons
+                                            name={showPassword ? 'eye-off' : 'eye'}
+                                            size={18}
+                                            color="#fff"
+                                        />
+                                    </TouchableOpacity>
+                                </View>
                             </ImageBackground>
                         </View>}
 
@@ -280,8 +307,13 @@ export default function Login() {
 
                         <View style={tw`w-full py-2 mt-1.5 justify-start items-start`}>
                             <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-Medium' }]}>Don't want to use {mode === 'email' ? 'email' : 'phone number'}?{' '}</Text>
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => { setMode(mode === 'email' ? 'phone' : 'email'); setLoginInfo('') }}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => { setMode(mode === 'email' ? 'phone' : 'email'); setLoginInfo(''); setNotRegistered(false); }}>
                                 <Text style={{ fontFamily: 'Nunito-ExtraBold', color: '#fff', fontSize: 13 }}>Log in with {mode === 'email' ? 'phone number' : 'email'} instead</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={tw`w-full items-start mt-6`}>
+                            <TouchableOpacity activeOpacity={0.7} onPress={() => { /* forgot password logic to be implemented */ }}>
+                                <Text style={{ fontFamily: 'Nunito-Bold', color: '#9ca3af', fontSize: 12, marginBottom: 6 }}>Forgot password?</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -301,18 +333,17 @@ export default function Login() {
                         disabled={
                             (mode === 'email' && (!loginInfo.trim() || !loginInfo.includes('@')))
                             || (mode === 'phone' && !loginInfo.trim())
+                            || !password
                         }
                         style={[
                             tw`rounded-full py-[10] w-full items-center mb-4`,
                             {
-                                backgroundColor:
-                                    (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
-                                    (mode === 'phone' && loginInfo.trim())
-                                        ? '#FFFFFF' : '#FFFFFF',
+                                backgroundColor: '#FFFFFF',
                                 opacity:
-                                    (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
-                                    (mode === 'phone' && loginInfo.trim())
-                                        ? 1 : 0.3
+                                    ((mode === 'email' && (!loginInfo.trim() || !loginInfo.includes('@')))
+                                    || (mode === 'phone' && !loginInfo.trim())
+                                    || !password)
+                                    ? 0.3 : 1
                             }
                         ]}
                     >

@@ -24,6 +24,9 @@ export default function SignUp() {
     const [isFocusedCode, setIsFocusedCode] = useState(false);
     const [isFocusedPass, setIsFocusedPass] = useState(false);
 
+    // State for password visibility toggle
+    const [showPassword, setShowPassword] = useState(false);
+
     const { setSignupInfo, setPass } = useAuthStore();
 
     const checkEmail = async (email: string) => {
@@ -96,7 +99,7 @@ export default function SignUp() {
 
             // router.replace('/(auth)/verify');
         } else {
-            Alert.alert('no phone');
+            Alert.alert('Please enter a valid phone number');
         }
     };
 
@@ -108,7 +111,7 @@ export default function SignUp() {
                 setIsFocusedCode(false);
                 setIsFocusedPass(false);
             }}>
-                <View style={{ flex: 1 }}>
+                <View style={tw`flex-1 mx-4`}> 
                     {/* Center content - takes up most of the screen */}
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <View style={tw`mb-8 items-center`}>
@@ -151,33 +154,46 @@ export default function SignUp() {
                                 imageStyle={{ borderRadius: 8, opacity: isFocusedPass ? 0.3 : 0 }}
                                 style={tw`w-full rounded-[2]`}
                             >
-                                <TextInput
-                                    style={[
-                                        tw`w-full px-3 py-3 text-white text-[15px]`,
-                                        {
-                                            fontFamily: 'Nunito-Medium',
-                                            borderWidth: 1,
-                                            borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
-                                            backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
-                                            borderRadius: 8,
-                                        }
-                                    ]}
-                                    placeholder="Password"
-                                    placeholderTextColor={'#9CA3AF'}
-                                    value={password}
-                                    onChangeText={(newVal) => {
-                                        setPassword(newVal); setValid(true);
-                                        setPassRule([
-                                            /[A-Z]/.test(newVal),      // At least one uppercase letter
-                                            /[a-z]/.test(newVal),      // At least one lowercase letter
-                                            /[0-9]/.test(newVal),      // At least one number
-                                            newVal.length >= 6         // At least 6 characters
-                                        ])
-                                    }}
-                                    onFocus={() => setIsFocusedPass(true)}
-                                    onBlur={() => setIsFocusedPass(false)}
-                                    secureTextEntry={true}
-                                />
+                                <View style={tw`flex-row items-center`}>
+                                    <TextInput
+                                        style={[
+                                            tw`flex-1 px-3 py-3 text-white text-[15px]`,
+                                            {
+                                                fontFamily: 'Nunito-Medium',
+                                                borderWidth: 1,
+                                                borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
+                                                backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                                                borderRadius: 8,
+                                            }
+                                        ]}
+                                        placeholder="Password"
+                                        placeholderTextColor={'#9CA3AF'}
+                                        value={password}
+                                        onChangeText={(newVal) => {
+                                            setPassword(newVal); setValid(true);
+                                            setPassRule([
+                                                /[A-Z]/.test(newVal),      // At least one uppercase letter
+                                                /[a-z]/.test(newVal),      // At least one lowercase letter
+                                                /[0-9]/.test(newVal),      // At least one number
+                                                newVal.length >= 6         // At least 6 characters
+                                            ])
+                                        }}
+                                        onFocus={() => setIsFocusedPass(true)}
+                                        onBlur={() => setIsFocusedPass(false)}
+                                        secureTextEntry={!showPassword}
+                                    />
+                                    <TouchableOpacity
+                                        onPress={() => setShowPassword((prev) => !prev)}
+                                        style={tw`absolute right-0 px-3 py-3`}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Ionicons
+                                            name={showPassword ? 'eye-off' : 'eye'}
+                                            size={18}
+                                            color="#fff"
+                                        />
+                                    </TouchableOpacity>
+                                </View>
                             </ImageBackground>
                         </View>}
 
@@ -246,39 +262,68 @@ export default function SignUp() {
                                 imageStyle={{ borderRadius: 8, opacity: isFocusedPass ? 0.3 : 0 }}
                                 style={tw`w-full rounded-[2]`}
                             >
-                                <TextInput
-                                    style={[
-                                        tw`w-full px-3 py-3 text-white text-[15px]`,
-                                        {
-                                            fontFamily: 'Nunito-Medium',
-                                            borderWidth: 1,
-                                            borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
-                                            backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
-                                            borderRadius: 8,
-                                        }
-                                    ]}
-                                    placeholder="Password"
-                                    placeholderTextColor={'#9CA3AF'}
-                                    value={password}
-                                    onChangeText={(newVal) => { setPassword(newVal); setValid(true);
-                                        setPassRule([
-                                            /[A-Z]/.test(newVal),      // At least one uppercase letter
-                                            /[a-z]/.test(newVal),      // At least one lowercase letter
-                                            /[0-9]/.test(newVal),      // At least one number
-                                            newVal.length >= 6         // At least 6 characters
-                                        ])
-                                    }}
-                                    onFocus={() => setIsFocusedPass(true)}
-                                    onBlur={() => setIsFocusedPass(false)}
-                                    secureTextEntry={true}
-                                />
+                                <View style={tw`flex-row items-center`}>
+                                    <TextInput
+                                        style={[
+                                            tw`flex-1 px-3 py-3 text-white text-[15px]`,
+                                            {
+                                                fontFamily: 'Nunito-Medium',
+                                                borderWidth: 1,
+                                                borderColor: isFocusedPass ? '#FFFFFF' : 'rgba(255, 255, 255, 0.1)',
+                                                backgroundColor: isFocusedPass ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                                                borderRadius: 8,
+                                            }
+                                        ]}
+                                        placeholder="Password"
+                                        placeholderTextColor={'#9CA3AF'}
+                                        value={password}
+                                        onChangeText={(newVal) => { setPassword(newVal); setValid(true);
+                                            setPassRule([
+                                                /[A-Z]/.test(newVal),      // At least one uppercase letter
+                                                /[a-z]/.test(newVal),      // At least one lowercase letter
+                                                /[0-9]/.test(newVal),      // At least one number
+                                                newVal.length >= 6         // At least 6 characters
+                                            ])
+                                        }}
+                                        onFocus={() => setIsFocusedPass(true)}
+                                        onBlur={() => setIsFocusedPass(false)}
+                                        secureTextEntry={!showPassword}
+                                    />
+                                    <TouchableOpacity
+                                        onPress={() => setShowPassword((prev) => !prev)}
+                                        style={tw`absolute right-0 px-3 py-3`}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Ionicons
+                                            name={showPassword ? 'eye-off' : 'eye'}
+                                            size={18}
+                                            color="#fff"
+                                        />
+                                    </TouchableOpacity>
+                                </View>
                             </ImageBackground>
                         </View>}
                         
-                        {passRule[0] || <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>At least one uppercase please...</Text>}
-                        {passRule[1] || <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>At least one lowercase please...</Text>}
-                        {passRule[2] || <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>At least one number please...</Text>}
-                        {passRule[3] || <Text style={[tw`text-[#FFFFFF]`, { fontFamily: 'Nunito-Medium' }]}>At least six characters please...</Text>}
+                        {isFocusedPass && (
+                            <View style={tw`w-full mt-2`}> 
+                                <View style={tw`flex-row items-center mb-1`}>
+                                    <Ionicons name={passRule[0] ? 'checkmark-circle' : 'close-circle'} size={16} color={passRule[0] ? tw.color('green-500') : tw.color('rose-600')} style={tw`mr-1.5`} />
+                                    <Text style={[tw`${passRule[0] ? 'text-green-500' : 'text-rose-600'} text-[13px] text-left`, { fontFamily: 'Nunito-Medium' }]}>Must have at least one uppercase</Text>
+                                </View>
+                                <View style={tw`flex-row items-center mb-1`}>
+                                    <Ionicons name={passRule[1] ? 'checkmark-circle' : 'close-circle'} size={16} color={passRule[1] ? tw.color('green-500') : tw.color('rose-600')} style={tw`mr-1.5`} />
+                                    <Text style={[tw`${passRule[1] ? 'text-green-500' : 'text-rose-600'} text-[13px] text-left`, { fontFamily: 'Nunito-Medium' }]}>Must have at least one lowercase</Text>
+                                </View>
+                                <View style={tw`flex-row items-center mb-1`}>
+                                    <Ionicons name={passRule[2] ? 'checkmark-circle' : 'close-circle'} size={16} color={passRule[2] ? tw.color('green-500') : tw.color('rose-600')} style={tw`mr-1.5`} />
+                                    <Text style={[tw`${passRule[2] ? 'text-green-500' : 'text-rose-600'} text-[13px] text-left`, { fontFamily: 'Nunito-Medium' }]}>Must have at least one number</Text>
+                                </View>
+                                <View style={tw`flex-row items-center`}>
+                                    <Ionicons name={passRule[3] ? 'checkmark-circle' : 'close-circle'} size={16} color={passRule[3] ? tw.color('green-500') : tw.color('rose-600')} style={tw`mr-1.5`} />
+                                    <Text style={[tw`${passRule[3] ? 'text-green-500' : 'text-rose-600'} text-[13px] text-left`, { fontFamily: 'Nunito-Medium' }]}>Must have at least six characters</Text>
+                                </View>
+                            </View>
+                        )}
 
                         {/* Error */}
                         {valid ||
@@ -319,18 +364,19 @@ export default function SignUp() {
                         disabled={
                             (mode === 'email' && (!loginInfo.trim() || !loginInfo.includes('@')))
                             || (mode === 'phone' && !loginInfo.trim())
+                            || !password
+                            || passRule.indexOf(false) >= 0
                         }
                         style={[
                             tw`rounded-full py-[10] w-full items-center mb-4`,
                             {
-                                backgroundColor:
-                                    (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
-                                        (mode === 'phone' && loginInfo.trim())
-                                        ? '#FFFFFF' : '#FFFFFF',
+                                backgroundColor: '#FFFFFF',
                                 opacity:
-                                    (mode === 'email' && loginInfo.trim() && loginInfo.includes('@')) ||
-                                        (mode === 'phone' && loginInfo.trim())
-                                        ? 1 : 0.3
+                                    ((mode === 'email' && (!loginInfo.trim() || !loginInfo.includes('@')))
+                                    || (mode === 'phone' && !loginInfo.trim())
+                                    || !password
+                                    || passRule.indexOf(false) >= 0)
+                                    ? 0.3 : 1
                             }
                         ]}
                     >
