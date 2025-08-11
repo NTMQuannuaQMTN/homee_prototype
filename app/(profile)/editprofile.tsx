@@ -3,7 +3,7 @@ import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Easing, Image, ImageBackground, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, Animated, Easing, Image, ImageBackground, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View, GestureResponderEvent, PanResponderGestureState } from 'react-native';
 // No fixed modal height; will measure content dynamically
 let BG_MODAL_HEIGHT = 0;
 import tw from 'twrnc';
@@ -15,10 +15,7 @@ import CustomDatePicker from './customdatepicker';
 
 import { supabase } from '@/utils/supabase';
 import Camera from '../../assets/icons/camera_icon.svg';
-import FBIcon from '../../assets/icons/fb-icon.svg';
-import InstagramIcon from '../../assets/icons/insta-icon.svg';
-import SnapchatIcon from '../../assets/icons/snapchat-icon.svg';
-import XIcon from '../../assets/icons/x-icon.svg';
+
 import ProfileBackgroundWrapper from './background_wrapper';
 
 const bggreenmodal = '#22C55E';
@@ -303,7 +300,7 @@ export default function EditProfile() {
               keyboardShouldPersistTaps="handled"
               contentContainerStyle={{ paddingBottom: Object.values(focus).some(Boolean) ? 20 : 0 }}
             >
-              <View style={{ marginTop: 50, paddingTop: 3, marginHorizontal: 'auto', width: '90%', paddingBottom: 20 }}>
+              <View style={{ marginTop: 50, paddingTop: 3, marginHorizontal: 'auto', width: '90%', paddingBottom: 10 }}>
                 <Text style={[tw`w-full text-center text-white text-[16px] mb-4`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit profile</Text>
                 {/* Change background button */}
                 <TouchableOpacity
@@ -356,10 +353,10 @@ export default function EditProfile() {
         ]}
       />
                 {/* Profile picture */}
-                <View style={{ alignItems: 'center', marginBottom: 12 }}>
-                  <View style={{ width: 100, height: 100, position: 'relative' }}>
+                <View style={{ alignItems: 'center', marginBottom: 16 }}>
+                  <View style={{ width: 120, height: 120, position: 'relative' }}>
                     <TouchableOpacity
-                      style={[tw`rounded-full border-2 border-white`, { width: 100, height: 100, overflow: 'hidden', backgroundColor: '#222' }]}
+                      style={[tw`rounded-full border-2 border-white`, { width: 120, height: 120, overflow: 'hidden', backgroundColor: '#222' }]}
                       onPress={pickAvatar}
                       activeOpacity={0.7}
                     >
@@ -367,7 +364,7 @@ export default function EditProfile() {
                       {avtInput ? (
                         <Image
                           source={{ uri: avtInput + (avtInput.startsWith('file') ? '' : `?cb=${user?.id || ''}`) }}
-                          style={{ width: 100, height: 100 }}
+                          style={{ width: 120, height: 120 }}
                           resizeMode="cover"
                           defaultSource={require('../../assets/icons/pfpdefault.svg')}
                           onError={() => { }}
@@ -375,7 +372,7 @@ export default function EditProfile() {
                       ) : (
                         <Image
                           source={require('../../assets/icons/pfpdefault.svg')}
-                          style={{ width: 100, height: 100 }}
+                          style={{ width: 120, height: 120 }}
                           resizeMode="cover"
                         />
                       )}
@@ -384,7 +381,7 @@ export default function EditProfile() {
                     <TouchableOpacity
                       onPress={pickAvatar}
                       activeOpacity={0.7}
-                      style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: 'white', borderRadius: 999, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', elevation: 3, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, zIndex: 10 }}
+                      style={{ position: 'absolute', bottom: 1, right: 1, backgroundColor: 'white', borderRadius: 999, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', elevation: 3, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, zIndex: 10 }}
                     >
                       <Camera width={18} height={18} />
                     </TouchableOpacity>
@@ -402,9 +399,9 @@ export default function EditProfile() {
                       >
                         <TextInput
                           style={[
-                            tw`px-4 py-2.5 text-center text-[14px]`,
+                            tw`px-4 py-2.5 text-center text-[15px]`,
                             {
-                              fontFamily: 'Nunito-Medium',
+                              fontFamily: 'Nunito-ExtraBold',
                               color: input.name && input.name.trim() ? '#fff' : '#fff',
                               borderWidth: 1,
                               borderColor: focus.name ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
@@ -436,9 +433,9 @@ export default function EditProfile() {
                     >
                       <TextInput
                         style={[
-                          tw`px-4 py-2.5 text-center text-[14px]`,
+                          tw`px-4 py-2.5 text-center text-[15px]`,
                           {
-                            fontFamily: 'Nunito-Medium',
+                            fontFamily: 'Nunito-ExtraBold',
                             color: input.username && input.username.trim() ? '#fff' : '#fff',
                             borderWidth: 1,
                             borderColor: focus.username ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
@@ -476,9 +473,9 @@ export default function EditProfile() {
                     >
                       <TextInput
                         style={[
-                          tw`px-4 py-2.5 text-center text-[14px]`,
+                          tw`px-4 py-2.5 text-center text-[15px]`,
                           {
-                            fontFamily: 'Nunito-Medium',
+                            fontFamily: 'Nunito-ExtraBold',
                             color: dobAvail && dob ? '#fff' : '#fff',
                             borderWidth: 1,
                             borderColor: focus.birthday ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
@@ -505,9 +502,9 @@ export default function EditProfile() {
                     >
                       <TextInput
                         style={[
-                          tw`px-4 py-2.5 text-[14px]`,
+                          tw`px-4 py-2.5 text-[15px]`,
                           {
-                            fontFamily: 'Nunito-Medium',
+                            fontFamily: 'Nunito-ExtraBold',
                             color: input.bio && input.bio.trim() ? '#fff' : '#fff',
                             borderWidth: 1,
                             borderColor: focus.bio ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
@@ -553,22 +550,24 @@ export default function EditProfile() {
                     >
                       <View
                         style={[
-                          tw`flex-row items-center bg-white/5 rounded-lg`,
+                          tw`flex-row items-center`,
                           {
                             borderWidth: 1,
-                            borderColor: focus.instagram_url ? '#fff' : 'rgba(255,255,255,0.1)',
+                            borderColor: focus.instagram_url ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
+                            backgroundColor: focus.instagram_url ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                            borderRadius: 8,
                             height: 48,
                             paddingHorizontal: 12,
                             alignItems: 'center',
                           },
                         ]}
                       >
-                        <InstagramIcon width={22} height={22} style={{ marginRight: 8, zIndex: 1 }} />
+                        <Ionicons name="logo-instagram" size={20} color="#fff" style={{ marginRight: 8, zIndex: 1 }} />
                         <TextInput
                           style={[
-                            tw`flex-1 text-left px-2 text-[14px]`,
+                            tw`flex-1 text-left px-2 text-[15px]`,
                             {
-                              fontFamily: 'Nunito-Medium',
+                              fontFamily: 'Nunito-Bold',
                               color: input.instagram_url && input.instagram_url.trim() ? '#fff' : '#fff',
                               backgroundColor: 'transparent',
                               borderWidth: 0,
@@ -587,7 +586,7 @@ export default function EditProfile() {
                         />
                       </View>
                     </ImageBackground>
-                    {/* X (Twitter) */}
+                    {/* TikTok (using Ionicons logo-tiktok) */}
                     <ImageBackground
                       source={require('../../assets/images/galaxy.jpg')}
                       imageStyle={{ borderRadius: 8, opacity: focus.tiktok_url ? 0.3 : 0 }}
@@ -595,22 +594,24 @@ export default function EditProfile() {
                     >
                       <View
                         style={[
-                          tw`flex-row items-center bg-white/5 rounded-lg`,
+                          tw`flex-row items-center`,
                           {
                             borderWidth: 1,
-                            borderColor: focus.tiktok_url ? '#fff' : 'rgba(255,255,255,0.1)',
+                            borderColor: focus.tiktok_url ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
+                            backgroundColor: focus.tiktok_url ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                            borderRadius: 8,
                             height: 48,
                             paddingHorizontal: 12,
                             alignItems: 'center',
                           },
                         ]}
                       >
-                        <XIcon width={22} height={22} style={{ marginRight: 8, zIndex: 1 }} />
+                        <Ionicons name="logo-tiktok" size={20} color="#fff" style={{ marginRight: 8, zIndex: 1 }} />
                         <TextInput
-                          style={[
-                            tw`flex-1 text-left px-2 text-[14px]`,
+                          style={[ 
+                            tw`flex-1 text-left px-2 text-[15px]`,
                             {
-                              fontFamily: 'Nunito-Medium',
+                              fontFamily: 'Nunito-Bold',
                               color: input.tiktok_url && input.tiktok_url.trim() ? '#fff' : '#fff',
                               backgroundColor: 'transparent',
                               borderWidth: 0,
@@ -629,7 +630,7 @@ export default function EditProfile() {
                         />
                       </View>
                     </ImageBackground>
-                    {/* Snapchat */}
+                    {/* Snapchat (using Ionicons logo-snapchat) */}
                     <ImageBackground
                       source={require('../../assets/images/galaxy.jpg')}
                       imageStyle={{ borderRadius: 8, opacity: focus.snapchat_url ? 0.3 : 0 }}
@@ -637,22 +638,24 @@ export default function EditProfile() {
                     >
                       <View
                         style={[
-                          tw`flex-row items-center bg-white/5 rounded-lg`,
+                          tw`flex-row items-center`,
                           {
                             borderWidth: 1,
-                            borderColor: focus.snapchat_url ? '#fff' : 'rgba(255,255,255,0.1)',
+                            borderColor: focus.snapchat_url ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
+                            backgroundColor: focus.snapchat_url ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                            borderRadius: 8,
                             height: 48,
                             paddingHorizontal: 12,
                             alignItems: 'center',
                           },
                         ]}
                       >
-                        <SnapchatIcon width={22} height={22} style={{ marginRight: 8, zIndex: 1 }} />
+                        <Ionicons name="logo-snapchat" size={20} color="#fff" style={{ marginRight: 8, zIndex: 1 }} />
                         <TextInput
-                          style={[
-                            tw`flex-1 text-left px-2 text-[14px]`,
+                          style={[ 
+                            tw`flex-1 text-left px-2 text-[15px]`,
                             {
-                              fontFamily: 'Nunito-Medium',
+                              fontFamily: 'Nunito-Bold',
                               color: input.snapchat_url && input.snapchat_url.trim() ? '#fff' : '#fff',
                               backgroundColor: 'transparent',
                               borderWidth: 0,
@@ -671,7 +674,7 @@ export default function EditProfile() {
                         />
                       </View>
                     </ImageBackground>
-                    {/* Facebook */}
+                    {/* Facebook (using Ionicons logo-facebook) */}
                     <ImageBackground
                       source={require('../../assets/images/galaxy.jpg')}
                       imageStyle={{ borderRadius: 8, opacity: focus.facebook_url ? 0.3 : 0 }}
@@ -679,22 +682,24 @@ export default function EditProfile() {
                     >
                       <View
                         style={[
-                          tw`flex-row items-center bg-white/5 rounded-lg`,
+                          tw`flex-row items-center`,
                           {
                             borderWidth: 1,
-                            borderColor: focus.facebook_url ? '#fff' : 'rgba(255,255,255,0.1)',
+                            borderColor: focus.facebook_url ? '#FFFFFF' : 'rgba(255,255,255,0.1)',
+                            backgroundColor: focus.facebook_url ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.05)',
+                            borderRadius: 8,
                             height: 48,
                             paddingHorizontal: 12,
                             alignItems: 'center',
                           },
                         ]}
                       >
-                        <FBIcon width={22} height={22} style={{ marginRight: 8, zIndex: 1 }} />
+                        <Ionicons name="logo-facebook" size={20} color="#fff" style={{ marginRight: 8, zIndex: 1 }} />
                         <TextInput
-                          style={[
-                            tw`flex-1 text-left px-2 text-[14px]`,
+                          style={[ 
+                            tw`flex-1 text-left px-2 text-[15px]`,
                             {
-                              fontFamily: 'Nunito-Medium',
+                              fontFamily: 'Nunito-Bold',
                               color: input.facebook_url && input.facebook_url.trim() ? '#fff' : '#fff',
                               backgroundColor: 'transparent',
                               borderWidth: 0,
@@ -720,22 +725,25 @@ export default function EditProfile() {
               <View style={{ paddingHorizontal: '5%' }}>
                 <TouchableOpacity
                   style={[
-                    tw`bg-white rounded-full py-[10] w-full items-center`,
+                    tw`bg-white rounded-full py-2.5 w-full items-center`,
                     (!(input.name && input.name.trim() && input.username && input.username.trim()) || loading) && tw`opacity-50`
                   ]}
                   onPress={handleSave}
                   activeOpacity={input.name && input.name.trim() && input.username && input.username.trim() && !loading ? 0.85 : 1}
                   disabled={!(input.name && input.name.trim() && input.username && input.username.trim()) || loading}
                 >
-                  <Text style={[tw`text-black text-[15px]`, { fontFamily: 'Nunito-ExtraBold', opacity: input.name && input.name.trim() && input.username && input.username.trim() && !loading ? 1 : 0.5 }]}>
+                  <Text style={[tw`text-black text-[16px]`, { fontFamily: 'Nunito-ExtraBold', opacity: input.name && input.name.trim() && input.username && input.username.trim() && !loading ? 1 : 0.5 }]}>
                     {loading ? 'Saving...' : 'Save changes'}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={tw`flex-row items-center justify-center mt-4`}
+                  style={[
+                    tw`bg-white/5 rounded-full py-2.5 w-full items-center mt-2.5`,
+                  ]}
                   onPress={() => router.replace({ pathname: '/(profile)/profile', params: { user_id: user?.id } })}
+                  activeOpacity={0.85}
                 >
-                  <Text style={[tw`text-gray-400 text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>Not now</Text>
+                  <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Not now</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -755,7 +763,7 @@ export default function EditProfile() {
               pointerEvents="none"
               >
               <View style={[tw`px-6 py-2 rounded-full shadow-lg`, { backgroundColor: bggreenmodal, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
-                <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Profile updated successfully 🥳</Text>
+                <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Profile updated successfully 🥳</Text>
               </View>
               </View>
             )}
@@ -817,6 +825,7 @@ export default function EditProfile() {
 }
 
 // AnimatedDatePickerModal: wrapper for CustomDatePicker with slide-up animation and overlay fade
+
 const AnimatedDatePickerModal = ({
   visible,
   onCancel,
@@ -839,11 +848,62 @@ const AnimatedDatePickerModal = ({
   const modalHeight = 370;
   const slideAnim = useRef(new Animated.Value(1)).current; // always start hidden
   const overlayAnim = useRef(new Animated.Value(0)).current; // overlay opacity
+  const pan = useRef(new Animated.Value(0)).current;
   const [shouldRender, setShouldRender] = useState(visible);
+
+  // PanResponder for drag-to-dismiss
+  const PanResponder = require('react-native').PanResponder;
+  // Track if a picker is being interacted with
+  const [pickerActive, setPickerActive] = useState(false);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => !pickerActive,
+      onMoveShouldSetPanResponder: (_evt: GestureResponderEvent, gestureState: PanResponderGestureState) => !pickerActive && Math.abs(gestureState.dy) > Math.abs(gestureState.dx),
+      onPanResponderGrant: () => {
+        slideAnim.stopAnimation();
+        pan.setOffset((slideAnim as any).__getValue ? (slideAnim as any).__getValue() : 0);
+        pan.setValue(0);
+      },
+      onPanResponderMove: (_evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+        const clampedDy = Math.max(0, gestureState.dy);
+        pan.setValue(clampedDy);
+      },
+      onPanResponderRelease: (_evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+        pan.flattenOffset();
+        const currentPosition = (pan as any).__getValue ? (pan as any).__getValue() : 0;
+        const slideDownThreshold = modalHeight * 0.3;
+        const velocityThreshold = 0.5;
+        if (currentPosition > slideDownThreshold || gestureState.vy > velocityThreshold) {
+          Animated.timing(slideAnim, {
+            toValue: 1,
+            duration: 200,
+            easing: Easing.in(Easing.cubic),
+            useNativeDriver: true,
+          }).start(() => {
+            setShouldRender(false);
+            pan.setValue(0);
+            onCancel();
+          });
+        } else {
+          Animated.spring(slideAnim, {
+            toValue: 0,
+            useNativeDriver: true,
+            bounciness: 0,
+            speed: 10,
+          }).start(() => {
+            pan.setValue(0);
+          });
+        }
+      },
+    })
+  ).current;
 
   useEffect(() => {
     if (visible) {
       setShouldRender(true);
+      slideAnim.setValue(1);
+      pan.setValue(0);
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
@@ -872,14 +932,35 @@ const AnimatedDatePickerModal = ({
         })
       ]).start(() => setShouldRender(false));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   if (!shouldRender) return null;
 
+  // Helper to animate slide down before closing
+  // Helper to animate slide down before closing
+  const handleAnimatedClose = () => {
+    Animated.timing(slideAnim, {
+      toValue: 1,
+      duration: 250,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
+      setShouldRender(false);
+      pan.setValue(0);
+      onCancel();
+    });
+  };
+
+  // Pass this to CustomDatePicker so Cancel animates
+  const handleCancel = () => {
+    handleAnimatedClose();
+  };
+
   return (
     <Animated.View style={[tw`w-full h-full flex-col-reverse absolute top-0 left-0 z-[99]`, { opacity: overlayAnim }]} pointerEvents={visible ? 'auto' : 'none'}>
       <TouchableWithoutFeedback
-        onPress={onCancel}
+        onPress={handleAnimatedClose}
         accessible={false}
       >
         <View style={tw`w-full h-full`} />
@@ -891,10 +972,13 @@ const AnimatedDatePickerModal = ({
             bottom: 0,
             transform: [
               {
-                translateY: slideAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, modalHeight],
-                }),
+                translateY: Animated.add(
+                  slideAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, modalHeight],
+                  }),
+                  pan
+                ),
               },
             ],
             zIndex: 100,
@@ -904,14 +988,17 @@ const AnimatedDatePickerModal = ({
       >
         <TouchableWithoutFeedback onPress={() => { }}>
           <View>
+            {/* Only the header in CustomDatePicker is draggable */}
             <CustomDatePicker
               initialDate={initialDate}
               onDateChange={onDateChange}
-              onCancel={onCancel}
+              onCancel={handleCancel}
               onSave={onSave}
               textColor={textColor}
               maximumDate={maximumDate}
               minimumDate={minimumDate}
+              setPickerActive={setPickerActive}
+              panHandlers={panResponder.panHandlers}
             />
           </View>
         </TouchableWithoutFeedback>
