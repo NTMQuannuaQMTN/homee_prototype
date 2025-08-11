@@ -27,6 +27,7 @@ export default function GroupList() {
                 .from('groups')
                 .select('*')
                 .range(currentOffset, currentOffset + limit - 1)
+                .eq('public', true)
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -35,7 +36,6 @@ export default function GroupList() {
             }
 
             if (data) {
-                console.log(data);
                 if (isLoadMore) {
                     setGroups(prev => [...prev, ...data]);
                 } else {
