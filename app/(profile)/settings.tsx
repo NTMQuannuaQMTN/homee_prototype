@@ -145,7 +145,7 @@ export default function Settings() {
                     <TouchableOpacity
                         style={tw`bg-white/10 rounded-lg flex-row items-center gap-x-2.5 py-4 px-4 mb-3`}
                         activeOpacity={0.8}
-                        onPress={() => {/* TODO: Add change password logic */}}
+                        onPress={() => router.push('/(auth)/changepassword')}
                     >
                         <Ionicons name="person-circle-outline" size={20} color="#fff" />
                         <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Change password</Text>
