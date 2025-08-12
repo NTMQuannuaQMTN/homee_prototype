@@ -41,7 +41,7 @@ export default function GroupListAll() {
 
   const numColumns = 2;
   const { width } = Dimensions.get('window');
-  const cardWidth = width / 2 - 28; // 24px padding + 4px gap
+  const cardWidth = width / 2 - 20; // 24px padding + 4px gap
 
   return (
     <GradientBackground style={{ flex: 1 }}>
