@@ -224,7 +224,7 @@ export default function GroupView() {
         <TouchableOpacity
           style={[
             tw`flex-1 py-2 rounded-t-lg items-center`,
-            tab === 'details' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
+            tab === 'requests' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
           ]}
           onPress={() => setTab('requests')}
         >
