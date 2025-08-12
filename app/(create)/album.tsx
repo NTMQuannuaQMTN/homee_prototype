@@ -78,7 +78,7 @@ export default function CreateAlbum() {
         console.log(userGroups);
     }, [user?.id]);
 
-    const addGroup = async () => {
+    const addAlbum = async () => {
         console.log('adding');
         // Check if event title, date, RSVP deadline, and location are available
         if (!title) {
@@ -91,19 +91,19 @@ export default function CreateAlbum() {
 
         if (id === '') {
             // Insert new event if id is empty
-            ({ data: dataEvent, error: draftErr } = await supabase.from('groups')
+            ({ data: dataEvent, error: draftErr } = await supabase.from('albums')
                 .insert([{
-                    title: title, public: publicEvent,
-                    creator: user.id, bio: bio,
+                    title: title, bio: bio,
+                    group: groupID, creator: user.id
                 }])
                 .select('id') // Request the id of the inserted event
             );
         } else {
             // Update existing event if id is not empty
-            ({ error: draftErr } = await supabase.from('groups')
+            ({ error: draftErr } = await supabase.from('albums')
                 .update({
-                    title: title, public: publicEvent,
-                    creator: user.id, bio: bio,
+                    title: title, bio: bio,
+                    group: groupID, creator: user.id
                 })
                 .eq('id', id));
         }
@@ -137,7 +137,7 @@ export default function CreateAlbum() {
                     // Get file info and determine file extension
                     const fileUri = image;
                     const fileExtension = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
-                    const fileName = `group/${eventId}.${fileExtension}`;
+                    const fileName = `album/${eventId}.${fileExtension}`;
 
                     // Read file as ArrayBuffer for proper binary upload
                     const fileArrayBuffer = await FileSystem.readAsStringAsync(fileUri, {
@@ -189,8 +189,8 @@ export default function CreateAlbum() {
             console.error("No imageURL provided for update.");
         } else {
             const { error: setAvatarError } = await supabase
-                .from('groups')
-                .update({ group_image: imgURL })
+                .from('albums')
+                .update({ album_image: imgURL })
                 .eq('id', eventId)
                 .select();
 
@@ -272,7 +272,7 @@ export default function CreateAlbum() {
                                     onPress={async () => {
                                         if (isEditing) {
                                             setToastVisible(true);
-                                            const newId = await addGroup();
+                                            const newId = await addAlbum();
                                             if (newId) {
                                                 await updateImage(newId);
                                                 setTimeout(() => {
@@ -453,7 +453,7 @@ export default function CreateAlbum() {
                         onPublish={async () => {
                             setShowEventDoneModal(false);
                             setToastVisible(true);
-                            const newId = await addGroup();
+                            const newId = await addAlbum();
                             if (newId) {
                                 await updateImage(newId);
 

@@ -19,7 +19,6 @@ interface Album {
   id: string;
   title: string;
   bio?: string;
-  album_image: string;
   group: string;
   creator: string;
 }
@@ -53,13 +52,17 @@ export default function GroupView() {
 
   useEffect(() => {
     const fetchAlbums = async () => {
+      console.log('albums');
       if (!id) return;
       const { data, error } = await supabase
-        .from("album")
-        .select("id, title, bio, album_image, group, creator")
+        .from("albums")
+        .select("id, title, bio, group, creator")
         .eq("group", id);
       if (!error && data) {
+        console.log('event', data, id);
         setAlbums(data);
+      } else {
+        console.log(error);
       }
     };
     fetchAlbums();
@@ -161,7 +164,7 @@ export default function GroupView() {
     <ScrollView style={tw`flex-1 bg-[#080B32]`}>
       <View style={tw`items-center pt-10 px-6`}>
         {isDefault ? (
-          <View style={[tw`rounded-lg bg-gray-500 justify-center items-center mb-4`, {width: width - 40, aspectRatio: 1/1}]}>
+          <View style={[tw`rounded-lg bg-gray-500 justify-center items-center mb-4`, { width: width - 40, aspectRatio: 1 / 1 }]}>
             <Text style={[tw`text-white text-2xl text-center`, { fontFamily: "Nunito-ExtraBold" }]}>
               {group.title}
             </Text>
@@ -169,7 +172,7 @@ export default function GroupView() {
         ) : (
           <Image
             source={{ uri: group.group_image }}
-            style={[tw`rounded-lg mb-4`, {width: width - 40, aspectRatio: 1/1}]}
+            style={[tw`rounded-lg mb-4`, { width: width - 40, aspectRatio: 1 / 1 }]}
             resizeMode="cover"
           />
         )}
@@ -239,6 +242,43 @@ export default function GroupView() {
       <View style={tw`px-6 pb-10`}>
         {tab === 'album' ? (
           <View style={tw`flex-row flex-wrap gap-4`}>
+            {albums && albums.map(album => (
+              <TouchableOpacity
+                key={album.id}
+                style={[
+                  tw`bg-white/10 rounded-lg overflow-hidden`,
+                  { width: (width - 64) / 2, height: (width - 64) / 2 }
+                ]}
+                onPress={() => { }}
+                activeOpacity={0.8}
+              >
+                <View style={[tw`bg-gray-700 justify-center items-center`, { width: '100%', height: '70%' }]}>
+                  <Text style={tw`text-white text-3xl`}>📷</Text>
+                </View>
+                <View style={tw`px-2 py-2`}>
+                  <Text
+                    style={[
+                      tw`text-white text-base`,
+                      { fontFamily: "Nunito-Bold" }
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {album.title}
+                  </Text>
+                  {album.bio ? (
+                    <Text
+                      style={[
+                        tw`text-white text-xs mt-1`,
+                        { fontFamily: "Nunito-Regular" }
+                      ]}
+                      numberOfLines={2}
+                    >
+                      {album.bio}
+                    </Text>
+                  ) : null}
+                </View>
+              </TouchableOpacity>
+            ))}
             {(reqStat === 'Joined' || creator) && <TouchableOpacity
               style={[tw`bg-gray-500 rounded-lg justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
               onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title } })}
