@@ -4,6 +4,7 @@ import tw from "twrnc";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import GroupCard from "@/app/(group)/groupcard";
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface Group {
     id: string;
@@ -64,15 +65,25 @@ export default function GroupList() {
     }, []);
 
     const handleSeeMore = () => {
-        if (!loading && hasMore) {
-            fetchGroups(true);
-        }
+        router.navigate('/(group)/grouplist_all');
     };
 
     return (
         <View>
-            <Text style={[tw`text-white text-2xl mt-1 px-4`, { fontFamily: 'Nunito-ExtraBold' }]}>Groups</Text>
-            <ScrollView horizontal style={tw`h-32 flex-row mt-2`} showsHorizontalScrollIndicator={false} contentContainerStyle={tw`gap-4 px-4`}>
+            <View style={tw`flex-row items-center px-4`}>
+                <Text style={[tw`text-white text-[18px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Groups</Text>
+                {hasMore && (
+                    <TouchableOpacity
+                        onPress={handleSeeMore}
+                        disabled={loading}
+                        style={tw`ml-2`}
+                        accessibilityLabel="See more groups"
+                    >
+                        <Ionicons name="chevron-forward" size={16} color="#fff" />
+                    </TouchableOpacity>
+                )}
+            </View>
+            <ScrollView horizontal style={tw`h-48 flex-row mt-2`} showsHorizontalScrollIndicator={false} contentContainerStyle={tw`gap-4 px-4`}>
                 {groups.map((group) => (
                     <GroupCard key={group.id}
                         id={group.id}
@@ -93,24 +104,14 @@ export default function GroupList() {
                 ))}
 
                 <TouchableOpacity
-                    style={tw`h-32 w-32 bg-gray-500 rounded-lg justify-center items-center`}
+                    style={tw`h-48 w-48 bg-white/10 rounded-xl justify-center items-center`}
                     onPress={() => router.navigate('/(create)/group')}
                 >
                     <Text style={tw`text-white text-2xl`}>+</Text>
                 </TouchableOpacity>
             </ScrollView>
 
-            {hasMore && (
-                <TouchableOpacity
-                    style={tw`mt-2 bg-blue-500 rounded-lg py-2 px-4 self-center`}
-                    onPress={handleSeeMore}
-                    disabled={loading}
-                >
-                    <Text style={tw`text-white font-bold`}>
-                        {loading ? 'Loading...' : 'See More'}
-                    </Text>
-                </TouchableOpacity>
-            )}
+            {/* See more button replaced by right arrow next to Groups title */}
         </View>
     );
 }

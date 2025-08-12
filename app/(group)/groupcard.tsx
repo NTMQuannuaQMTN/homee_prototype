@@ -1,5 +1,6 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import tw from "twrnc";
+import defaultImages from "./group_defaultimg";
 
 interface GroupCardProps {
   id: string;
@@ -15,22 +16,34 @@ interface GroupCardProps {
 
 export default function GroupCard({ id, title, bio, creator, group_image, publicGroup, member_count, onPress }: GroupCardProps) {
   const isDefault = group_image === "default";
+  // Use id to get a consistent random image for each group, but if id is missing or too short, use random
+  let defaultIndex = 0;
+  if (isDefault) {
+    if (id && id.length > 2) {
+      defaultIndex = Math.abs(Array.from(id).reduce((acc, c) => acc + c.charCodeAt(0), 0)) % defaultImages.length;
+    } else {
+      defaultIndex = Math.floor(Math.random() * defaultImages.length);
+    }
+  }
+  const defaultImage = defaultImages[defaultIndex];
   return (
     <TouchableOpacity
-      style={tw`w-32 h-32 rounded-lg overflow-hidden`}
+      style={tw`w-48 h-48 rounded-xl overflow-hidden`}
       onPress={onPress}
       activeOpacity={0.85}
     >
       {isDefault ? (
-        <View style={tw`flex-1 bg-gray-500 justify-center items-center`}>
-          <Text style={[tw`text-white text-lg text-center`, { fontFamily: 'Nunito-ExtraBold' }]} numberOfLines={2}>
-            {title}
-          </Text>
-          {bio ? (
-            <Text style={[tw`text-white text-xs text-center mt-1`, { fontFamily: 'Nunito-Medium' }]} numberOfLines={2}>
-              {bio}
+        <View style={tw`flex-1 justify-center items-center`}>
+          <Image
+            source={defaultImage}
+            style={tw`w-full h-full absolute`}
+            resizeMode="cover"
+          />
+          <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 px-2.5 py-1.5`}>
+            <Text style={[tw`text-white text-[17px]`, { fontFamily: 'Nunito-ExtraBold' }]} numberOfLines={2}>
+              {title}
             </Text>
-          ) : null}
+          </View>
         </View>
       ) : (
         <Image
@@ -42,15 +55,10 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
         </Image>
       )}
       {!isDefault && (
-        <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1`}>
-          <Text style={[tw`text-white text-xs font-bold`, { fontFamily: 'Nunito-ExtraBold' }]} numberOfLines={1}>
+        <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 px-2.5 py-1.5`}>
+          <Text style={[tw`text-white text-[17px]`, { fontFamily: 'Nunito-ExtraBold' }]} numberOfLines={1}>
             {title}
           </Text>
-          {bio ? (
-            <Text style={[tw`text-white text-[10px]`, { fontFamily: 'Nunito-Medium' }]} numberOfLines={1}>
-              {bio}
-            </Text>
-          ) : null}
         </View>
       )}
     </TouchableOpacity>
