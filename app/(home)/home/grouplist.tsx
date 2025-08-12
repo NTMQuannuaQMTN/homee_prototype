@@ -22,24 +22,19 @@ interface Group {
 export default function GroupList() {
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(false);
-    const [offset, setOffset] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
-    const limit = 5;
+    // Removed offset, hasMore, and limit for full fetch
     const width = Dimensions.get('screen').width;
   
     const cardWidth = width / 2 - 20;
 
-    const fetchGroups = async (isLoadMore = false) => {
+    const fetchGroups = async () => {
         setLoading(true);
         try {
-            const currentOffset = isLoadMore ? offset : 0;
-
             const { data, error } = await supabase
                 .from('groups')
                 .select('id, title, bio, creator, group_image, public, member_count')
                 .order('member_count', { ascending: false })
-                .order('created_at', { ascending: false })
-                .range(currentOffset, currentOffset + limit - 1);
+                .order('created_at', { ascending: false });
 
             if (error) {
                 console.error('Error fetching groups:', error);
@@ -47,14 +42,7 @@ export default function GroupList() {
             }
 
             if (data) {
-                if (isLoadMore) {
-                    setGroups(prev => [...prev, ...data]);
-                } else {
-                    setGroups(data);
-                }
-
-                setOffset(currentOffset + limit);
-                setHasMore(data.length === limit);
+                setGroups(data);
             }
         } catch (error) {
             console.error('Error fetching groups:', error);
@@ -78,22 +66,20 @@ export default function GroupList() {
         .map(fid => groups.find(g => g.id === fid))
         .filter(Boolean) as Group[];
     const restGroups = groups.filter(g => !featuredGroupIds.includes(g.id));
-    const displayGroups = [...featuredGroups, ...restGroups];
+    const displayGroups = [...featuredGroups, ...restGroups].slice(0, 5); // Show only first 5
 
     return (
         <View>
             <View style={tw`flex-row items-center px-4`}>
                 <Text style={[tw`text-white text-[18px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Groups</Text>
-                {hasMore && (
-                    <TouchableOpacity
-                        onPress={handleSeeMore}
-                        disabled={loading}
-                        style={tw`ml-2`}
-                        accessibilityLabel="See more groups"
-                    >
-                        <Ionicons name="chevron-forward" size={16} color="#fff" />
-                    </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                    onPress={handleSeeMore}
+                    disabled={loading}
+                    style={tw`ml-2`}
+                    accessibilityLabel="See more groups"
+                >
+                    <Ionicons name="chevron-forward" size={16} color="#fff" />
+                </TouchableOpacity>
             </View>
             <ScrollView
                 key={featuredGroupIds.join(",")}
