@@ -3,6 +3,7 @@ import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Dim
 import { useEffect, useState } from "react";
 import tw from "twrnc";
 import { supabase } from "@/utils/supabase";
+import { useUserStore } from "../store/userStore";
 
 interface Group {
   id: string;
@@ -30,6 +31,9 @@ export default function GroupView() {
   const [tab, setTab] = useState<'album' | 'details'>('album');
   const [albums, setAlbums] = useState<Album[]>([]);
   const width = Dimensions.get('screen').width;
+  const { user } = useUserStore();
+  const [creator, setCreator] = useState<boolean>(false);
+  const [reqStat, setReqStat] = useState<string>('');
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -60,6 +64,37 @@ export default function GroupView() {
     };
     fetchAlbums();
   }, [id]);
+
+  useEffect(() => {
+    const checkJoin = async () => {
+      if (!group || !user?.id) return;
+      const { data, error } = await supabase
+        .from('group_members')
+        .select('id')
+        .eq('group_id', group.id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        if (group.public) {
+          setReqStat('Nothing');
+        } else {
+          const { data, error } = await supabase.from('group_requests')
+            .select('id')
+            .eq('group_id', group.id)
+            .eq('user_id', user.id).single();
+
+          if (error) setReqStat('Nothing');
+          else setReqStat('Requested');
+        }
+      } else setReqStat('Joined');
+    }
+
+    if (group) setCreator(group.creator === user.id);
+    if (group?.creator !== user.id) {
+      checkJoin();
+    }
+  }, [group]);
 
   if (loading) {
     return (
@@ -100,6 +135,15 @@ export default function GroupView() {
         <Text style={[tw`text-white text-2xl mb-2 text-center`, { fontFamily: "Nunito-ExtraBold" }]}>
           {group.title}
         </Text>
+        {creator ? <View>
+          <Text style={[tw`text-white text-2xl mb-2 text-center`, { fontFamily: "Nunito-ExtraBold" }]}>
+            Creator
+          </Text>
+        </View> : <TouchableOpacity>
+          <Text style={[tw`text-white text-2xl mb-2 text-center`, { fontFamily: "Nunito-ExtraBold" }]}>
+            {reqStat === 'Nothing' ? 'Join' : reqStat}
+          </Text>
+        </TouchableOpacity>}
         {group.bio ? (
           <Text style={[tw`text-white text-base mb-2 text-center`, { fontFamily: "Nunito-Medium" }]}>
             {group.bio}
@@ -141,8 +185,8 @@ export default function GroupView() {
         {tab === 'album' ? (
           <View style={tw`flex-row flex-wrap gap-4`}>
             <TouchableOpacity
-              style={[tw`bg-gray-500 rounded-lg justify-center items-center`, {width: (width - 64) / 2, height: (width - 64) / 2}]}
-              onPress={() => router.navigate({pathname: '/(create)/album', params: {groupId: id as string, name: group.title}})}
+              style={[tw`bg-gray-500 rounded-lg justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
+              onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title } })}
             >
               <Text style={tw`text-white text-2xl`}>+</Text>
             </TouchableOpacity>
