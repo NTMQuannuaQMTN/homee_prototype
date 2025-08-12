@@ -17,6 +17,7 @@ export default function GroupView() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [group, setGroup] = useState<Group | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<'album' | 'details'>('album');
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -78,12 +79,57 @@ export default function GroupView() {
             {group.bio}
           </Text>
         ) : null}
-        <Text style={[tw`text-white text-sm mb-1`, { fontFamily: "Nunito-Medium" }]}>
-          Members: {group.member_count}
-        </Text>
-        <Text style={[tw`text-white text-xs`, { fontFamily: "Nunito-Medium" }]}>
-          Created by: {group.creator}
-        </Text>
+      </View>
+      {/* Tabs for Album and Details */}
+      <View style={tw`flex-row justify-center mb-4`}>
+        <TouchableOpacity
+          style={[
+            tw`px-6 py-2 rounded-t-lg`,
+            tab === 'album' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
+          ]}
+          onPress={() => setTab('album')}
+        >
+          <Text style={[
+            tw`text-base`,
+            { fontFamily: "Nunito-Bold", color: tab === 'album' ? '#fff' : '#c7c7c7' }
+          ]}>
+            Album
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            tw`px-6 py-2 rounded-t-lg ml-2`,
+            tab === 'details' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
+          ]}
+          onPress={() => setTab('details')}
+        >
+          <Text style={[
+            tw`text-base`,
+            { fontFamily: "Nunito-Bold", color: tab === 'details' ? '#fff' : '#c7c7c7' }
+          ]}>
+            Details
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={tw`px-6 pb-10`}>
+        {tab === 'album' ? (
+          <View>
+            {/* Album content goes here */}
+            <Text style={[tw`text-white text-center`, { fontFamily: "Nunito-Medium" }]}>
+              Album content coming soon.
+            </Text>
+          </View>
+        ) : (
+          <View>
+            {/* Details content goes here */}
+            <Text style={[tw`text-white text-sm mb-1`, { fontFamily: "Nunito-Medium" }]}>
+              Members: {group.member_count}
+            </Text>
+            <Text style={[tw`text-white text-sm`, { fontFamily: "Nunito-Medium" }]}>
+              Created by: {group.creator}
+            </Text>
+          </View>
+        )}
       </View>
       {/* You can add more group details or actions here */}
     </ScrollView>
