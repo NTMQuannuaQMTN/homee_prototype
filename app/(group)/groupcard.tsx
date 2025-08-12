@@ -18,7 +18,7 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
   const isDefault = group_image === "default";
   const width = Dimensions.get('screen').width;
 
-  const cardWidth = width / 2 - 28;
+  const cardWidth = width / 2 - 20;
   // Use id to get a consistent random image for each group, but if id is missing or too short, use random
   let defaultIndex = 0;
   if (isDefault) {

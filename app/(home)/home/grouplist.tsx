@@ -26,7 +26,7 @@ export default function GroupList() {
     const limit = 5;
     const width = Dimensions.get('screen').width;
   
-    const cardWidth = width / 2 - 28;
+    const cardWidth = width / 2 - 20;
 
     const fetchGroups = async (isLoadMore = false) => {
         setLoading(true);
