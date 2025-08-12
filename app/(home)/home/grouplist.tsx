@@ -32,7 +32,6 @@ export default function GroupList() {
             const { data, error } = await supabase
                 .from('groups')
                 .select('id, title, bio, creator, group_image, public, member_count')
-                .eq('public', true)
                 .order('member_count', { ascending: false })
                 .order('created_at', { ascending: false })
                 .range(currentOffset, currentOffset + limit - 1);

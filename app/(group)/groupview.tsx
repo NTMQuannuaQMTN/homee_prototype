@@ -10,6 +10,7 @@ interface Group {
   bio?: string;
   creator: string;
   group_image: string;
+  public: string;
   member_count: number;
 }
 
@@ -35,7 +36,7 @@ export default function GroupView() {
       setLoading(true);
       const { data, error } = await supabase
         .from("groups")
-        .select("id, title, bio, creator, group_image, member_count")
+        .select("id, title, bio, creator, group_image, public, member_count")
         .eq("id", id)
         .single();
       if (!error && data) {
