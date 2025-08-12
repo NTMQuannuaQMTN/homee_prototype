@@ -1,5 +1,5 @@
-import { useLocalSearchParams } from "expo-router";
-import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from "react-native";
 import { useEffect, useState } from "react";
 import tw from "twrnc";
 import { supabase } from "@/utils/supabase";
@@ -13,11 +13,22 @@ interface Group {
   member_count: number;
 }
 
+interface Album {
+  id: string;
+  title: string;
+  bio?: string;
+  album_image: string;
+  group: string;
+  creator: string;
+}
+
 export default function GroupView() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [group, setGroup] = useState<Group | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'album' | 'details'>('album');
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const width = Dimensions.get('screen').width;
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -33,6 +44,20 @@ export default function GroupView() {
       setLoading(false);
     };
     if (id) fetchGroup();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchAlbums = async () => {
+      if (!id) return;
+      const { data, error } = await supabase
+        .from("album")
+        .select("id, title, bio, album_image, group, creator")
+        .eq("group", id);
+      if (!error && data) {
+        setAlbums(data);
+      }
+    };
+    fetchAlbums();
   }, [id]);
 
   if (loading) {
@@ -57,7 +82,7 @@ export default function GroupView() {
 
   return (
     <ScrollView style={tw`flex-1 bg-[#080B32]`}>
-      <View style={tw`items-center pt-10 pb-6 px-6`}>
+      <View style={tw`items-center pt-10 px-6`}>
         {isDefault ? (
           <View style={tw`w-32 h-32 rounded-lg bg-gray-500 justify-center items-center mb-4`}>
             <Text style={[tw`text-white text-2xl text-center`, { fontFamily: "Nunito-ExtraBold" }]}>
@@ -81,10 +106,10 @@ export default function GroupView() {
         ) : null}
       </View>
       {/* Tabs for Album and Details */}
-      <View style={tw`flex-row justify-center mb-4`}>
+      <View style={tw`flex-row justify-center mb-4 gap-2 px-2`}>
         <TouchableOpacity
           style={[
-            tw`px-6 py-2 rounded-t-lg`,
+            tw`flex-1 py-2 rounded-t-lg items-center`,
             tab === 'album' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
           ]}
           onPress={() => setTab('album')}
@@ -98,7 +123,7 @@ export default function GroupView() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[
-            tw`px-6 py-2 rounded-t-lg ml-2`,
+            tw`flex-1 py-2 rounded-t-lg items-center`,
             tab === 'details' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
           ]}
           onPress={() => setTab('details')}
@@ -113,11 +138,13 @@ export default function GroupView() {
       </View>
       <View style={tw`px-6 pb-10`}>
         {tab === 'album' ? (
-          <View>
-            {/* Album content goes here */}
-            <Text style={[tw`text-white text-center`, { fontFamily: "Nunito-Medium" }]}>
-              Album content coming soon.
-            </Text>
+          <View style={tw`flex-row flex-wrap gap-4`}>
+            <TouchableOpacity
+              style={[tw`bg-gray-500 rounded-lg justify-center items-center`, {width: (width - 64) / 2, height: (width - 64) / 2}]}
+              onPress={() => router.navigate({pathname: '/(create)/album', params: {groupId: id as string, name: group.title}})}
+            >
+              <Text style={tw`text-white text-2xl`}>+</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <View>
