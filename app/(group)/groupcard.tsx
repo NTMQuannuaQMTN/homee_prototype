@@ -33,7 +33,7 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
     <TouchableOpacity
       style={[tw`rounded-xl overflow-hidden`, {width: cardWidth, aspectRatio: 1/1}]}
       onPress={onPress}
-      activeOpacity={0.85}
+      activeOpacity={0.7}
     >
       {isDefault ? (
         <View style={tw`flex-1 justify-center items-center`}>

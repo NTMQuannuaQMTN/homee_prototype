@@ -54,12 +54,13 @@ export default function GroupListAll() {
         </View>
         <View style={tw`w-7`} />
       </View>
+      <View style={tw`items-center mb-18`}>
       <FlatList
         data={groups}
         keyExtractor={item => item.id}
         numColumns={numColumns}
-        contentContainerStyle={tw`px-3 pb-6`}
-        columnWrapperStyle={tw`gap-4 mb-4`}
+        contentContainerStyle={tw`pb-14`}
+        columnWrapperStyle={tw`gap-x-4 mb-4`}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <View style={{ width: cardWidth }}>
@@ -79,6 +80,7 @@ export default function GroupListAll() {
           loading ? <Text style={[tw`text-white text-center mt-10`, { fontFamily: 'Nunito-Bold' }]}>Loading...</Text> : <Text style={[tw`text-white text-center mt-10`, { fontFamily: 'Nunito-Bold' }]}>No groups found.</Text>
         }
       />
+      </View>
     </GradientBackground>
   );
 }
