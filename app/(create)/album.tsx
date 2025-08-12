@@ -70,6 +70,7 @@ export default function CreateAlbum() {
             const uniqueGroups = Array.from(
                 new Map(allGroups.map(g => [g.id, g])).values()
             );
+            console.log(allGroups, uniqueGroups);
             setUserGroups(uniqueGroups);
         };
 
