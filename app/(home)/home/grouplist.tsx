@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { View, Text, Touchable, TouchableOpacity, ScrollView, Dimensions } from "react-native";
 import tw from "twrnc";
 import { useState, useEffect } from "react";
+import { useFeaturedGroupsStore } from "@/app/store/featuredGroupsStore";
 import { supabase } from "@/utils/supabase";
 import GroupCard from "@/app/(group)/groupcard";
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -62,13 +63,22 @@ export default function GroupList() {
         }
     };
 
+    const { featuredGroupIds } = useFeaturedGroupsStore();
     useEffect(() => {
         fetchGroups();
-    }, []);
+        // eslint-disable-next-line
+    }, [featuredGroupIds.join(",")]);
 
     const handleSeeMore = () => {
         router.navigate('/(group)/grouplist_all');
     };
+
+    // Place featured groups at the top, then the rest (excluding featured)
+    const featuredGroups = featuredGroupIds
+        .map(fid => groups.find(g => g.id === fid))
+        .filter(Boolean) as Group[];
+    const restGroups = groups.filter(g => !featuredGroupIds.includes(g.id));
+    const displayGroups = [...featuredGroups, ...restGroups];
 
     return (
         <View>
@@ -85,8 +95,14 @@ export default function GroupList() {
                     </TouchableOpacity>
                 )}
             </View>
-            <ScrollView horizontal style={tw`h-48 flex-row mt-2`} showsHorizontalScrollIndicator={false} contentContainerStyle={tw`gap-4 px-4`}>
-                {groups.map((group) => (
+            <ScrollView
+                key={featuredGroupIds.join(",")}
+                horizontal
+                style={tw`h-48 flex-row mt-2.5`}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={tw`gap-4 px-4`}
+            >
+                {displayGroups.map((group) => (
                     <GroupCard key={group.id}
                         id={group.id}
                         title={group.title}
@@ -108,12 +124,16 @@ export default function GroupList() {
                 <TouchableOpacity
                     style={[tw`bg-white/10 rounded-xl justify-center items-center`, {width: cardWidth, aspectRatio: 1/1}]}
                     onPress={() => router.navigate('/(create)/group')}
+                    activeOpacity={0.7}
                 >
-                    <Text style={tw`text-white text-2xl`}>+</Text>
+                    <View style={tw`flex-row items-center border border-white/50 rounded-full px-2.5 py-2`}>
+                        <Text style={[tw`text-white text-xl mr-1.5 -mt-0.5`, { fontFamily: 'Nunito-ExtraBold' }]}>+</Text>
+                        <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Create group</Text>
+                    </View>
                 </TouchableOpacity>
             </ScrollView>
 
-            {/* See more button replaced by right arrow next to Groups title */}
+            {/* To use the selector, render <FeatureGroupsSelector groups={groups} /> somewhere in your app */}
         </View>
     );
 }

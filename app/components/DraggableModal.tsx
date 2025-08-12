@@ -89,14 +89,14 @@ const DraggableModal: React.FC<DraggableModalProps> = ({
       slideAnim.setValue(modalContentHeight);
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 250,
+        duration: 300,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }).start();
     } else if (!visible && modalContentHeight > 0) {
       Animated.timing(slideAnim, {
         toValue: modalContentHeight,
-        duration: 200,
+        duration: 300,
         easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
       }).start(() => {
