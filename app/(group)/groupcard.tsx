@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import tw from "twrnc";
 import defaultImages from "./group_defaultimg";
 
@@ -16,6 +16,9 @@ interface GroupCardProps {
 
 export default function GroupCard({ id, title, bio, creator, group_image, publicGroup, member_count, onPress }: GroupCardProps) {
   const isDefault = group_image === "default";
+  const width = Dimensions.get('screen').width;
+
+  const cardWidth = width / 2 - 28;
   // Use id to get a consistent random image for each group, but if id is missing or too short, use random
   let defaultIndex = 0;
   if (isDefault) {
@@ -28,7 +31,7 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
   const defaultImage = defaultImages[defaultIndex];
   return (
     <TouchableOpacity
-      style={tw`w-48 h-48 rounded-xl overflow-hidden`}
+      style={[tw`rounded-xl overflow-hidden`, {width: cardWidth, aspectRatio: 1/1}]}
       onPress={onPress}
       activeOpacity={0.85}
     >

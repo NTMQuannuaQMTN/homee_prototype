@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { View, Text, Touchable, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, Touchable, TouchableOpacity, ScrollView, Dimensions } from "react-native";
 import tw from "twrnc";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
@@ -24,6 +24,9 @@ export default function GroupList() {
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const limit = 5;
+    const width = Dimensions.get('screen').width;
+  
+    const cardWidth = width / 2 - 28;
 
     const fetchGroups = async (isLoadMore = false) => {
         setLoading(true);
@@ -103,7 +106,7 @@ export default function GroupList() {
                 ))}
 
                 <TouchableOpacity
-                    style={tw`h-48 w-48 bg-white/10 rounded-xl justify-center items-center`}
+                    style={[tw`bg-white/10 rounded-xl justify-center items-center`, {width: cardWidth, aspectRatio: 1/1}]}
                     onPress={() => router.navigate('/(create)/group')}
                 >
                     <Text style={tw`text-white text-2xl`}>+</Text>
