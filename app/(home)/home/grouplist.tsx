@@ -6,6 +6,7 @@ import { useAsyncFeaturedGroupsStore } from "@/app/store/asyncFeaturedGroupsStor
 import { supabase } from "@/utils/supabase";
 import GroupCard from "@/app/(group)/groupcard";
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useUserStore } from "@/app/store/userStore";
 
 interface Group {
     id: string;
@@ -22,9 +23,10 @@ interface Group {
 export default function GroupList() {
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(false);
-    // Removed offset, hasMore, and limit for full fetch
+    const { user } = useUserStore();
+
     const width = Dimensions.get('screen').width;
-  
+
     const cardWidth = width / 2 - 20;
 
     const fetchGroups = async () => {
@@ -34,7 +36,17 @@ export default function GroupList() {
                 .from('groups')
                 .select('id, title, bio, creator, group_image, public, member_count')
                 .order('member_count', { ascending: false })
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false })
+                .or(
+                    `creator.eq.${user.id},id.in.(${ // groups where user is a member
+                    (
+                        await supabase
+                            .from('group_members')
+                            .select('group_id')
+                            .eq('user_id', user.id)
+                    ).data?.map((gm: { group_id: string }) => gm.group_id).join(',') || ''
+                    })`
+                );
 
             if (error) {
                 console.error('Error fetching groups:', error);
@@ -43,6 +55,7 @@ export default function GroupList() {
 
             if (data) {
                 setGroups(data);
+                console.log(data);
             }
         } catch (error) {
             console.error('Error fetching groups:', error);
@@ -59,7 +72,7 @@ export default function GroupList() {
     useEffect(() => {
         fetchGroups();
         // eslint-disable-next-line
-    }, [featuredGroupIds.join(",")]);
+    }, [user, featuredGroupIds.join(",")]);
 
     const handleSeeMore = () => {
         router.navigate('/(group)/grouplist_all');
@@ -112,7 +125,7 @@ export default function GroupList() {
                 ))}
 
                 <TouchableOpacity
-                    style={[tw`bg-white/10 rounded-xl justify-center items-center`, {width: cardWidth, aspectRatio: 1/1}]}
+                    style={[tw`bg-white/10 rounded-xl justify-center items-center`, { width: cardWidth, aspectRatio: 1 / 1 }]}
                     onPress={() => router.navigate('/(create)/group')}
                     activeOpacity={0.7}
                 >

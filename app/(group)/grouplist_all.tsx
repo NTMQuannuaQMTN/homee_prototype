@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import React from 'react';
 import { Animated } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
@@ -12,6 +12,7 @@ import GroupCard from './groupcard';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useAsyncFeaturedGroupsStore } from '../store/asyncFeaturedGroupsStore';
 import BackIcon from '../../assets/icons/back.svg';
+import { useUserStore } from '../store/userStore';
 
 interface Group {
   id: string;
@@ -38,6 +39,8 @@ export default function GroupListAll() {
   const cardWidth = width / 2 - 20;
   const router = useRouter();
 
+  const {user} = useUserStore();
+
   useEffect(() => {
     const fetchGroups = async () => {
       setLoading(true);
@@ -45,6 +48,16 @@ export default function GroupListAll() {
         .from('groups')
         .select('id, title, bio, creator, group_image, public, member_count')
         .eq('public', true)
+        .or(
+          `creator.eq.${user.id},id.in.(${ // groups where user is a member
+            (
+              await supabase
+                .from('group_members')
+                .select('group_id')
+                .eq('user_id', user.id)
+            ).data?.map((gm: { group_id: string }) => gm.group_id).join(',') || ''
+          })`
+        )
         .order('member_count', { ascending: false })
         .order('created_at', { ascending: false });
       if (!error && data) setGroups(data);
