@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { View, Text, Touchable, TouchableOpacity, ScrollView, Dimensions } from "react-native";
 import tw from "twrnc";
 import { useState, useEffect } from "react";
-import { useFeaturedGroupsStore } from "@/app/store/featuredGroupsStore";
+import { useAsyncFeaturedGroupsStore } from "@/app/store/asyncFeaturedGroupsStore";
 import { supabase } from "@/utils/supabase";
 import GroupCard from "@/app/(group)/groupcard";
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -51,7 +51,11 @@ export default function GroupList() {
         }
     };
 
-    const { featuredGroupIds } = useFeaturedGroupsStore();
+    const { featuredGroupIds, hydrate } = useAsyncFeaturedGroupsStore();
+
+    useEffect(() => {
+        hydrate();
+    }, []);
     useEffect(() => {
         fetchGroups();
         // eslint-disable-next-line

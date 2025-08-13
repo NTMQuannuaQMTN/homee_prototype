@@ -7,7 +7,7 @@ import GradientBackground from '../components/GradientBackground';
 import { supabase } from '@/utils/supabase';
 import GroupCard from './groupcard';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useFeaturedGroupsStore } from '../store/featuredGroupsStore';
+import { useAsyncFeaturedGroupsStore } from '../store/asyncFeaturedGroupsStore';
 import BackIcon from '../../assets/icons/back.svg';
 
 interface Group {
@@ -24,7 +24,11 @@ export default function GroupListAll() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-  const { featuredGroupIds } = useFeaturedGroupsStore();
+  const { featuredGroupIds, hydrate } = useAsyncFeaturedGroupsStore();
+
+  useEffect(() => {
+    hydrate();
+  }, []);
   const numColumns = 2;
   const { width } = Dimensions.get('window');
   const cardWidth = width / 2 - 20;

@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import GradientBackground from '../components/GradientBackground';
 import tw from 'twrnc';
-import { useFeaturedGroupsStore } from '../store/featuredGroupsStore';
+import { useAsyncFeaturedGroupsStore } from '../store/asyncFeaturedGroupsStore';
 import { useRouter } from 'expo-router';
 
 interface Group {
@@ -22,9 +22,21 @@ import { supabase } from '@/utils/supabase';
 
 export default function FeatureGroupsSelector({ groups: propGroups, onSave, onCancel }: FeatureGroupsSelectorProps) {
   const router = useRouter();
-  const { featuredGroupIds, setFeaturedGroupIds } = useFeaturedGroupsStore();
-  const [selected, setSelected] = React.useState<string[]>(featuredGroupIds);
+  const { featuredGroupIds, setFeaturedGroupIds, hydrate } = useAsyncFeaturedGroupsStore();
+  const [selected, setSelected] = React.useState<string[]>([]);
   const [groups, setGroups] = useState<Group[]>(propGroups || []);
+
+  useEffect(() => {
+    const init = async () => {
+      await hydrate();
+      setSelected(useAsyncFeaturedGroupsStore.getState().featuredGroupIds);
+    };
+    init();
+  }, []);
+
+  useEffect(() => {
+    setSelected(featuredGroupIds);
+  }, [featuredGroupIds]);
 
   useEffect(() => {
     if (!propGroups) {
@@ -49,13 +61,14 @@ export default function FeatureGroupsSelector({ groups: propGroups, onSave, onCa
     else if (canAdd) setSelected([...selected, id]);
   };
 
-  const handleSave = () => {
-    setFeaturedGroupIds(selected);
+  const handleSave = async () => {
+    await setFeaturedGroupIds(selected);
     if (onSave) onSave();
     else router.back();
   };
-  const handleCancel = () => {
-    setSelected(featuredGroupIds);
+  const handleCancel = async () => {
+    await hydrate();
+    setSelected(useAsyncFeaturedGroupsStore.getState().featuredGroupIds);
     if (onCancel) onCancel();
     else router.back();
   };
