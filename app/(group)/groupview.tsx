@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import tw from "twrnc";
 import { supabase } from "@/utils/supabase";
 import { useUserStore } from "../store/userStore";
+import AlbumCard from "../(album)/albumcard";
 
 interface Group {
   id: string;
@@ -18,9 +19,12 @@ interface Group {
 interface Album {
   id: string;
   title: string;
-  bio?: string;
-  group: string;
-  creator: string;
+}
+
+interface User {
+  id: string;
+  name: string;
+  profile_image: string;
 }
 
 export default function GroupView() {
@@ -31,6 +35,11 @@ export default function GroupView() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const width = Dimensions.get('screen').width;
   const { user } = useUserStore();
+  const [creatorInfo, setCreatorInfo] = useState<User>({
+    id: '',
+    name: '',
+    profile_image: '',
+  });
   const [creator, setCreator] = useState<boolean>(false);
   const [reqStat, setReqStat] = useState<string>('');
 
@@ -52,14 +61,12 @@ export default function GroupView() {
 
   useEffect(() => {
     const fetchAlbums = async () => {
-      console.log('albums');
       if (!id) return;
       const { data, error } = await supabase
         .from("albums")
-        .select("id, title, bio, group, creator")
+        .select("id, title")
         .eq("group", id);
       if (!error && data) {
-        console.log('event', data, id);
         setAlbums(data);
       } else {
         console.log(error);
@@ -67,6 +74,23 @@ export default function GroupView() {
     };
     fetchAlbums();
   }, [id]);
+
+  useEffect(() => {
+    const fetchCreator = async () => {
+      if (!id) return;
+      const { data, error } = await supabase
+        .from("users")
+        .select("id, name, profile_image")
+        .eq("id", group?.creator).single();
+      if (!error && data) {
+        console.log('event', data, id);
+        setCreatorInfo(data);
+      } else {
+        console.log(error);
+      }
+    };
+    fetchCreator();
+  }, [group])
 
   useEffect(() => {
     const checkJoin = async () => {
@@ -243,41 +267,10 @@ export default function GroupView() {
         {tab === 'album' ? (
           <View style={tw`flex-row flex-wrap gap-4`}>
             {albums && albums.map(album => (
-              <TouchableOpacity
-                key={album.id}
-                style={[
-                  tw`bg-white/10 rounded-lg overflow-hidden`,
-                  { width: (width - 64) / 2, height: (width - 64) / 2 }
-                ]}
-                onPress={() => { }}
-                activeOpacity={0.8}
-              >
-                <View style={[tw`bg-gray-700 justify-center items-center`, { width: '100%', height: '70%' }]}>
-                  <Text style={tw`text-white text-3xl`}>📷</Text>
-                </View>
-                <View style={tw`px-2 py-2`}>
-                  <Text
-                    style={[
-                      tw`text-white text-base`,
-                      { fontFamily: "Nunito-Bold" }
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {album.title}
-                  </Text>
-                  {album.bio ? (
-                    <Text
-                      style={[
-                        tw`text-white text-xs mt-1`,
-                        { fontFamily: "Nunito-Regular" }
-                      ]}
-                      numberOfLines={2}
-                    >
-                      {album.bio}
-                    </Text>
-                  ) : null}
-                </View>
-              </TouchableOpacity>
+              <AlbumCard key={album.id}
+              id={album.id}
+              title={album.title}
+              onPress={() => {}}/>
             ))}
             {(reqStat === 'Joined' || creator) && <TouchableOpacity
               style={[tw`bg-gray-500 rounded-lg justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
@@ -292,9 +285,24 @@ export default function GroupView() {
             <Text style={[tw`text-white text-sm mb-1`, { fontFamily: "Nunito-Medium" }]}>
               Members: {group.member_count}
             </Text>
-            <Text style={[tw`text-white text-sm`, { fontFamily: "Nunito-Medium" }]}>
-              Created by: {group.creator}
-            </Text>
+            <View style={tw`flex-row items-center mt-1`}>
+              <Text style={[tw`text-white text-sm mr-2`, { fontFamily: "Nunito-Medium" }]}>
+                Created by:
+              </Text>
+              <TouchableOpacity
+                style={tw`flex-row items-center bg-gray-700 p-2 rounded-xl`}
+                activeOpacity={0.7}
+                onPress={() => {router.navigate({pathname: '/(profile)/profile', params: {user_id: creatorInfo.id}})}}
+              >
+                <Image
+                  source={{ uri: creatorInfo.profile_image || undefined }}
+                  style={tw`w-6 h-6 rounded-full mr-2 bg-gray-400`}
+                />
+                <Text style={[tw`text-white text-sm`, { fontFamily: "Nunito-Bold" }]}>
+                  {creatorInfo.name}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ) : (<View>
           {/* Details content goes here */}
