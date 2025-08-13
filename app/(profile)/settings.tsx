@@ -41,7 +41,7 @@ export default function Settings() {
         <GradientBackground style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 36 }} showsVerticalScrollIndicator={false}>
                 {/* Top row: back icon and settings title */}
-                <View style={tw`flex-row items-center px-4 pt-14 pb-4 w-full`}>
+                <View style={tw`flex-row items-center px-4 pt-14 pb-2 w-full`}>
                     <TouchableOpacity
                         style={tw`mr-2`}
                         onPress={() => user?.id && router.replace({ pathname: '/(profile)/profile', params: { user_id: user.id } })}
