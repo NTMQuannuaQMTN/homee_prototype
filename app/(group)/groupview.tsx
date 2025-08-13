@@ -248,7 +248,7 @@ export default function GroupView() {
             Details
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {creator && !group.public && <TouchableOpacity
           style={[
             tw`flex-1 py-2 rounded-t-lg items-center`,
             tab === 'requests' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
@@ -261,16 +261,16 @@ export default function GroupView() {
           ]}>
             Requests
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </View>
       <View style={tw`px-6 pb-10`}>
         {tab === 'album' ? (
           <View style={tw`flex-row flex-wrap gap-4`}>
             {albums && albums.map(album => (
               <AlbumCard key={album.id}
-              id={album.id}
-              title={album.title}
-              onPress={() => {}}/>
+                id={album.id}
+                title={album.title}
+                onPress={() => { }} />
             ))}
             {(reqStat === 'Joined' || creator) && <TouchableOpacity
               style={[tw`bg-gray-500 rounded-lg justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
@@ -292,7 +292,7 @@ export default function GroupView() {
               <TouchableOpacity
                 style={tw`flex-row items-center bg-gray-700 p-2 rounded-xl`}
                 activeOpacity={0.7}
-                onPress={() => {router.navigate({pathname: '/(profile)/profile', params: {user_id: creatorInfo.id}})}}
+                onPress={() => { router.navigate({ pathname: '/(profile)/profile', params: { user_id: creatorInfo.id } }) }}
               >
                 <Image
                   source={{ uri: creatorInfo.profile_image || undefined }}
