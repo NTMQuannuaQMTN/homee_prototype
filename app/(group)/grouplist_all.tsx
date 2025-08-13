@@ -1,7 +1,10 @@
-
 import { useEffect, useState } from 'react';
+import React from 'react';
+import { Animated } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
 import { View, Text, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import { View as RNView } from 'react-native';
+import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import GradientBackground from '../components/GradientBackground';
 import { supabase } from '@/utils/supabase';
@@ -21,6 +24,7 @@ interface Group {
 }
 
 export default function GroupListAll() {
+  const scrollY = React.useRef(new Animated.Value(0)).current;
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
@@ -58,33 +62,93 @@ export default function GroupListAll() {
 
   return (
     <GradientBackground style={{ flex: 1 }}>
-      <View style={tw`flex-row items-center px-4 pt-14 pb-4`}>
+      {/* Animated Header - scrolls up and fades out */}
+      <Animated.View
+        style={{
+          paddingTop: 56,
+          paddingBottom: 0,
+          paddingHorizontal: 16,
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          opacity: scrollY.interpolate({ inputRange: [0, 60], outputRange: [1, 0], extrapolate: 'clamp' }),
+          transform: [
+            {
+              translateY: scrollY.interpolate({
+                inputRange: [0, 60],
+                outputRange: [0, -60],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 2,
+        }}
+      >
+        <View style={tw`flex-row items-center mb-2 w-full`}>
+          <Text style={[tw`text-white text-[24px] flex-1`, { fontFamily: 'Nunito-ExtraBold' }]}>Your groups</Text>
+          <TouchableOpacity
+            onPress={() => router.push('/(group)/FeatureGroupsSelector')}
+            style={tw`px-4 py-2 bg-white/10 rounded-full`}
+            activeOpacity={0.7}
+          >
+            <Text style={[tw`text-[#7A5CFA] text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+
+      {/* Compact Header (appears as you scroll) */}
+      <Animated.View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 16,
+          paddingTop: 52,
+          paddingBottom: 0,
+          opacity: scrollY.interpolate({ inputRange: [0, 60], outputRange: [0, 1], extrapolate: 'clamp' }),
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 2,
+          overflow: 'hidden',
+        }}
+      >
+        <BlurView intensity={0} tint="dark" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, zIndex: -1 }} />
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackIcon width={24} height={24} color="#fff" />
         </TouchableOpacity>
-        <View style={tw`flex-1 flex-row items-center justify-center`}>
-          <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Your groups</Text>
+        <View style={tw`flex-row items-center w-full`}>
+          <Text style={[tw`text-white text-[16px] ml-2.5`, { fontFamily: 'Nunito-ExtraBold' }]}>Your groups</Text>
+          <View style={tw`flex-1`} />
           <TouchableOpacity
             onPress={() => router.push('/(group)/FeatureGroupsSelector')}
-            style={tw`ml-2 px-2 py-1 bg-white/10 rounded-full`}
+            style={tw`mr-4.5 px-4 py-2 bg-white/10 rounded-full`}
             activeOpacity={0.7}
           >
-            <Text style={tw`text-blue-300 text-xs`}>Choose</Text>
+            <Text style={[tw`text-[#7A5CFA] text-[13px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
           </TouchableOpacity>
         </View>
-        <View style={tw`w-7`} />
-      </View>
-      <View style={tw`items-center mb-18`}>
+      </Animated.View>
 
-        <FlatList
+      <View style={tw`items-center pt-25`}> {/* Add top padding for header overlay */}
+        <Animated.FlatList
           data={[...displayGroups, { id: 'create-group-btn' }]}
           keyExtractor={item => item.id}
           extraData={featuredGroupIds.join(',')}
           numColumns={numColumns}
-          contentContainerStyle={tw`pb-14`}
+          contentContainerStyle={tw`pt-3.5 pb-10`}
           columnWrapperStyle={tw`gap-x-4 mb-4`}
           showsVerticalScrollIndicator={false}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true }
+          )}
+          scrollEventThrottle={16}
           renderItem={({ item }) => {
+            // ...existing code...
             if (item.id === 'create-group-btn') {
               return (
                 <View style={{ width: cardWidth }}>

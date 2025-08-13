@@ -83,7 +83,7 @@ export default function FeatureGroupsSelector({ groups: propGroups, onSave, onCa
   return (
     <GradientBackground>
       <View style={tw`flex-1 px-4 py-14`}>
-        <View style={tw`flex-row items-center mb-3`}>
+        <View style={tw`flex-row items-center mb-4`}>
           <TouchableOpacity onPress={() => router.back()} style={tw`mr-2`}>
             <BackIcon width={24} height={24} />
           </TouchableOpacity>
@@ -131,7 +131,7 @@ export default function FeatureGroupsSelector({ groups: propGroups, onSave, onCa
               </TouchableOpacity>
             );
           }}
-          contentContainerStyle={tw`pb-4`}
+          contentContainerStyle={tw`pb-0`}
           style={tw`flex-1`}
           showsVerticalScrollIndicator={false}
         />
