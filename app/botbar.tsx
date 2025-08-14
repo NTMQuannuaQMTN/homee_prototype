@@ -63,12 +63,14 @@ export default function BotBar({ currentTab = 'home', selfView = false }: { curr
         {/* Center Add Button */}
         <TouchableOpacity
           onPress={() => {
-            if (currentTab !== 'create') router.replace('/(create)/create');
+            if (currentTab !== 'create') router.replace('/(create)/image');
           }}
           style={tw`flex-1 items-center justify-center`}
           disabled={currentTab === 'create'}
         >
-          {currentTab === 'create' ? <CreateTabActive width={24} height={24} /> : <CreateTab width={24} height={24} />}
+          <View style={tw`rounded-full bg-white w-10 h-10 justify-center items-center`}>
+            <View style={tw`rounded-full bg-white w-8 h-8 border border-[#080B32]`} />
+          </View>
         </TouchableOpacity>
         {/* Profile Tab */}
         <TouchableOpacity
