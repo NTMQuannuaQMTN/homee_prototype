@@ -220,7 +220,7 @@ export default function ProfilePage() {
   }, [userView?.id, loading]);
 
   const handleAddRequest = async (id: string | string[] | undefined) => {
-    const { error } = await supabase.from('requests')
+    const { error } = await supabase.from('friend_requests')
       .insert({ user_id: user.id, requestee: id });
     if (error) {
       console.error(error.message);
@@ -239,7 +239,7 @@ export default function ProfilePage() {
     }
 
     const { error: deleteErr, data: deletedRows } = await supabase
-      .from('requests')
+      .from('friend_requests')
       .delete()
       .eq('user_id', user.id)
       .eq('requestee', id)
@@ -263,7 +263,7 @@ export default function ProfilePage() {
     }
 
     const { error: deleteErr, data: deletedRows } = await supabase
-      .from('requests')
+      .from('friend_requests')
       .delete()
       .eq('user_id', id)
       .eq('requestee', user.id)
@@ -367,21 +367,21 @@ export default function ProfilePage() {
     if (self) return;
 
     const { error: friendError } = await supabase.from('friends')
-      .select('*').eq('user_id', user.id).eq('friend', id).single();
+      .select('id').eq('user_id', user.id).eq('friend', id).single();
     if (!friendError) {
       setFriendStat('friend');
       return;
     }
 
-    const { error: requestingError } = await supabase.from('requests')
-      .select('*').eq('user_id', user.id).eq('requestee', id).single();
+    const { error: requestingError } = await supabase.from('friend_requests')
+      .select('id').eq('user_id', user.id).eq('requestee', id).single();
     if (!requestingError) {
       setFriendStat('requesting');
       return;
     }
 
-    const { error: requestedError } = await supabase.from('requests')
-      .select('*').eq('user_id', id).eq('requestee', user.id).single();
+    const { error: requestedError } = await supabase.from('friend_requests')
+      .select('id').eq('user_id', id).eq('requestee', user.id).single();
     if (!requestedError) {
       setFriendStat('requested');
       return;
@@ -399,10 +399,10 @@ export default function ProfilePage() {
 
     // Subscribe to real-time changes in the 'requests' table where requestee is the current user
     const channel = supabase
-      .channel('public:requests')
+      .channel('public:friend_requests')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'requests', filter: `requestee=eq.${user.id}` },
+        { event: 'INSERT', schema: 'public', table: 'friend_requests', filter: `requestee=eq.${user.id}` },
         (payload) => {
           // Someone sent a friend request to me
           // Re-run checkRequest for the sender's id
