@@ -31,37 +31,32 @@ export default function GroupList() {
 
     const fetchGroups = async () => {
         setLoading(true);
-        try {
-            const { data, error } = await supabase
-                .from('groups')
-                .select('id, title, bio, creator, group_image, public, member_count')
-                .order('member_count', { ascending: false })
-                .order('created_at', { ascending: false })
-                .or(
-                    `creator.eq.${user.id},id.in.(${ // groups where user is a member
-                    (
-                        await supabase
-                            .from('group_members')
-                            .select('group_id')
-                            .eq('user_id', user.id)
-                    ).data?.map((gm: { group_id: string }) => gm.group_id).join(',') || ''
-                    })`
-                );
+        const { data, error } = await supabase
+            .from('groups')
+            .select('id, title, bio, creator, group_image, public, member_count')
+            .order('member_count', { ascending: false })
+            .order('created_at', { ascending: false })
+            .or(
+                `creator.eq.${user.id},id.in.(${ // groups where user is a member
+                (
+                    await supabase
+                        .from('group_members')
+                        .select('group_id')
+                        .eq('user_id', user.id)
+                ).data?.map((gm: { group_id: string }) => gm.group_id).join(',') || ''
+                })`
+            );
 
-            if (error) {
-                console.error('Error fetching groups:', error);
-                return;
-            }
-
-            if (data) {
-                setGroups(data);
-                console.log(data);
-            }
-        } catch (error) {
-            console.error('Error fetching groups:', error);
-        } finally {
-            setLoading(false);
+        if (error) {
+            console.error('Error fetching groups:', error.message);
+            return;
         }
+
+        if (data) {
+            setGroups(data);
+            console.log(data);
+        }
+        setLoading(false);
     };
 
     const { featuredGroupIds, hydrate } = useAsyncFeaturedGroupsStore();

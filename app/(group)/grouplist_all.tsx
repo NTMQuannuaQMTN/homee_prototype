@@ -39,7 +39,7 @@ export default function GroupListAll() {
   const cardWidth = width / 2 - 20;
   const router = useRouter();
 
-  const {user} = useUserStore();
+  const { user } = useUserStore();
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -50,12 +50,12 @@ export default function GroupListAll() {
         .eq('public', true)
         .or(
           `creator.eq.${user.id},id.in.(${ // groups where user is a member
-            (
-              await supabase
-                .from('group_members')
-                .select('group_id')
-                .eq('user_id', user.id)
-            ).data?.map((gm: { group_id: string }) => gm.group_id).join(',') || ''
+          (
+            await supabase
+              .from('group_members')
+              .select('group_id')
+              .eq('user_id', user.id)
+          ).data?.map((gm: { group_id: string }) => gm.group_id).join(',') || ''
           })`
         )
         .order('member_count', { ascending: false })
@@ -119,7 +119,7 @@ export default function GroupListAll() {
           alignItems: 'center',
           paddingHorizontal: 16,
           paddingTop: 52,
-          paddingBottom: 0,
+          paddingBottom: 8,
           opacity: scrollY.interpolate({ inputRange: [0, 60], outputRange: [0, 1], extrapolate: 'clamp' }),
           position: 'absolute',
           top: 0,
@@ -129,7 +129,14 @@ export default function GroupListAll() {
           overflow: 'hidden',
         }}
       >
-        <BlurView intensity={0} tint="dark" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, zIndex: -1 }} />
+        <BlurView
+          intensity={30}
+          tint="dark"
+          style={[tw`absolute top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
+        />
+        <View
+          style={[tw`absolute bg-[#080B32] bg-opacity-20 top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
+        />
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackIcon width={24} height={24} color="#fff" />
         </TouchableOpacity>
@@ -146,13 +153,13 @@ export default function GroupListAll() {
         </View>
       </Animated.View>
 
-      <View style={tw`items-center pt-25`}> {/* Add top padding for header overlay */}
+      <View style={tw`items-center`}> {/* Add top padding for header overlay */}
         <Animated.FlatList
           data={[...displayGroups, { id: 'create-group-btn' }]}
           keyExtractor={item => item.id}
           extraData={featuredGroupIds.join(',')}
           numColumns={numColumns}
-          contentContainerStyle={tw`pt-3.5 pb-10`}
+          contentContainerStyle={tw`pt-28.5 pb-10`}
           columnWrapperStyle={tw`gap-x-4 mb-4`}
           showsVerticalScrollIndicator={false}
           onScroll={Animated.event(
@@ -166,7 +173,7 @@ export default function GroupListAll() {
               return (
                 <View style={{ width: cardWidth }}>
                   <TouchableOpacity
-                    style={[tw`bg-white/10 rounded-xl justify-center items-center`, {width: cardWidth, aspectRatio: 1/1}]}
+                    style={[tw`bg-white/10 rounded-xl justify-center items-center`, { width: cardWidth, aspectRatio: 1 / 1 }]}
                     onPress={() => router.navigate('/(create)/group')}
                     activeOpacity={0.7}
                   >
