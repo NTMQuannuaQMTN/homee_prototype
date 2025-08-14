@@ -135,7 +135,7 @@ export default function GroupListAll() {
           style={[tw`absolute top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
         />
         <View
-          style={[tw`absolute bg-[#080B32] bg-opacity-20 top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
+          style={[tw`absolute bg-[#080B32] bg-opacity-80 top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
         />
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <BackIcon width={24} height={24} color="#fff" />
