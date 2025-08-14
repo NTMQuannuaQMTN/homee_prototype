@@ -3,6 +3,11 @@ import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Dim
 import { useEffect, useState } from "react";
 import tw from "twrnc";
 import { supabase } from "@/utils/supabase";
+import defaultImages from "./group_defaultimg";
+import BackIcon from '../../assets/icons/back.svg';
+import EditIcon from '../../assets/icons/edit-icon.svg';
+import ShareIcon from '../../assets/icons/share-icon.svg';
+import ThreeDotsIcon from '../../assets/icons/threedots.svg';
 import { useUserStore } from "../store/userStore";
 import AlbumCard from "../(album)/albumcard";
 
@@ -28,6 +33,7 @@ interface User {
 }
 
 export default function GroupView() {
+  // ...existing code...
   const { id } = useLocalSearchParams<{ id: string }>();
   const [group, setGroup] = useState<Group | null>(null);
   const [loading, setLoading] = useState(true);
@@ -175,7 +181,7 @@ export default function GroupView() {
   if (!group) {
     return (
       <View style={tw`flex-1 justify-center items-center bg-[#080B32]`}>
-        <Text style={[tw`text-white text-lg`, { fontFamily: "Nunito-ExtraBold" }]}>
+        <Text style={[tw`text-white text-lg`, { fontFamily: "Nunito-ExtraBold" }]}> 
           Group not found.
         </Text>
       </View>
@@ -183,135 +189,167 @@ export default function GroupView() {
   }
 
   const isDefault = group.group_image === "default";
+  // Pick a default image index based on group id for consistency
+  let defaultIndex = 0;
+  if (isDefault) {
+    if (group.id && group.id.length > 2) {
+      defaultIndex = Math.abs(Array.from(group.id).reduce((acc, c) => acc + c.charCodeAt(0), 0)) % defaultImages.length;
+    } else {
+      defaultIndex = Math.floor(Math.random() * defaultImages.length);
+    }
+  }
+  const defaultImage = defaultImages[defaultIndex];
 
   return (
-    <ScrollView style={tw`flex-1 bg-[#080B32]`}>
-      <View style={tw`items-center pt-10 px-6`}>
-        {isDefault ? (
-          <View style={[tw`rounded-lg bg-gray-500 justify-center items-center mb-4`, { width: width - 40, aspectRatio: 1 / 1 }]}>
-            <Text style={[tw`text-white text-2xl text-center`, { fontFamily: "Nunito-ExtraBold" }]}>
-              {group.title}
+    <View style={tw`flex-1 bg-[#080B32]`}>
+      <ScrollView style={tw`flex-1`}>
+        {/* Topbar (now scrolls with content) */}
+        <View style={tw`flex-row items-center justify-between px-4 pt-14`}>
+          <TouchableOpacity onPress={() => router.back()} style={tw``}>
+            <BackIcon width={24} height={24} />
+          </TouchableOpacity>
+          <View style={tw`flex-row items-center gap-x-2`}>
+            <TouchableOpacity onPress={() => {}} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
+              <EditIcon width={18} height={18} />
+              <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {}} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
+              <ShareIcon width={20} height={20} />
+              <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Share</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {}}>
+              <ThreeDotsIcon width={20} height={20} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        {/* Main scrollable content */}
+        <View style={tw`items-center pt-6 px-6`}>
+          {isDefault ? (
+            <Image
+              source={defaultImage}
+              style={[tw`rounded-xl mb-4`, { width: width - 40, height: width - 40 }]}
+              resizeMode="cover"
+            />
+          ) : (
+            <Image
+              source={{ uri: group.group_image }}
+              style={[tw`rounded-xl mb-4`, { width: width - 40, height: width - 40 }]}
+              resizeMode="cover"
+            />
+          )}
+          <Text style={[tw`text-white text-2xl mb-2 text-center`, { fontFamily: "Nunito-ExtraBold" }]}> 
+            {group.title}
+          </Text>
+          {creator ? <View>
+            <Text style={[tw`text-white text-2xl mb-2 text-center`, { fontFamily: "Nunito-ExtraBold" }]}> 
+              Creator
             </Text>
-          </View>
-        ) : (
-          <Image
-            source={{ uri: group.group_image }}
-            style={[tw`rounded-lg mb-4`, { width: width - 40, aspectRatio: 1 / 1 }]}
-            resizeMode="cover"
-          />
-        )}
-        <Text style={[tw`text-white text-2xl mb-2 text-center`, { fontFamily: "Nunito-ExtraBold" }]}>
-          {group.title}
-        </Text>
-        {creator ? <View>
-          <Text style={[tw`text-white text-2xl mb-2 text-center`, { fontFamily: "Nunito-ExtraBold" }]}>
-            Creator
-          </Text>
-        </View> : <TouchableOpacity onPress={toggleJoin}>
-          <Text style={[tw`text-white text-2xl mb-2 text-center`, { fontFamily: "Nunito-ExtraBold" }]}>
-            {reqStat === 'Nothing' ? 'Join' : reqStat}
-          </Text>
-        </TouchableOpacity>}
-        {group.bio ? (
-          <Text style={[tw`text-white text-base mb-2 text-center`, { fontFamily: "Nunito-Medium" }]}>
-            {group.bio}
-          </Text>
-        ) : null}
-      </View>
-      {/* Tabs for Album and Details */}
-      <View style={tw`flex-row justify-center mb-4 gap-2 px-2`}>
-        <TouchableOpacity
-          style={[
-            tw`flex-1 py-2 rounded-t-lg items-center`,
-            tab === 'album' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
-          ]}
-          onPress={() => setTab('album')}
-        >
-          <Text style={[
-            tw`text-base`,
-            { fontFamily: "Nunito-Bold", color: tab === 'album' ? '#fff' : '#c7c7c7' }
-          ]}>
-            Album
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            tw`flex-1 py-2 rounded-t-lg items-center`,
-            tab === 'details' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
-          ]}
-          onPress={() => setTab('details')}
-        >
-          <Text style={[
-            tw`text-base`,
-            { fontFamily: "Nunito-Bold", color: tab === 'details' ? '#fff' : '#c7c7c7' }
-          ]}>
-            Details
-          </Text>
-        </TouchableOpacity>
-        {creator && !group.public && <TouchableOpacity
-          style={[
-            tw`flex-1 py-2 rounded-t-lg items-center`,
-            tab === 'requests' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
-          ]}
-          onPress={() => setTab('requests')}
-        >
-          <Text style={[
-            tw`text-base`,
-            { fontFamily: "Nunito-Bold", color: tab === 'requests' ? '#fff' : '#c7c7c7' }
-          ]}>
-            Requests
-          </Text>
-        </TouchableOpacity>}
-      </View>
-      <View style={tw`px-6 pb-10`}>
-        {tab === 'album' ? (
-          <View style={tw`flex-row flex-wrap gap-4`}>
-            {albums && albums.map(album => (
-              <AlbumCard key={album.id}
-                id={album.id}
-                title={album.title}
-                onPress={() => { }} />
-            ))}
-            {(reqStat === 'Joined' || creator) && <TouchableOpacity
-              style={[tw`bg-gray-500 rounded-lg justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
-              onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title } })}
-            >
-              <Text style={tw`text-white text-2xl`}>+</Text>
-            </TouchableOpacity>}
-          </View>
-        ) : tab === 'details' ? (
-          <View>
+          </View> : <TouchableOpacity onPress={toggleJoin}>
+            <Text style={[tw`text-white text-2xl mb-2 text-center`, { fontFamily: "Nunito-ExtraBold" }]}> 
+              {reqStat === 'Nothing' ? 'Join' : reqStat}
+            </Text>
+          </TouchableOpacity>}
+          {group.bio ? (
+            <Text style={[tw`text-white text-base mb-2 text-center`, { fontFamily: "Nunito-Medium" }]}> 
+              {group.bio}
+            </Text>
+          ) : null}
+        </View>
+        {/* Tabs for Album and Details */}
+        <View style={tw`flex-row justify-center mb-4 gap-2 px-2`}>
+          <TouchableOpacity
+            style={[ 
+              tw`flex-1 py-2 rounded-t-lg items-center`,
+              tab === 'album' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
+            ]}
+            onPress={() => setTab('album')}
+          >
+            <Text style={[ 
+              tw`text-base`,
+              { fontFamily: "Nunito-Bold", color: tab === 'album' ? '#fff' : '#c7c7c7' }
+            ]}>
+              Album
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[ 
+              tw`flex-1 py-2 rounded-t-lg items-center`,
+              tab === 'details' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
+            ]}
+            onPress={() => setTab('details')}
+          >
+            <Text style={[ 
+              tw`text-base`,
+              { fontFamily: "Nunito-Bold", color: tab === 'details' ? '#fff' : '#c7c7c7' }
+            ]}>
+              Details
+            </Text>
+          </TouchableOpacity>
+          {creator && !group.public && <TouchableOpacity
+            style={[ 
+              tw`flex-1 py-2 rounded-t-lg items-center`,
+              tab === 'requests' ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
+            ]}
+            onPress={() => setTab('requests')}
+          >
+            <Text style={[ 
+              tw`text-base`,
+              { fontFamily: "Nunito-Bold", color: tab === 'requests' ? '#fff' : '#c7c7c7' }
+            ]}>
+              Requests
+            </Text>
+          </TouchableOpacity>}
+        </View>
+        <View style={tw`px-6 pb-10`}>
+          {tab === 'album' ? (
+            <View style={tw`flex-row flex-wrap gap-4`}>
+              {albums && albums.map(album => (
+                <AlbumCard key={album.id}
+                  id={album.id}
+                  title={album.title}
+                  onPress={() => { }} />
+              ))}
+              {(reqStat === 'Joined' || creator) && <TouchableOpacity
+                style={[tw`bg-gray-500 rounded-lg justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
+                onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title } })}
+              >
+                <Text style={tw`text-white text-2xl`}>+</Text>
+              </TouchableOpacity>}
+            </View>
+          ) : tab === 'details' ? (
+            <View>
+              {/* Details content goes here */}
+              <Text style={[tw`text-white text-sm mb-1`, { fontFamily: "Nunito-Medium" }]}> 
+                Members: {group.member_count}
+              </Text>
+              <View style={tw`flex-row items-center mt-1`}>
+                <Text style={[tw`text-white text-sm mr-2`, { fontFamily: "Nunito-Medium" }]}> 
+                  Created by:
+                </Text>
+                <TouchableOpacity
+                  style={tw`flex-row items-center bg-gray-700 p-2 rounded-xl`}
+                  activeOpacity={0.7}
+                  onPress={() => { router.navigate({ pathname: '/(profile)/profile', params: { user_id: creatorInfo.id } }) }}
+                >
+                  <Image
+                    source={{ uri: creatorInfo.profile_image || undefined }}
+                    style={tw`w-6 h-6 rounded-full mr-2 bg-gray-400`}
+                  />
+                  <Text style={[tw`text-white text-sm`, { fontFamily: "Nunito-Bold" }]}> 
+                    {creatorInfo.name}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (<View>
             {/* Details content goes here */}
-            <Text style={[tw`text-white text-sm mb-1`, { fontFamily: "Nunito-Medium" }]}>
+            <Text style={[tw`text-white text-sm mb-1`, { fontFamily: "Nunito-Medium" }]}> 
               Members: {group.member_count}
             </Text>
-            <View style={tw`flex-row items-center mt-1`}>
-              <Text style={[tw`text-white text-sm mr-2`, { fontFamily: "Nunito-Medium" }]}>
-                Created by:
-              </Text>
-              <TouchableOpacity
-                style={tw`flex-row items-center bg-gray-700 p-2 rounded-xl`}
-                activeOpacity={0.7}
-                onPress={() => { router.navigate({ pathname: '/(profile)/profile', params: { user_id: creatorInfo.id } }) }}
-              >
-                <Image
-                  source={{ uri: creatorInfo.profile_image || undefined }}
-                  style={tw`w-6 h-6 rounded-full mr-2 bg-gray-400`}
-                />
-                <Text style={[tw`text-white text-sm`, { fontFamily: "Nunito-Bold" }]}>
-                  {creatorInfo.name}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ) : (<View>
-          {/* Details content goes here */}
-          <Text style={[tw`text-white text-sm mb-1`, { fontFamily: "Nunito-Medium" }]}>
-            Members: {group.member_count}
-          </Text>
-        </View>)}
-      </View>
-      {/* You can add more group details or actions here */}
-    </ScrollView>
+          </View>)}
+        </View>
+        {/* You can add more group details or actions here */}
+      </ScrollView>
+    </View>
   );
 }
