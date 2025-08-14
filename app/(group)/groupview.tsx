@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions, Alert } from "react-native";
+import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions, Alert, SafeAreaView } from "react-native";
 import { useEffect, useState } from "react";
 import tw from "twrnc";
 import { supabase } from "@/utils/supabase";
@@ -201,10 +201,10 @@ export default function GroupView() {
   const defaultImage = defaultImages[defaultIndex];
 
   return (
-    <View style={tw`flex-1 bg-[#080B32]`}>
+    <SafeAreaView style={tw`flex-1 bg-[#080B32]`}>
       <ScrollView style={tw`flex-1`}>
         {/* Topbar (now scrolls with content) */}
-        <View style={tw`flex-row items-center justify-between px-4 pt-14`}>
+        <View style={tw`flex-row items-center justify-between px-4`}>
           <TouchableOpacity onPress={() => router.back()} style={tw``}>
             <BackIcon width={24} height={24} />
           </TouchableOpacity>
@@ -307,7 +307,7 @@ export default function GroupView() {
                 <AlbumCard key={album.id}
                   id={album.id}
                   title={album.title}
-                  onPress={() => { }} />
+                  onPress={() => { router.navigate({pathname: '/(album)/albumview', params: {id: album.id}}) }} />
               ))}
               {(reqStat === 'Joined' || creator) && <TouchableOpacity
                 style={[tw`bg-gray-500 rounded-lg justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
@@ -350,6 +350,6 @@ export default function GroupView() {
         </View>
         {/* You can add more group details or actions here */}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
