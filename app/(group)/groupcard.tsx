@@ -36,7 +36,7 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
       activeOpacity={0.7}
     >
       {isDefault ? (
-        <View style={tw`flex-1 justify-center items-center`}>
+        <View style={tw`flex-1 justify-center items-center shadow-lg`}>
           <Image
             source={defaultImage}
             style={tw`w-full h-full absolute`}

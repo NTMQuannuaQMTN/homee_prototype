@@ -227,13 +227,13 @@ export default function GroupView() {
           {isDefault ? (
             <Image
               source={defaultImage}
-              style={[tw`rounded-xl mb-4`, { width: width - 40, height: width - 40 }]}
+              style={[tw`rounded-xl mb-4`, { width: width - 80, height: width - 80 }]}
               resizeMode="cover"
             />
           ) : (
             <Image
               source={{ uri: group.group_image }}
-              style={[tw`rounded-xl mb-4`, { width: width - 40, height: width - 40 }]}
+              style={[tw`rounded-xl mb-4`, { width: width - 80, height: width - 80 }]}
               resizeMode="cover"
             />
           )}
