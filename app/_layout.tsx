@@ -123,6 +123,7 @@ export default function RootLayout() {
     'Nunito-Regular': require('../assets/fonts/Nunito-Regular.ttf'),
     'Nunito-SemiBold': require('../assets/fonts/Nunito-SemiBold.ttf'),
     'Nunito-Medium': require('../assets/fonts/Nunito-Medium.ttf'),
+    'Nunito-Black': require('../assets/fonts/Nunito-Black.ttf'),
   });
 
   const { user } = useUserStore();

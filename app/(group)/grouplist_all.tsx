@@ -47,17 +47,16 @@ export default function GroupListAll() {
       const { data, error } = await supabase
         .from('groups')
         .select('id, title, bio, creator, group_image, public, member_count')
-        .eq('public', true)
-        .or(
-          `creator.eq.${user.id},id.in.(${ // groups where user is a member
-          (
-            await supabase
-              .from('group_members')
-              .select('group_id')
-              .eq('user_id', user.id)
-          ).data?.map((gm: { group_id: string }) => gm.group_id).join(',') || ''
-          })`
-        )
+        // .or(
+        //   `creator.eq.${user.id},id.in.(${ // groups where user is a member
+        //   (
+        //     await supabase
+        //       .from('group_members')
+        //       .select('group_id')
+        //       .eq('user_id', user.id)
+        //   ).data?.map((gm: { group_id: string }) => gm.group_id).join(',') || ''
+        //   })`
+        // )
         .order('member_count', { ascending: false })
         .order('created_at', { ascending: false });
       if (!error && data) setGroups(data);
@@ -101,7 +100,7 @@ export default function GroupListAll() {
         }}
       >
         <View style={tw`flex-row items-center mb-2 w-full`}>
-          <Text style={[tw`text-white text-[24px] flex-1`, { fontFamily: 'Nunito-ExtraBold' }]}>Your groups</Text>
+          <Text style={[tw`text-white text-[24px] flex-1`, { fontFamily: 'Nunito-Black' }]}>Your groups</Text>
           <TouchableOpacity
             onPress={() => router.push('/(group)/FeatureGroupsSelector')}
             style={tw`px-4 py-2 bg-white/10 rounded-full`}
