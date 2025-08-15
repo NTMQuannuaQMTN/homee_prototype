@@ -316,7 +316,7 @@ export default function GroupView() {
   return (
     <GradientBackground style={tw`flex-1`}>
       <Image
-        source={{ uri: group.group_image }}
+        source={{ uri: group.group_image === 'default' ? defaultImage : group.group_image }}
         style={{
           position: 'absolute',
           top: 0,
