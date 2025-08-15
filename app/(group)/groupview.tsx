@@ -442,7 +442,7 @@ export default function GroupView() {
               {(reqStat === 'Joined' || creator) && 
               <TouchableOpacity
                 style={[tw`bg-white/10 rounded-xl justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
-                onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title } })}
+                onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title, img: group.group_image } })}
               >
                 <View style={tw`flex-row items-center border border-white/50 rounded-full px-2.5 py-2`}>
                   <Text style={[tw`text-white text-xl mr-1.5 -mt-0.5`, { fontFamily: 'Nunito-ExtraBold' }]}>+</Text>
