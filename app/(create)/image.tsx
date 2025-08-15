@@ -23,7 +23,6 @@ export default function CreateImage() {
   const [tab, setTab] = useState<TabType>("upload");
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [aspect, setAspect] = useState(1);
 
   const [showCaptionAlbum, setShowCaptionAlbum] = useState(false);
   const [showGroupDropdown, setShowGroupDropdown] = useState(false);
@@ -35,10 +34,6 @@ export default function CreateImage() {
   const [caption, setCaption] = useState('');
 
   const { user } = useUserStore();
-
-  useEffect(() => {
-    if (image) Image.getSize(image, (width, height) => setAspect(height / width), (error) => { });
-  }, [image]);
 
   useEffect(() => {
     const getAlbums = async () => {
@@ -164,13 +159,13 @@ export default function CreateImage() {
         {loading ? (
           <ActivityIndicator size="large" color="#7A5CFA" />
         ) : image ? (
-          <View style={[tw`w-64 rounded-xl mb-6 bg-gray-800 items-center justify-center`, { overflow: "hidden", height: 256 * aspect }]}>
+          <View style={[tw`w-64 h-96 rounded-xl mb-6 items-center justify-center`, { overflow: "hidden" }]}>
             <Image
               source={{ uri: image }}
               style={[
-                tw`rounded-xl w-full h-full`,
+                tw`rounded-xl w-64 h-96`
               ]}
-              resizeMode="cover"
+              resizeMode="contain"
             />
           </View>
         ) : (
@@ -259,6 +254,7 @@ export default function CreateImage() {
               </View>
             )}
             {/* Album Dropdown with Checkboxes */}
+            <Text style={[tw`text-white mb-2`, { fontFamily: "Nunito-Medium" }]}>Album</Text>
             <View style={tw`mb-6`}>
               <TouchableOpacity
                 style={[
