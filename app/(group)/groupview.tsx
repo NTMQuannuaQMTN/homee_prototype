@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import tw from "twrnc";
 import { supabase } from "@/utils/supabase";
 import GradientBackground from "../components/GradientBackground";
-import defaultImages from "./group_defaultimg";
+import defaultImages from "../(create)/defaultimage";
 import BackIcon from '../../assets/icons/back.svg';
 import EditIcon from '../../assets/icons/edit-icon.svg';
 import ShareIcon from '../../assets/icons/share-icon.svg';
@@ -282,17 +282,36 @@ export default function GroupView() {
     );
   }
 
-  const isDefault = group.group_image === "default";
-  // Pick a default image index based on group id for consistency
-  let defaultIndex = 0;
-  if (isDefault) {
+  // Default image logic: match group.tsx and imageModal.tsx
+  let isDefault = false;
+  let defaultImage;
+  if (group.group_image === 'default') {
+    // Use group id to consistently pick a default image
+    let defaultIndex = 0;
     if (group.id && group.id.length > 2) {
       defaultIndex = Math.abs(Array.from(group.id).reduce((acc, c) => acc + c.charCodeAt(0), 0)) % defaultImages.length;
     } else {
       defaultIndex = Math.floor(Math.random() * defaultImages.length);
     }
+    defaultImage = defaultImages[defaultIndex];
+    isDefault = true;
+  } else if (group.group_image && group.group_image.startsWith('default')) {
+    // Try to find the matching image in defaultImages by filename
+    const found = defaultImages.find(img => {
+      if (typeof img === 'number') return false;
+      if (img && img.uri && typeof img.uri === 'string') {
+        return img.uri.includes(group.group_image);
+      }
+      return false;
+    });
+    if (found) {
+      defaultImage = found;
+      isDefault = true;
+    } else {
+      defaultImage = defaultImages[0];
+      isDefault = true;
+    }
   }
-  const defaultImage = defaultImages[defaultIndex];
 
   return (
     <GradientBackground style={tw`flex-1`}>

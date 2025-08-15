@@ -1,6 +1,6 @@
 import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import tw from "twrnc";
-import defaultImages from "./group_defaultimg";
+import defaultImages from "../(create)/defaultimage";
 
 interface GroupCardProps {
   id: string;
@@ -15,20 +15,39 @@ interface GroupCardProps {
 }
 
 export default function GroupCard({ id, title, bio, creator, group_image, publicGroup, member_count, onPress }: GroupCardProps) {
-  const isDefault = group_image === "default";
   const width = Dimensions.get('screen').width;
-
   const cardWidth = width / 2 - 20;
-  // Use id to get a consistent random image for each group, but if id is missing or too short, use random
-  let defaultIndex = 0;
-  if (isDefault) {
+
+  // Default image logic: match group.tsx and imageModal.tsx
+  let isDefault = false;
+  let defaultImage;
+  if (group_image === 'default') {
+    // Use id to consistently pick a default image
+    let defaultIndex = 0;
     if (id && id.length > 2) {
       defaultIndex = Math.abs(Array.from(id).reduce((acc, c) => acc + c.charCodeAt(0), 0)) % defaultImages.length;
     } else {
       defaultIndex = Math.floor(Math.random() * defaultImages.length);
     }
+    defaultImage = defaultImages[defaultIndex];
+    isDefault = true;
+  } else if (group_image && group_image.startsWith('default')) {
+    // Try to find the matching image in defaultImages by filename
+    const found = defaultImages.find(img => {
+      if (typeof img === 'number') return false;
+      if (img && img.uri && typeof img.uri === 'string') {
+        return img.uri.includes(group_image);
+      }
+      return false;
+    });
+    if (found) {
+      defaultImage = found;
+      isDefault = true;
+    } else {
+      defaultImage = defaultImages[0];
+      isDefault = true;
+    }
   }
-  const defaultImage = defaultImages[defaultIndex];
   return (
     <TouchableOpacity
       style={[tw`rounded-xl overflow-hidden`, {width: cardWidth, aspectRatio: 1/1}]}
@@ -53,17 +72,13 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
           source={{ uri: group_image }}
           style={tw`w-full h-full`}
           resizeMode="cover"
-        >
-          {/* Fallback for RN <Image> not supporting children: */}
-        </Image>
+        />
       )}
-      {!isDefault && (
-        <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
-          <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
-            {title}
-          </Text>
-        </View>
-      )}
+      <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
+        <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
+          {title}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 }
