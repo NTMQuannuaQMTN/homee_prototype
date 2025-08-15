@@ -54,7 +54,6 @@ export default function GroupList() {
 
         if (data) {
             setGroups(data);
-            console.log(data);
         }
         setLoading(false);
     };

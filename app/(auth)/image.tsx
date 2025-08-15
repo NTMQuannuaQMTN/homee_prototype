@@ -34,9 +34,6 @@ export default function ImagePage() {
     if (!imageInput || !signupInfo) return;
     setLoading(true);
     try {
-      // Find user by email
-      console.log('Looking for user with email:', signupInfo.email);
-      
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id, email, profile_image')
@@ -44,16 +41,11 @@ export default function ImagePage() {
         .single();
       
       if (userError) {
-        console.log('User lookup error:', userError);
         throw userError;
       }
       
       const userID = userData?.id;
       if (!userID) throw new Error('User not found');
-      
-      console.log('Found user data:', userData);
-      console.log('User ID:', userID);
-      console.log('Current profile_image:', userData?.profile_image);
 
       // Get file info and determine file extension
       const fileUri = imageInput;
@@ -82,7 +74,6 @@ export default function ImagePage() {
         });
 
       if (uploadError) {
-        console.log('Upload error:', uploadError);
         throw uploadError;
       }
 
@@ -93,10 +84,6 @@ export default function ImagePage() {
       
       const publicUrl = urlData?.publicUrl;
       if (!publicUrl) throw new Error('Failed to get public URL');
-
-      // Update user profile with image URL
-      console.log('Attempting to update profile_image for user:', userID);
-      console.log('New profile_image URL:', publicUrl);
       
       const { data: updateData, error: updateError } = await supabase
         .from('users')
@@ -105,22 +92,16 @@ export default function ImagePage() {
         .select();
 
       if (updateError) {
-        console.log('Database update error:', updateError);
         throw updateError;
       }
-
-      console.log('Update response data:', updateData);
-      console.log('Number of rows updated:', updateData?.length || 0);
 
       if (updateData?.length === 0) {
         throw new Error('No rows were updated - this might be a policy issue');
       }
 
-      console.log('Profile image updated successfully:', publicUrl);
       Alert.alert('Success', 'Profile image uploaded successfully!');
       router.replace('/(home)/home/homepage');
     } catch (err) {
-      console.log('Full error:', err);
       const errorMessage = (err instanceof Error && err.message) ? err.message : String(err);
       Alert.alert('Image upload failed', errorMessage);
     }

@@ -9,7 +9,6 @@ import { supabase } from '@/utils/supabase';
 export async function sendInviteNotification(toUserId: string, fromUser: { id: string, username: string }, event: { id: string, title: string }) {
   if (!toUserId || !fromUser?.username || !event?.id || !event?.title) return;
   const message = `@${fromUser.username} invites you to ${event.title}`;
-  console.log('ádin');
   await supabase.from('invitenoti').insert([
     {
       user_id: toUserId,

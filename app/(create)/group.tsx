@@ -31,7 +31,6 @@ export default function CreateGroup() {
     const [showImageModal, setShowImageModal] = useState(false);
 
     const addGroup = async () => {
-        console.log('adding');
         // Check if event title, date, RSVP deadline, and location are available
         if (!title) {
             Alert.alert('Please fill in all required fields, including location.');
@@ -66,7 +65,6 @@ export default function CreateGroup() {
             setShowSuccessToast(true);
             if (dataEvent) {
                 setID(dataEvent[0].id);
-                console.log(dataEvent[0].id);
                 return dataEvent[0].id; // <-- return the new id
             }
             return id;
@@ -77,7 +75,6 @@ export default function CreateGroup() {
     }
 
     const updateImage = async (eventId: string) => {
-        console.log('updating');
         let imgURL = '';
         if (image && typeof image !== 'number') {
             // If image is already a URL, just use it
@@ -132,8 +129,6 @@ export default function CreateGroup() {
             setImageURL(`default`);
             imgURL = `default`;
         }
-
-        console.log("Attempting to update event image", { eventId, imgURL });
 
         if (!eventId) {
             console.error("No event id provided for update.");

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image, ActivityIndicator } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import tw from "twrnc";
@@ -10,13 +10,18 @@ export default function CreateImage() {
   const [tab, setTab] = useState<TabType>("upload");
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [aspect, setAspect] = useState(1);
+
+  useEffect(() => {
+    if (image) Image.getSize(image, (width, height) => setAspect(height / width), (error) => { });
+  }, [image]);
 
   const pickImage = async () => {
     setLoading(true);
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: false,
         quality: 0.8,
       });
       if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -51,10 +56,11 @@ export default function CreateImage() {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-[#080B32]`}>
-      <View style={tw`flex-row justify-center mt-6 mb-4`}>
+      <Text style={[tw`text-white text-[22px] text-center`, { fontFamily: 'Nunito-ExtraBold' }]}>Add an image</Text>
+      <View style={tw`flex-row justify-center mt-2 px-4 gap-4 mb-4`}>
         <TouchableOpacity
           style={[
-            tw`flex-1 py-3 items-center rounded-t-lg`,
+            tw`flex-1 py-2 items-center rounded-t-lg`,
             tab === "upload" ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
           ]}
           onPress={() => setTab("upload")}
@@ -65,7 +71,7 @@ export default function CreateImage() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[
-            tw`flex-1 py-3 items-center rounded-t-lg`,
+            tw`flex-1 py-2 items-center rounded-t-lg`,
             tab === "camera" ? tw`bg-[#7A5CFA]` : tw`bg-gray-700`
           ]}
           onPress={() => setTab("camera")}
@@ -79,11 +85,15 @@ export default function CreateImage() {
         {loading ? (
           <ActivityIndicator size="large" color="#7A5CFA" />
         ) : image ? (
-          <Image
-            source={{ uri: image }}
-            style={tw`w-64 h-64 rounded-xl mb-6 bg-gray-800`}
-            resizeMode="cover"
-          />
+          <View style={[tw`w-64 rounded-xl mb-6 bg-gray-800 items-center justify-center`, { overflow: "hidden", height: 256 * aspect }]}>
+            <Image
+              source={{ uri: image }}
+              style={[
+                tw`rounded-xl w-full h-full`,
+              ]}
+              resizeMode="cover"
+            />
+          </View>
         ) : (
           <View style={tw`w-64 h-64 rounded-xl mb-6 bg-gray-800 items-center justify-center`}>
             <Text style={tw`text-gray-400 text-lg`}>No image selected</Text>
