@@ -397,7 +397,7 @@ export default function GroupView() {
             )}
             <TouchableOpacity onPress={() => {}} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
               <ShareIcon width={20} height={20} />
-              <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Share</Text>
+              <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Invite</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <ThreeDotsIcon width={20} height={20} />
