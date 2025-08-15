@@ -34,11 +34,15 @@ export default function AlbumCard({ id, title, onPress }: AlbumCardProps) {
     }, [id]);
 
     const cardWidth = width / 2 - 32;
-    // Always use default4.png as the fallback image
-    const defaultImage = require('../../assets/default_images/default4.png');
+    // Use default4, default1, and default3 as fallback images in order
+    const fallbackImages = [
+        require('../../assets/default_images/default4.png'),
+        require('../../assets/default_images/default1.png'),
+        require('../../assets/default_images/default5.png'),
+    ];
     const displayImages = [...images];
-    while (displayImages.length < 3) {
-        displayImages.push(defaultImage);
+    for (let i = displayImages.length; i < 3; i++) {
+        displayImages.push(fallbackImages[i]);
     }
     return (
         <TouchableOpacity

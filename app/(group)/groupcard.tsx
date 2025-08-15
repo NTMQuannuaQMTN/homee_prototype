@@ -43,7 +43,7 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
             resizeMode="cover"
           />
           <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
-            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]} numberOfLines={2}>
+            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
               {title}
             </Text>
           </View>
@@ -59,7 +59,7 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
       )}
       {!isDefault && (
         <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
-          <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]} numberOfLines={1}>
+          <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
             {title}
           </Text>
         </View>
