@@ -8,6 +8,17 @@ import { useUserStore } from "../store/userStore";
 
 type TabType = "upload" | "camera";
 
+interface Group {
+  id: string;
+  title: string;
+  group_image: string;
+}
+
+interface Album {
+  id: string;
+  title: string;
+}
+
 export default function CreateImage() {
   const [tab, setTab] = useState<TabType>("upload");
   const [image, setImage] = useState<string | null>(null);
@@ -17,10 +28,10 @@ export default function CreateImage() {
   const [showCaptionAlbum, setShowCaptionAlbum] = useState(false);
   const [showGroupDropdown, setShowGroupDropdown] = useState(false);
   const [showAlbumDropdown, setShowAlbumDropdown] = useState(false);
-  const [groupList, setGroupList] = useState<string[]>([]);
-  const [group, setGroup] = useState<string>('');
-  const [albumList, setAlbumList] = useState<string[]>([]);
-  const [album, setAlbum] = useState<string[]>([]);
+  const [groupList, setGroupList] = useState<Group[]>([]);
+  const [group, setGroup] = useState<Group>({ id: '', title: '', group_image: '' });
+  const [albumList, setAlbumList] = useState<Album[]>([]);
+  const [album, setAlbum] = useState<Album[]>([]);
   const [caption, setCaption] = useState('');
 
   const { user } = useUserStore();
@@ -32,10 +43,10 @@ export default function CreateImage() {
   useEffect(() => {
     const getAlbums = async () => {
       const { data } = await supabase.from('albums')
-        .select('id')
-        .eq('group', group);
+        .select('id, title')
+        .eq('group', group.id);
 
-      if (data) setAlbumList(data.map(a => a.id));
+      if (data) setAlbumList(data);
     }
     getAlbums();
   }, [group]);
@@ -75,7 +86,9 @@ export default function CreateImage() {
         ...joinedGroups
       ];
       // Remove duplicates by group id
-      const uniqueGroups = allGroups.map(g => g.id);
+      const uniqueGroups = Array.from(
+        new Map(allGroups.map(g => [g.id, g])).values()
+      );
       setGroupList(uniqueGroups);
     };
 
@@ -207,7 +220,7 @@ export default function CreateImage() {
               value={caption}
               onChangeText={setCaption}
             />
-            <Text style={[tw`text-white mb-2`, { fontFamily: "Nunito-Medium" }]}>Album</Text>
+            <Text style={[tw`text-white mb-2`, { fontFamily: "Nunito-Medium" }]}>Group</Text>
             <TouchableOpacity
               style={[
                 tw`bg-gray-800 text-white rounded-lg px-4 py-2 mb-6 flex-row items-center justify-between`,
@@ -216,7 +229,7 @@ export default function CreateImage() {
               onPress={() => setShowGroupDropdown(!showGroupDropdown)}
             >
               <Text style={[tw`text-white`, { fontFamily: "Nunito-Medium" }]}>
-                {group ? group : "Choose group..."}
+                {group ? group.title : "Choose group..."}
               </Text>
               <Text style={tw`text-white text-lg`}>
                 {showGroupDropdown ? "▲" : "▼"}
@@ -228,7 +241,7 @@ export default function CreateImage() {
                   .filter(Boolean)
                   .map((g, idx) => (
                     <TouchableOpacity
-                      key={g + idx}
+                      key={g.id}
                       style={tw`py-2`}
                       onPress={() => {
                         setGroup(g);
@@ -239,7 +252,7 @@ export default function CreateImage() {
                         tw`text-white`,
                         { fontFamily: "Nunito-Medium", fontWeight: group === g ? "bold" : "normal" }
                       ]}>
-                        {g}
+                        {g.title}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -256,7 +269,7 @@ export default function CreateImage() {
               >
                 <Text style={[tw`text-white`, { fontFamily: "Nunito-Medium" }]}>
                   {album && album.length > 0
-                    ? album.join(", ")
+                    ? album.map(a => a.title).join(", ")
                     : "Select albums..."}
                 </Text>
                 <Text style={tw`text-white text-lg`}>
@@ -268,7 +281,7 @@ export default function CreateImage() {
                   {albumList
                     .map((a, idx) => (
                       <TouchableOpacity
-                        key={a + idx}
+                        key={a.id}
                         style={tw`flex-row items-center py-2`}
                         onPress={() => {
                           if (album.includes(a)) {
@@ -288,7 +301,7 @@ export default function CreateImage() {
                             <Text style={tw`text-white text-xs`}>✓</Text>
                           )}
                         </View>
-                        <Text style={[tw`text-white`, { fontFamily: "Nunito-Medium" }]}>{album}</Text>
+                        <Text style={[tw`text-white`, { fontFamily: "Nunito-Medium" }]}>{a.title}</Text>
                       </TouchableOpacity>
                     ))}
                 </View>
