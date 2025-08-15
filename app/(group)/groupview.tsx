@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions, Alert } from "react-native";
+import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions, Alert, Animated } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from "react";
 import tw from "twrnc";
@@ -12,6 +12,7 @@ import ShareIcon from '../../assets/icons/share-icon.svg';
 import ThreeDotsIcon from '../../assets/icons/threedots.svg';
 import { useUserStore } from "../store/userStore";
 import AlbumCard from "../(album)/albumcard";
+import DraggableModal from "../components/DraggableModal";
 
 interface Group {
   id: string;
@@ -36,6 +37,28 @@ interface User {
 }
 
 export default function GroupView() {
+  // Custom state for delete confirmation modal
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleteModalAnim] = useState(new Animated.Value(0));
+
+  // Fade in/out effect for delete modal
+  useEffect(() => {
+    if (showDeleteConfirm) {
+      setDeleteModalVisible(true);
+      Animated.timing(deleteModalAnim, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    } else if (deleteModalVisible) {
+      Animated.timing(deleteModalAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setDeleteModalVisible(false));
+    }
+  }, [showDeleteConfirm]);
   // Only one set of state/variable declarations:
   const { id } = useLocalSearchParams<{ id: string }>();
   const [group, setGroup] = useState<Group | null>(null);
@@ -53,6 +76,7 @@ export default function GroupView() {
   const [creator, setCreator] = useState<boolean>(false);
   const [reqStat, setReqStat] = useState<string>('');
   const [members, setMembers] = useState<User[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
   // Friend status for each member (for MEMBERS section)
   const [friendStats, setFriendStats] = useState<{[id: string]: string}>({});
   useEffect(() => {
@@ -272,6 +296,92 @@ export default function GroupView() {
 
   return (
     <GradientBackground style={tw`flex-1`}>
+      <DraggableModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        buttons={creator
+          ? [{
+              label: 'Delete group',
+              color: 'bg-red-600',
+              textColor: 'text-white',
+              onPress: () => {
+                setModalVisible(false);
+                setTimeout(() => setShowDeleteConfirm(true), 250);
+              },
+            }]
+          : [{
+              label: 'Report group',
+              color: 'bg-yellow-600',
+              textColor: 'text-white',
+              onPress: () => {
+                setModalVisible(false);
+                Alert.alert('Report group', 'Group report logic goes here.');
+              },
+            }]
+        }
+      />
+
+      {/* Custom Delete Confirmation Modal with fade animation */}
+      {deleteModalVisible && (
+        <Animated.View
+          style={[
+            tw`bg-black/50 absolute top-0 left-0 w-full h-full justify-center items-center z-50`,
+            { opacity: deleteModalAnim }
+          ]}
+        >
+          <View style={tw`bg-[#080B32] rounded-xl p-7 w-80 items-center`}>
+            <Text style={[tw`text-white text-xl mb-3`, { fontFamily: 'Nunito-Black', textAlign: 'center' }]}>Delete group?</Text>
+            <Text style={[tw`text-white text-base mb-4.5 leading-[1.3]`, { fontFamily: 'Nunito-Medium', textAlign: 'center', opacity: 0.8 }]}>Your group members will no longer have access to the albums or photos of this group.</Text>
+            <View style={tw`flex-row gap-3 w-full justify-center`}>
+              <TouchableOpacity
+                style={tw`flex-1 bg-white/10 rounded-full px-4 py-2 items-center`}
+                activeOpacity={0.7}
+                onPress={() => setShowDeleteConfirm(false)}
+              >
+                <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Not now</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={tw`flex-1 bg-red-600 rounded-full px-4 py-2 items-center`}
+                activeOpacity={0.7}
+                onPress={() => {
+                  setShowDeleteConfirm(false);
+                  // Group deletion logic
+                  (async () => {
+                    if (!group?.id) return;
+                    // Delete group image from storage if not default
+                    if (group.group_image && group.group_image !== 'default') {
+                      try {
+                        // Extract bucket and path from group_image URL
+                        // Example: https://<project>.supabase.co/storage/v1/object/public/group_images/filename.png
+                        const url = group.group_image;
+                        const match = url.match(/storage\/v1\/object\/public\/([^/]+)\/(.+)$/);
+                        if (match) {
+                          const bucket = match[1];
+                          const path = match[2];
+                          await supabase.storage.from(bucket).remove([path]);
+                        }
+                      } catch (e) {
+                        // Ignore image deletion errors
+                      }
+                    }
+                    // Remove group from database
+                    const { error } = await supabase.from('groups').delete().eq('id', group.id);
+                    if (error) {
+                      Alert.alert('Error', 'Failed to delete group: ' + error.message);
+                    } else {
+                      Alert.alert('Deleted!', 'Group has been deleted.');
+                      // Navigate to group list
+                      router.replace({ pathname: '/(group)/grouplist_all' });
+                    }
+                  })();
+                }}
+              >
+                <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Animated.View>
+      )}
       <ScrollView style={tw`flex-1`} showsVerticalScrollIndicator={false}>
         {/* Topbar (now scrolls with content) */}
         <View style={tw`flex-row items-center justify-between px-4 pt-14`}>
@@ -289,7 +399,7 @@ export default function GroupView() {
               <ShareIcon width={20} height={20} />
               <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Share</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => {}}>
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
               <ThreeDotsIcon width={20} height={20} />
             </TouchableOpacity>
           </View>
