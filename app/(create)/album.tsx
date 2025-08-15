@@ -18,11 +18,12 @@ import EventDoneModal from './eventdonemodal';
 import ImageModal from './imageModal';
 
 export default function CreateAlbum() {
-    const { groupId, name } = useLocalSearchParams();
+    const { groupId, name, img } = useLocalSearchParams();
     const [groupID, setGroupID] = useState(groupId ?? '');
     const [groupName, setGroupName] = useState(name ?? '');
+    const [groupImage, setGroupImage] = useState(img ?? '');
     const [title, setTitle] = useState('');
-    const [userGroups, setUserGroups] = useState<{ id: string; title: string }[]>([]);
+    const [userGroups, setUserGroups] = useState<{ id: string; title: string; group_image: string; }[]>([]);
     const [id, setID] = useState('');
     const [bio, setBio] = useState('');
     const [showImageModal, setShowImageModal] = useState(false);
@@ -35,7 +36,7 @@ export default function CreateAlbum() {
             // Get groups where user is creator
             const { data: createdGroups, error: createdError } = await supabase
                 .from('groups')
-                .select('id, title')
+                .select('id, title, group_image')
                 .eq('creator', user.id);
 
             // Get group memberships
@@ -44,12 +45,12 @@ export default function CreateAlbum() {
                 .select('group_id')
                 .eq('user_id', user.id);
 
-            let joinedGroups: { id: string; title: string }[] = [];
+            let joinedGroups: { id: string; title: string; group_image: string; }[] = [];
             if (memberships && memberships.length > 0) {
                 const groupIds = memberships.map(m => m.group_id);
                 const { data: joined, error: joinedError } = await supabase
                     .from('groups')
-                    .select('id, title')
+                    .select('id, title, group_image')
                     .in('id', groupIds);
 
                 if (joined) {
@@ -137,6 +138,25 @@ export default function CreateAlbum() {
                 resetScrollToCoords={{ x: 0, y: 0 }}
                 scrollEnabled={!showImageModal}
             >
+                {/* Background image and overlay */}
+                <Image
+                    source={typeof groupImage === 'string' ? { uri: groupImage } : undefined}
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        bottom: 0,
+                        height: undefined,
+                        minHeight: '100%',
+                        resizeMode: 'cover',
+                        zIndex: 0,
+                    }}
+                    blurRadius={8}
+                    onError={e => {
+                        console.log('Background image failed to load:', e.nativeEvent);
+                    }}
+                />
                 <View style={tw`w-full h-full pt-3 bg-black bg-opacity-60`}>
                     {/* Top bar */}
                     <View style={tw`relative flex-row items-center px-4 mt-10 mb-2 h-10`}>
@@ -270,6 +290,7 @@ export default function CreateAlbum() {
                                                 onPress: () => {
                                                     setGroupID(g.id);
                                                     setGroupName(g.title);
+                                                    setGroupImage(g.group_image);
                                                 }
                                             }))
                                         );

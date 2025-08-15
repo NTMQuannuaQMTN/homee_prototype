@@ -63,7 +63,7 @@ export default function BotBar({ currentTab = 'home', selfView = false }: { curr
         {/* Center Add Button */}
         <TouchableOpacity
           onPress={() => {
-            if (currentTab !== 'create') router.replace('/(create)/image');
+            if (currentTab !== 'create') router.navigate('/(create)/image');
           }}
           style={tw`flex-1 items-center justify-center`}
           disabled={currentTab === 'create'}
