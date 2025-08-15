@@ -61,7 +61,7 @@ export default function GroupView() {
       const allMembers = [creatorInfo, ...members.filter(m => m.id !== creatorInfo.id)];
       const stats: {[id: string]: string} = {};
       for (const member of allMembers) {
-        if (member.id === user?.id || member.id === creatorInfo.id) continue;
+        if (member.id === user?.id) continue;
         // Check friend status
         const { error: friendError } = await supabase.from('friends')
           .select('id').eq('user_id', user.id).eq('friend', member.id).single();
@@ -480,7 +480,7 @@ export default function GroupView() {
                         source={{ uri: creatorInfo.profile_image || undefined }}
                         style={tw`w-8 h-8 rounded-full mr-2 shadow-lg`}
                       />
-                      <Text style={[tw`text-white text-[18px]`, { fontFamily: "Nunito-ExtraBold" }]}> 
+                      <Text style={[tw`text-white text-[18px]`, { fontFamily: "Nunito-ExtraBold" }]} numberOfLines={1} ellipsizeMode="tail"> 
                         {creatorInfo.name}
                       </Text>
                     </TouchableOpacity>
@@ -525,42 +525,46 @@ export default function GroupView() {
                         <Text style={[tw`text-white text-[15px]`, { fontFamily: "Nunito-Medium", textAlign: 'center' }]}>No members found.</Text>
                       );
                     }
-                    return allMembers.map((member, idx) => (
-                      <TouchableOpacity
-                        key={member.id || idx}
-                        style={tw`p-3 flex-row items-center mb-2 bg-black/20 rounded-xl`}
-                        activeOpacity={0.7}
-                        onPress={() => router.navigate({ pathname: '/(profile)/profile', params: { user_id: member.id } })}
-                      >
-                        <Image
-                          source={member.profile_image ? { uri: member.profile_image } : require('../../assets/default_images/default1.png')}
-                          style={tw`w-8 h-8 rounded-full mr-2 shadow-lg`}
-                        />
-                        <Text style={[tw`text-white text-[16px] mr-2.5`, { fontFamily: "Nunito-ExtraBold" }]}>{member.name}</Text>
-                        {/* Status: add friend/friends, hidden for creator and current user */}
-                        {member.id !== creatorInfo.id && member.id !== user?.id && (
-                          <View style={tw`ml-auto`}>
-                            {friendStats[member.id] === 'friend' ? (
-                              <TouchableOpacity style={tw`bg-[#7A5CFA] rounded-full px-3 py-1.5`} activeOpacity={0.7}>
-                                <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Friends</Text>
-                              </TouchableOpacity>
-                            ) : friendStats[member.id] === 'requesting' ? (
-                              <TouchableOpacity style={tw`bg-white/20 rounded-full px-3 py-1.5`} activeOpacity={0.7}>
-                                <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Requested</Text>
-                              </TouchableOpacity>
-                            ) : friendStats[member.id] === 'requested' ? (
-                              <TouchableOpacity style={tw`bg-yellow-600 rounded-full px-3 py-1.5`} activeOpacity={0.7}>
-                                <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Accept?</Text>
-                              </TouchableOpacity>
-                            ) : (
-                              <TouchableOpacity style={tw`bg-white/20 rounded-full px-3 py-1.5`} activeOpacity={0.7}>
-                                <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Add friend</Text>
-                              </TouchableOpacity>
-                            )}
-                          </View>
-                        )}
-                      </TouchableOpacity>
-                    ));
+                    return allMembers.map((member, idx) => {
+                      const isCreator = member.id === creatorInfo.id;
+                      const isCurrentUser = member.id === user?.id;
+                      return (
+                        <TouchableOpacity
+                          key={member.id || idx}
+                          style={tw`p-3 flex-row items-center mb-2 bg-black/20 rounded-xl`}
+                          activeOpacity={0.7}
+                          onPress={() => router.navigate({ pathname: '/(profile)/profile', params: { user_id: member.id } })}
+                        >
+                          <Image
+                            source={member.profile_image ? { uri: member.profile_image } : require('../../assets/default_images/default1.png')}
+                            style={tw`w-8 h-8 rounded-full mr-2 shadow-lg`}
+                          />
+                          <Text style={[tw`text-white text-[16px] mr-2.5`, { fontFamily: "Nunito-ExtraBold" }]}>{member.name}</Text>
+                          {/* Status: show for creator (if not me) and other members, hidden for current user */}
+                          {!isCurrentUser && (
+                            <View style={tw`ml-auto`}>
+                              {friendStats[member.id] === 'friend' ? (
+                                <TouchableOpacity style={tw`bg-[#7A5CFA] rounded-full px-3 py-1.5`} activeOpacity={0.7}>
+                                  <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Friends</Text>
+                                </TouchableOpacity>
+                              ) : friendStats[member.id] === 'requesting' ? (
+                                <TouchableOpacity style={tw`bg-white/20 rounded-full px-3 py-1.5`} activeOpacity={0.7}>
+                                  <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Requested</Text>
+                                </TouchableOpacity>
+                              ) : friendStats[member.id] === 'requested' ? (
+                                <TouchableOpacity style={tw`bg-yellow-600 rounded-full px-3 py-1.5`} activeOpacity={0.7}>
+                                  <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Accept?</Text>
+                                </TouchableOpacity>
+                              ) : (
+                                <TouchableOpacity style={tw`bg-white/20 rounded-full px-3 py-1.5`} activeOpacity={0.7}>
+                                  <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Add friend</Text>
+                                </TouchableOpacity>
+                              )}
+                            </View>
+                          )}
+                        </TouchableOpacity>
+                      );
+                    });
                   })()}
                 </View>
               </View>
