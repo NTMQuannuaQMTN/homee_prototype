@@ -21,7 +21,7 @@ interface Album {
 
 export default function CreateImage() {
   const [tab, setTab] = useState<TabType>("upload");
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [showCaptionAlbum, setShowCaptionAlbum] = useState(false);
@@ -99,7 +99,7 @@ export default function CreateImage() {
         quality: 0.8,
       });
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        setImage(result.assets[0].uri);
+        setImage([...image, result.assets[0].uri]);
       }
     } catch (e) {
       // handle error
@@ -120,7 +120,7 @@ export default function CreateImage() {
         quality: 0.8,
       });
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        setImage(result.assets[0].uri);
+        setImage([...image, result.assets[0].uri]);
       }
     } catch (e) {
       // handle error
@@ -158,10 +158,10 @@ export default function CreateImage() {
       <View style={tw`flex-1 items-center justify-center px-6`}>
         {loading ? (
           <ActivityIndicator size="large" color="#7A5CFA" />
-        ) : image ? (
+        ) : image.length > 0 ? (
           <View style={[tw`w-64 h-96 rounded-xl mb-6 items-center justify-center`, { overflow: "hidden" }]}>
             <Image
-              source={{ uri: image }}
+              source={{ uri: image[0] }}
               style={[
                 tw`rounded-xl w-64 h-96`
               ]}
