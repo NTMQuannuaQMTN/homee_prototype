@@ -204,7 +204,7 @@ export default function CreateGroup() {
                         </TouchableOpacity>
                         {/* Centered title */}
                         <View style={tw`flex-1 items-center justify-center`}>
-                            <Text style={[tw`text-white text-base`, { fontFamily: 'Nunito-ExtraBold' }]}>
+                            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>
                                 {id ? 'Update group' : 'Create group'}
                             </Text>
                         </View>
@@ -215,7 +215,7 @@ export default function CreateGroup() {
                             const isEditing = id;
                             return requiredFilled ? (
                                 <TouchableOpacity
-                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7b61ff]`, { zIndex: 2 }]}
+                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA]`, { zIndex: 2 }]}
                                     onPress={async () => {
                                         if (isEditing) {
                                             setToastVisible(true);
@@ -235,7 +235,7 @@ export default function CreateGroup() {
                                 </TouchableOpacity>
                             ) : (
                                 <TouchableOpacity
-                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-gray-500/60`, { zIndex: 2 }]}
+                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA] opacity-50`, { zIndex: 2 }]}
                                     disabled
                                 >
                                     <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Done</Text>
@@ -245,21 +245,19 @@ export default function CreateGroup() {
                     </View>
 
                     {/* Title input */}
-                    <View style={[tw`px-4 mb-4 items-center`]}>
+                    <View style={[tw`px-4 py-3 mx-4 mb-3 items-center border border-white/10 rounded-xl bg-white/5`]}>
                         <TextInput
                             style={[
                                 tw`text-white text-[24px] w-full`,
                                 {
                                     fontFamily: 'Nunito-ExtraBold',
-                                    lineHeight: 28,
-                                    paddingTop: 4,
-                                    textAlign: 'center',
-                                    textAlignVertical: 'top',
+                                    textAlign: 'left',
+                                    textAlignVertical: 'center',
                                 }
                             ]}
                             value={title}
                             onChangeText={setTitle}
-                            placeholder='your group title'
+                            placeholder='your group title...'
                             placeholderTextColor={'#9ca3af'}
                             multiline={false}
                             maxLength={60}
@@ -276,7 +274,7 @@ export default function CreateGroup() {
                         <TouchableOpacity style={tw`flex-row items-center gap-2 justify-center bg-[#080B32] ${publicEvent ? 'opacity-30' : 'border border-purple-900'} rounded-full px-2 py-0.5`}
                             onPress={() => { setPublic(false) }}>
                             <Private />
-                            <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Private</Text>
+                            <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Invite only</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -301,8 +299,8 @@ export default function CreateGroup() {
                             />
                             {/* Placeholder for event image */}
                             <View style={tw`flex-row gap-1.5 absolute top-2.5 right-2.5 bg-white rounded-lg px-2 py-1 shadow-md`}>
-                                <Camera width={14} height={14} />
-                                <Text style={[tw`text-xs text-black`, { fontFamily: 'Nunito-ExtraBold' }]}>{'Choose image'}</Text>
+                                <Camera width={16} height={16} style={tw`mt-0.2`} />
+                                <Text style={[tw`text-[13px] text-black`, { fontFamily: 'Nunito-ExtraBold' }]}>{'Choose image'}</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -312,9 +310,9 @@ export default function CreateGroup() {
                         <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
                             <TextInput
                                 style={[
-                                    tw`text-white text-[13px] px-0 py-0 text-left leading-[1.25]`,
+                                    tw`text-white text-[15px] px-0 py-0 text-left leading-[1.4]`,
                                     {
-                                        fontFamily: bio ? 'Nunito-Medium' : 'Nunito-ExtraBold',
+                                        fontFamily: bio ? 'Nunito-ExtraBold' : 'Nunito-ExtraBold',
                                         minHeight: 60,
                                         textAlignVertical: 'top'
                                     }
@@ -324,21 +322,21 @@ export default function CreateGroup() {
                                 multiline={true}
                                 value={bio}
                                 onChangeText={text => {
-                                    if (text.length <= 200) setBio(text);
+                                    if (text.length <= 100) setBio(text);
                                 }}
                                 blurOnSubmit={true}
                                 returnKeyType="done"
-                                maxLength={200}
+                                maxLength={100}
                             />
                             <View style={tw`flex-row justify-end items-center mt-0.5 -mr-1`}>
                                 <Text
                                     style={[
-                                        tw`text-[11px] mr-0.5`,
+                                        tw`text-[12px] mr-0.5`,
                                         { fontFamily: 'Nunito-Medium' },
-                                        bio.length >= 200 ? tw`text-rose-600` : tw`text-gray-400`
+                                        bio.length >= 100 ? tw`text-rose-600` : tw`text-gray-400`
                                     ]}
                                 >
-                                    {bio.length}/200
+                                {bio.length}/100
                                 </Text>
                                 {bio.length > 0 && (
                                     <TouchableOpacity

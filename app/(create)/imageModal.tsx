@@ -147,11 +147,11 @@ export default function ImageModal({ visible, onClose, imageOptions, onSelect }:
                         <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
                             {/* Drag handle (draggable only here) */}
                             <View
-                                style={tw`w-12 h-1.5 bg-gray-500 rounded-full self-center mb-3`}
+                                style={tw`w-12 h-1.5 bg-white/20 rounded-full self-center mb-3`}
                                 {...panResponder.panHandlers}
                             />
                             <View {...panResponder.panHandlers}>
-                                <Text style={[tw`text-white text-[15px] mb-4`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Choose a theme for your event 🔥</Text>
+                                <Text style={[tw`text-white text-[16px] mb-4`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Choose a theme for your group 🔥</Text>
                             </View>
                             <View style={{ flex: 1, minHeight: 0, width: '100%' }}>
                                 <ScrollView
@@ -177,7 +177,7 @@ export default function ImageModal({ visible, onClose, imageOptions, onSelect }:
                                                 borderWidth: 0,
                                                 borderColor: 'transparent',
                                                 width: '45%',
-                                                aspectRatio: 410 / 279, // maintain 410:279 ratio
+                                                aspectRatio: 1, // square aspect ratio
                                             }}
                                             activeOpacity={0.7}
                                         >
@@ -196,14 +196,14 @@ export default function ImageModal({ visible, onClose, imageOptions, onSelect }:
                                     onPress={pickImage}
                                 >
                                     <UploadIcon width={20} height={20} />
-                                    <Text style={[tw`text-white text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Upload image</Text>
+                                    <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Upload your image</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={tw`bg-white/5 rounded-full py-2.5 items-center mt-2`}
                                     onPress={onClose}
                                     activeOpacity={0.8}
                                 >
-                                    <Text style={[tw`text-white text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Cancel</Text>
+                                    <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Cancel</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
