@@ -78,12 +78,12 @@ export default function GroupView() {
   const [members, setMembers] = useState<User[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   // Friend status for each member (for MEMBERS section)
-  const [friendStats, setFriendStats] = useState<{[id: string]: string}>({});
+  const [friendStats, setFriendStats] = useState<{ [id: string]: string }>({});
   useEffect(() => {
     const fetchStatuses = async () => {
       if (!user?.id) return;
       const allMembers = [creatorInfo, ...members.filter(m => m.id !== creatorInfo.id)];
-      const stats: {[id: string]: string} = {};
+      const stats: { [id: string]: string } = {};
       for (const member of allMembers) {
         if (member.id === user?.id) continue;
         // Check friend status
@@ -275,7 +275,7 @@ export default function GroupView() {
   if (!group) {
     return (
       <View style={tw`flex-1 justify-center items-center bg-[#080B32]`}>
-        <Text style={[tw`text-white text-lg`, { fontFamily: "Nunito-ExtraBold" }]}> 
+        <Text style={[tw`text-white text-lg`, { fontFamily: "Nunito-ExtraBold" }]}>
           Group not found.
         </Text>
       </View>
@@ -315,28 +315,47 @@ export default function GroupView() {
 
   return (
     <GradientBackground style={tw`flex-1`}>
+      <Image
+        source={{ uri: group.group_image }}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          bottom: 0,
+          height: undefined,
+          minHeight: '100%',
+          resizeMode: 'cover',
+          zIndex: 0,
+        }}
+        blurRadius={8}
+        onError={e => {
+          console.log('Background image failed to load:', e.nativeEvent);
+        }}
+      />
+      <View style={tw`w-full h-full absolute top-0 left-0 bg-black bg-opacity-50`}/>
       <DraggableModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         buttons={creator
           ? [{
-              label: 'Delete group',
-              color: 'bg-red-600',
-              textColor: 'text-white',
-              onPress: () => {
-                setModalVisible(false);
-                setTimeout(() => setShowDeleteConfirm(true), 250);
-              },
-            }]
+            label: 'Delete group',
+            color: 'bg-red-600',
+            textColor: 'text-white',
+            onPress: () => {
+              setModalVisible(false);
+              setTimeout(() => setShowDeleteConfirm(true), 250);
+            },
+          }]
           : [{
-              label: 'Report group',
-              color: 'bg-yellow-600',
-              textColor: 'text-white',
-              onPress: () => {
-                setModalVisible(false);
-                Alert.alert('Report group', 'Group report logic goes here.');
-              },
-            }]
+            label: 'Report group',
+            color: 'bg-yellow-600',
+            textColor: 'text-white',
+            onPress: () => {
+              setModalVisible(false);
+              Alert.alert('Report group', 'Group report logic goes here.');
+            },
+          }]
         }
       />
 
@@ -409,12 +428,12 @@ export default function GroupView() {
           </TouchableOpacity>
           <View style={tw`flex-row items-center gap-x-2`}>
             {creator && (
-              <TouchableOpacity onPress={() => {}} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
+              <TouchableOpacity onPress={() => { }} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
                 <EditIcon width={18} height={18} />
                 <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={() => {}} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
+            <TouchableOpacity onPress={() => { }} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
               <ShareIcon width={20} height={20} />
               <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Invite</Text>
             </TouchableOpacity>
@@ -429,16 +448,17 @@ export default function GroupView() {
             {isDefault ? (
               <Image
                 source={defaultImage}
-                style={[tw`rounded-xl mb-4`, { width: width - 100, height: width - 100, opacity: 0.3 }]}
+                style={[tw`rounded-xl mb-4`, { width: width - 100, height: width - 100, opacity: 1 }]}
                 resizeMode="cover"
               />
             ) : (
               <Image
                 source={{ uri: group.group_image }}
-                style={[tw`rounded-xl mb-4`, { width: width - 100, height: width - 100, opacity: 0.3 }]}
+                style={[tw`rounded-xl mb-4`, { width: width - 100, height: width - 100, opacity: 1 }]}
                 resizeMode="cover"
               />
             )}
+            <View style={tw`absolute w-full h-full bg-black bg-opacity-50 top-0 left-0 rounded-xl`}/>
             {/* Top left corner: creator/join/joined button */}
             <View style={{ position: 'absolute', top: 12, left: 12, zIndex: 2 }}>
               {creator ? (
@@ -454,12 +474,12 @@ export default function GroupView() {
                 <TouchableOpacity onPress={toggleJoin}>
                   <Text
                     style={[tw`text-base px-3 py-1.5 rounded-full`,
-                      reqStat === 'Nothing'
-                        ? tw`bg-[#7A5CFA] text-white`
-                        : reqStat === 'Join'
-                          ? tw`bg-white text-black`
-                          : tw`bg-white/20 text-white`,
-                      { fontFamily: "Nunito-ExtraBold" }
+                    reqStat === 'Nothing'
+                      ? tw`bg-[#7A5CFA] text-white`
+                      : reqStat === 'Join'
+                        ? tw`bg-white text-black`
+                        : tw`bg-white/20 text-white`,
+                    { fontFamily: "Nunito-ExtraBold" }
                     ]}
                   >
                     {reqStat === 'Nothing' ? 'Join' : reqStat}
@@ -479,31 +499,31 @@ export default function GroupView() {
                     {group.title}
                   </Text>
                   <View style={tw`flex-row mt-2`}>
-                      <Text style={[tw`text-white bg-white/10 rounded-full px-2.5 py-1.5 text-[15px]`, { fontFamily: "Nunito-Medium" }]}> 
-                        <Text style={{ fontFamily: "Nunito-ExtraBold" }}>{albums.length}</Text> albums
-                      </Text>
-                      <Text style={[tw`text-white bg-white/10 rounded-full px-2.5 py-1.5 text-[15px] ml-1.5`, { fontFamily: "Nunito-Medium" }]}> 
-                        <Text style={{ fontFamily: "Nunito-ExtraBold" }}>0</Text> photos
-                      </Text>
+                    <Text style={[tw`text-white bg-white/10 rounded-full px-2.5 py-1.5 text-[15px]`, { fontFamily: "Nunito-Medium" }]}>
+                      <Text style={{ fontFamily: "Nunito-ExtraBold" }}>{albums.length}</Text> albums
+                    </Text>
+                    <Text style={[tw`text-white bg-white/10 rounded-full px-2.5 py-1.5 text-[15px] ml-1.5`, { fontFamily: "Nunito-Medium" }]}>
+                      <Text style={{ fontFamily: "Nunito-ExtraBold" }}>0</Text> photos
+                    </Text>
                   </View>
                   {/* Member profile images row */}
-                  <View style={[tw`flex-row items-center`, { position: 'absolute', bottom: 16, left: -4, width: width - 100, justifyContent: 'center' }]}> 
+                  <View style={[tw`flex-row items-center`, { position: 'absolute', bottom: 16, left: -4, width: width - 100, justifyContent: 'center' }]}>
                     {(() => {
                       // Combine creator and members, remove duplicates by id
                       const allMembers = [creatorInfo, ...members.filter(m => m.id !== creatorInfo.id)];
-                      return allMembers.slice(0,4).map((member, idx) => (
+                      return allMembers.slice(0, 4).map((member, idx) => (
                         <Image
                           key={member.id || idx}
                           source={member.profile_image ? { uri: member.profile_image } : require('../../assets/default_images/default1.png')}
-                          style={[tw`w-8 h-8 rounded-full mr-[-12px] shadow-lg`]} 
+                          style={[tw`w-8 h-8 rounded-full mr-[-12px] shadow-lg`]}
                         />
                       ));
                     })()}
                     {(() => {
                       const allMembers = [creatorInfo, ...members.filter(m => m.id !== creatorInfo.id)];
                       return allMembers.length > 4 ? (
-                        <View style={[tw`w-8 h-8 rounded-full bg-[#080B32]/90 border-[1px] border-white/10 justify-center items-center mr-[-12px]`]}> 
-                          <Text style={[tw`text-white text-[12px]`, { fontFamily: "Nunito-ExtraBold" }]}>+{allMembers.length-4}</Text>
+                        <View style={[tw`w-8 h-8 rounded-full bg-[#080B32]/90 border-[1px] border-white/10 justify-center items-center mr-[-12px]`]}>
+                          <Text style={[tw`text-white text-[12px]`, { fontFamily: "Nunito-ExtraBold" }]}>+{allMembers.length - 4}</Text>
                         </View>
                       ) : null;
                     })()}
@@ -517,13 +537,13 @@ export default function GroupView() {
         {/* Tabs for Album and Details */}
         <View style={tw`flex-row justify-center mb-4 gap-2 px-6`}>
           <TouchableOpacity
-            style={[ 
+            style={[
               tw`flex-1 py-2 rounded-full items-center`,
               tab === 'album' ? tw`bg-[#7A5CFA]` : tw``
             ]}
             onPress={() => setTab('album')}
           >
-            <Text style={[ 
+            <Text style={[
               tw`text-[16px]`,
               { fontFamily: "Nunito-ExtraBold", color: tab === 'album' ? '#fff' : '#9ca3af' }
             ]}>
@@ -531,13 +551,13 @@ export default function GroupView() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[ 
+            style={[
               tw`flex-1 py-2 rounded-full items-center`,
               tab === 'details' ? tw`bg-[#7A5CFA]` : tw``
             ]}
             onPress={() => setTab('details')}
           >
-            <Text style={[ 
+            <Text style={[
               tw`text-[16px]`,
               { fontFamily: "Nunito-ExtraBold", color: tab === 'details' ? '#fff' : '#9ca3af' }
             ]}>
@@ -545,13 +565,13 @@ export default function GroupView() {
             </Text>
           </TouchableOpacity>
           {creator && !group.public && <TouchableOpacity
-            style={[ 
+            style={[
               tw`flex-1 py-2 rounded-full items-center`,
               tab === 'requests' ? tw`bg-[#7A5CFA]` : tw``
             ]}
             onPress={() => setTab('requests')}
           >
-            <Text style={[ 
+            <Text style={[
               tw`text-base`,
               { fontFamily: "Nunito-ExtraBold", color: tab === 'requests' ? '#fff' : '#9ca3af' }
             ]}>
@@ -566,18 +586,18 @@ export default function GroupView() {
                 <AlbumCard key={album.id}
                   id={album.id}
                   title={album.title}
-                  onPress={() => { router.navigate({pathname: '/(album)/albumview', params: {id: album.id}}) }} />
+                  onPress={() => { router.navigate({ pathname: '/(album)/albumview', params: { id: album.id } }) }} />
               ))}
-              {(reqStat === 'Joined' || creator) && 
-              <TouchableOpacity
-                style={[tw`bg-white/10 rounded-xl justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
-                onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title, img: group.group_image } })}
-              >
-                <View style={tw`flex-row items-center border border-white/50 rounded-full px-2.5 py-2`}>
-                  <Text style={[tw`text-white text-xl mr-1.5 -mt-0.5`, { fontFamily: 'Nunito-ExtraBold' }]}>+</Text>
-                  <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Create album</Text>
-                </View>
-              </TouchableOpacity>}
+              {(reqStat === 'Joined' || creator) &&
+                <TouchableOpacity
+                  style={[tw`bg-white/10 rounded-xl justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
+                  onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title, img: group.group_image } })}
+                >
+                  <View style={tw`flex-row items-center border border-white/50 rounded-full px-2.5 py-2`}>
+                    <Text style={[tw`text-white text-xl mr-1.5 -mt-0.5`, { fontFamily: 'Nunito-ExtraBold' }]}>+</Text>
+                    <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Create album</Text>
+                  </View>
+                </TouchableOpacity>}
             </View>
           ) : tab === 'details' ? (
             <View>
@@ -585,7 +605,7 @@ export default function GroupView() {
               {group.bio ? (
                 <View style={tw`mb-2 w-full bg-black/20 rounded-xl p-4`}>
                   <Text style={[tw`text-white text-[11px] mb-1.5`, { fontFamily: "Nunito-Bold", textAlign: 'left' }]}>ABOUT THIS GROUP</Text>
-                  <Text style={[tw`text-white text-[18px]`, { fontFamily: "Nunito-ExtraBold", textAlign: 'left' }]}> 
+                  <Text style={[tw`text-white text-[18px]`, { fontFamily: "Nunito-ExtraBold", textAlign: 'left' }]}>
                     {group.bio}
                   </Text>
                 </View>
@@ -609,7 +629,7 @@ export default function GroupView() {
                         source={{ uri: creatorInfo.profile_image || undefined }}
                         style={tw`w-8 h-8 rounded-full mr-2 shadow-lg`}
                       />
-                      <Text style={[tw`text-white text-[18px]`, { fontFamily: "Nunito-ExtraBold" }]} numberOfLines={1} ellipsizeMode="tail"> 
+                      <Text style={[tw`text-white text-[18px]`, { fontFamily: "Nunito-ExtraBold" }]} numberOfLines={1} ellipsizeMode="tail">
                         {creatorInfo.name}
                       </Text>
                     </TouchableOpacity>
@@ -624,7 +644,7 @@ export default function GroupView() {
                     style={[tw`rounded-xl mt-1`, { padding: 2 }]}
                   >
                     <View style={tw`flex-row items-center justify-center p-2`}>
-                      <Text style={[tw`text-white text-[23px]`, { fontFamily: "Nunito-Black" }]}> 
+                      <Text style={[tw`text-white text-[23px]`, { fontFamily: "Nunito-Black" }]}>
                         {(() => {
                           if (!group.created_at) return '-';
                           const createdDate = new Date(group.created_at);
@@ -642,7 +662,7 @@ export default function GroupView() {
                 {(() => {
                   const allMembers = [creatorInfo, ...members.filter(m => m.id !== creatorInfo.id)];
                   return (
-                    <Text style={[tw`text-white text-[11px] mb-2 flex-row`, { fontFamily: "Nunito-Bold", textAlign: 'left' }]}>MEMBERS  <Text style={[tw`text-[12px]`,{ fontFamily: "Nunito-Black" }]}>{allMembers.length}</Text></Text>
+                    <Text style={[tw`text-white text-[11px] mb-2 flex-row`, { fontFamily: "Nunito-Bold", textAlign: 'left' }]}>MEMBERS  <Text style={[tw`text-[12px]`, { fontFamily: "Nunito-Black" }]}>{allMembers.length}</Text></Text>
                   );
                 })()}
                 <View style={tw`flex-col`}>
@@ -741,10 +761,10 @@ export default function GroupView() {
             </View>
           ) : (<View>
             {/* Details content goes here */}
-            <Text style={[tw`text-white text-sm mb-1`, { fontFamily: "Nunito-Medium" }]}> 
+            <Text style={[tw`text-white text-sm mb-1`, { fontFamily: "Nunito-Medium" }]}>
               Members: {group.member_count}
             </Text>
-          </View>) }
+          </View>)}
         </View>
         {/* You can add more group details or actions here */}
       </ScrollView>
