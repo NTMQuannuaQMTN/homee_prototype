@@ -56,7 +56,6 @@ export default function SignUp() {
             });
 
             if (error) {
-                console.log("OTP send error", error.message);
                 return;
             }
 
@@ -352,7 +351,6 @@ export default function SignUp() {
                             // Password must have at least 1 lowercase, 1 uppercase, 1 number, and be at least 6 characters
                             if (passRule.indexOf(false) >= 0) {
                                 setValid(false);
-                                console.log(passRule.indexOf(false))
                                 return;
                             }
                             if (mode === 'email') {

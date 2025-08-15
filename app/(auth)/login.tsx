@@ -27,7 +27,6 @@ export default function Login() {
     const { setSignupInfo, setPass } = useAuthStore();
 
     const checkEmail = async (email: string) => {
-        console.log("Checking email", email);
 
         if (email.indexOf('@') >= 0) {
             // Always use lowercase for email

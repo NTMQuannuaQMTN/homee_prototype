@@ -40,7 +40,6 @@ export default function Verify() {
         setCountdown(60);
         setCanResend(false);
 
-        console.log("Resending OTP to:", signupInfo.email);
         const { error } = await supabase.auth.signInWithOtp({
             email: signupInfo.email,
             options: {
@@ -48,12 +47,6 @@ export default function Verify() {
                 emailRedirectTo: 'exp://j3bihve-courtins-8081.exp.direct',
             },
         });
-
-        if (error) {
-            console.log("OTP resend error", error.message);
-        } else {
-            console.log("OTP resent successfully");
-        }
     };
 
     // Function to verify the entered OTP code
@@ -78,28 +71,20 @@ export default function Verify() {
 
             if (error) {
                 setValid(false);
-                console.log("Verification error:", error.message);
             } else if (data && data.session && data.user) {
-                console.log("Verification successful:", data);
                 // Set the session and user in the auth store after successful verification
                 setSession(data.session);
                 setUser(data.user);
 
                 // If a password was provided during signup, update it now
                 if (password) {
-                    const { error: pwError } = await supabase.auth.updateUser({
+                    await supabase.auth.updateUser({
                         password: password,
                     });
-                    if (pwError) {
-                        console.log("Password set error:", pwError.message);
-                    } else {
-                        console.log("Password set successfully");
-                    }
                 }
                 router.replace('/(auth)/register');
             } else {
                 setValid(false);
-                console.log("Verification failed: No session returned");
             }
         } else if (signupInfo.phone) {
             // Always use lowercase for email
@@ -113,10 +98,7 @@ export default function Verify() {
 
             if (error) {
                 setValid(false);
-                console.log("Verification error:", error.message);
             } else if (data && data.session && data.user) {
-                console.log("Verification successful:", data);
-
                 setSession(data.session);
                 setUser(data.user);
 
@@ -125,16 +107,10 @@ export default function Verify() {
                     const { error: pwError } = await supabase.auth.updateUser({
                         password: password,
                     });
-                    if (pwError) {
-                        console.log("Password set error:", pwError.message);
-                    } else {
-                        console.log("Password set successfully");
-                    }
                 }
                 router.replace('/(auth)/register');
             } else {
                 setValid(false);
-                console.log("Verification failed: No session returned");
             }
         }
 

@@ -107,7 +107,6 @@ export default function EditProfile() {
     });
     if (!result.canceled) {
       setAvtInput(result.assets[0].uri);
-      setTimeout(() => console.log(input), 0)
     }
   };
 
@@ -119,7 +118,6 @@ export default function EditProfile() {
     });
     if (!result.canceled) {
       setBgInput(result.assets[0].uri);
-      setTimeout(() => console.log(input), 0)
     }
   };
 

@@ -37,8 +37,6 @@ export default function Register() {
       quality: 1
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImageInput(result.assets[0].uri);
     }
@@ -75,22 +73,13 @@ export default function Register() {
     setValid(true);
     setLoading(false);
 
-    // TODO: Save user data to database
-    console.log('Registration data:', {
-      username: registerInfo.username,
-      name: registerInfo.name.trim()
-    });
-
-    const { error: insertError } = await supabase.from('users').insert({ ...registerInfo, ...signupInfo }).select().single();
-
-    if (insertError) { console.log("INSERT ERR:", insertError.message) }
+    await supabase.from('users').insert({ ...registerInfo, ...signupInfo }).select().single();
 
     return true;
   }
 
   const confirmRegister = async () => {
     if (!imageInput) return;
-    console.log(imageInput);
     const { data } = await supabase.from('users').select('id').eq('username', registerInfo.username).single();
     const userID = data?.id;
 
@@ -114,15 +103,13 @@ export default function Register() {
         .getPublicUrl(filePath);
 
       const publicUrl = urlData?.publicUrl;
-      console.log(publicUrl);
 
       const { error: setAvatarError } = await supabase.from('users').update({ 'profile_image': publicUrl }).eq('id', userID).select();
 
       if (setAvatarError) {
         console.error("Set error:", setAvatarError);
       } else {
-        const {data: checkData} = await supabase.from('users').select('profile_image').eq('username', registerInfo.username).single();
-        console.log(checkData);
+        await supabase.from('users').select('profile_image').eq('username', registerInfo.username).single();
       }
     } catch (err) {
       console.error('Image upload failed:', err);

@@ -67,16 +67,13 @@ export default function CreateAlbum() {
             const uniqueGroups = Array.from(
                 new Map(allGroups.map(g => [g.id, g])).values()
             );
-            console.log(allGroups, uniqueGroups);
             setUserGroups(uniqueGroups);
         };
 
         fetchUserGroups();
-        console.log(userGroups);
     }, [user?.id]);
 
     const addAlbum = async () => {
-        console.log('adding');
         // Check if event title, date, RSVP deadline, and location are available
         if (!title) {
             Alert.alert('Please fill in all required fields, including location.');
@@ -107,12 +104,10 @@ export default function CreateAlbum() {
 
         // Check if event meets all conditions
         const isValid = title !== '';
-        console.log(isValid, draftErr);
         if (isValid && !draftErr) {
             setShowSuccessToast(true);
             if (dataEvent) {
                 setID(dataEvent[0].id);
-                console.log(dataEvent[0].id); // <-- return the new id
             }
             router.back();
         } else {
