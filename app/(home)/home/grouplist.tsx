@@ -63,10 +63,30 @@ export default function GroupList() {
     useEffect(() => {
         hydrate();
     }, []);
+
     useEffect(() => {
         fetchGroups();
         // eslint-disable-next-line
     }, [user, featuredGroupIds.join(",")]);
+
+    // Listen for group deletion event from groupview.tsx
+    useEffect(() => {
+        const onGroupDeleted = (event: any) => {
+            const deletedId = event?.groupId;
+            if (deletedId) {
+                setGroups(prev => prev.filter(g => g.id !== deletedId));
+            }
+        };
+        // Add event listener
+        const subscription = (globalThis as any).addEventListener?.('groupDeleted', onGroupDeleted);
+        // Fallback for React Native
+        (globalThis as any).onGroupDeleted = onGroupDeleted;
+        return () => {
+            // Remove event listener
+            (globalThis as any).removeEventListener?.('groupDeleted', onGroupDeleted);
+            (globalThis as any).onGroupDeleted = undefined;
+        };
+    }, []);
 
     const handleSeeMore = () => {
         router.navigate('/(group)/grouplist_all');
