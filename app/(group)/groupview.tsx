@@ -333,7 +333,7 @@ export default function GroupView() {
           console.log('Background image failed to load:', e.nativeEvent);
         }}
       />
-      <View style={tw`w-full h-full absolute top-0 left-0 bg-black bg-opacity-50`}/>
+      <View style={tw`w-full h-full absolute top-0 left-0`}/>
       <DraggableModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
