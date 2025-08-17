@@ -269,7 +269,7 @@ export default function GroupView() {
       <View style={tw`flex-1 justify-center items-center bg-[#080B32]`}>
         {/* ActivityIndicator removed as requested */}
       </View>
-    );
+    );  
   }
 
   if (!group) {
@@ -333,7 +333,7 @@ export default function GroupView() {
           console.log('Background image failed to load:', e.nativeEvent);
         }}
       />
-      <View style={tw`w-full h-full absolute top-0 left-0`}/>
+      <View style={tw`w-full h-full absolute top-0 left-0 bg-black bg-opacity-50`}/>
       <DraggableModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
