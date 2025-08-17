@@ -156,226 +156,225 @@ export default function CreateGroup() {
 
     return (
         <View style={tw`w-full h-full`}>
-            <KeyboardAwareScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{ flexGrow: 1 }}
-                keyboardShouldPersistTaps="handled"
-                enableOnAndroid={true}
-                extraScrollHeight={0}
-                showsVerticalScrollIndicator={false}
-                resetScrollToCoords={{ x: 0, y: 0 }}
-                scrollEnabled={!showImageModal}
-            >
-
-                {/* Background image and overlay */}
-                <Image
-                    source={
-                        typeof image === 'string'
-                            ? { uri: image }
-                            : image && image.uri
-                                ? { uri: image.uri }
-                                : image
-                    }
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        bottom: 0,
-                        height: undefined,
-                        minHeight: '100%',
-                        resizeMode: 'cover',
-                        zIndex: 0,
-                    }}
-                    blurRadius={8}
-                    onError={e => {
-                        console.log('Background image failed to load:', e.nativeEvent);
-                    }}
-                />
-                <View style={tw`w-full h-full pt-3 bg-black bg-opacity-60`}>
+            {/* Background image, absolutely positioned, does not scroll */}
+            <Image
+                source={
+                    typeof image === 'string'
+                        ? { uri: image }
+                        : image && image.uri
+                            ? { uri: image.uri }
+                            : image
+                }
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    resizeMode: 'cover',
+                    zIndex: 0,
+                }}
+                blurRadius={8}
+                onError={e => {
+                    console.log('Background image failed to load:', e.nativeEvent);
+                }}
+            />
+            {/* Foreground content scrolls, background does not */}
+            <View style={tw`w-full h-full pt-3 bg-black bg-opacity-60`}>
+                <KeyboardAwareScrollView
+                    style={{ flex: 1, zIndex: 1 }}
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    keyboardShouldPersistTaps="handled"
+                    enableOnAndroid={true}
+                    extraScrollHeight={0}
+                    showsVerticalScrollIndicator={false}
+                    resetScrollToCoords={{ x: 0, y: 0 }}
+                    scrollEnabled={!showImageModal}
+                >
+                    
                     {/* Top bar */}
                     <View style={tw`relative flex-row items-center px-4 mt-10 mb-2 h-10`}>
-                        {/* Back button - absolute left */}
-                        <TouchableOpacity
-                            onPress={() => router.back()}
-                            style={[tw`absolute left-3`, { zIndex: 2 }]}
-                        >
-                            <Back />
-                        </TouchableOpacity>
-                        {/* Centered title */}
-                        <View style={tw`flex-1 items-center justify-center`}>
-                            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>
-                                {id ? 'Update group' : 'Create group'}
-                            </Text>
-                        </View>
-                        {/* Done button - absolute right */}
-                        {/* Determine if all required fields are filled and if editing */}
-                        {(() => {
-                            const requiredFilled = title;
-                            const isEditing = id;
-                            return requiredFilled ? (
-                                <TouchableOpacity
-                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA]`, { zIndex: 2 }]}
-                                    onPress={async () => {
-                                        if (isEditing) {
-                                            setToastVisible(true);
-                                            const newId = await addGroup();
-                                            if (newId) {
-                                                await updateImage(newId);
-                                                setTimeout(() => {
-                                                    router.replace('/home/homepage');
-                                                }, 250);
-                                            }
-                                        } else {
-                                            setShowEventDoneModal(true);
+                    {/* Back button - absolute left */}
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                        style={[tw`absolute left-3`, { zIndex: 2 }]}
+                    >
+                        <Back />
+                    </TouchableOpacity>
+                    {/* Centered title */}
+                    <View style={tw`flex-1 items-center justify-center`}>
+                        <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>
+                            {id ? 'Update group' : 'Create group'}
+                        </Text>
+                    </View>
+                    {/* Done button - absolute right */}
+                    {/* Determine if all required fields are filled and if editing */}
+                    {(() => {
+                        const requiredFilled = title;
+                        const isEditing = id;
+                        return requiredFilled ? (
+                            <TouchableOpacity
+                                style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA]`, { zIndex: 2 }]}
+                                onPress={async () => {
+                                    if (isEditing) {
+                                        setToastVisible(true);
+                                        const newId = await addGroup();
+                                        if (newId) {
+                                            await updateImage(newId);
+                                            setTimeout(() => {
+                                                router.replace('/home/homepage');
+                                            }, 250);
                                         }
-                                    }}
-                                >
-                                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>{isEditing ? 'Update' : 'Done'}</Text>
-                                </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity
-                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA] opacity-50`, { zIndex: 2 }]}
-                                    disabled
-                                >
-                                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Done</Text>
-                                </TouchableOpacity>
-                            );
-                        })()}
-                    </View>
-
-                    {/* Title input */}
-                    <View style={[tw`px-4 py-3 mx-4 mb-3 items-center border border-white/10 rounded-xl bg-white/5`]}>
-                        <TextInput
-                            style={[
-                                tw`text-white text-[24px] w-full`,
-                                {
-                                    fontFamily: 'Nunito-ExtraBold',
-                                    textAlign: 'left',
-                                    textAlignVertical: 'center',
-                                }
-                            ]}
-                            value={title}
-                            onChangeText={setTitle}
-                            placeholder='your group title...'
-                            placeholderTextColor={'#9ca3af'}
-                            multiline={false}
-                            maxLength={60}
-                            returnKeyType="done"
-                        />
-                    </View>
-
-                    <View style={tw`flex-row items-center mx-4 mb-2.5`}>
-                        <TouchableOpacity style={tw`flex-row items-center gap-2 justify-center bg-[#064B55] ${publicEvent ? 'border border-white/10' : 'opacity-30'} rounded-full px-2 py-0.5 mr-1`}
-                            onPress={() => { setPublic(true) }}>
-                            <Public />
-                            <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Public</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={tw`flex-row items-center gap-2 justify-center bg-[#080B32] ${publicEvent ? 'opacity-30' : 'border border-purple-900'} rounded-full px-2 py-0.5`}
-                            onPress={() => { setPublic(false) }}>
-                            <Private />
-                            <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Invite only</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* Image picker */}
-                    <View style={tw`px-4 mb-2`}>
-                        <TouchableOpacity style={[tw`rounded-xl overflow-hidden w-full items-center justify-center relative`, { aspectRatio: 1 / 1 }]}
-                            onPress={() => { setShowImageModal(true) }}>
-                            <Image
-                                source={
-                                    typeof image === 'string'
-                                        ? { uri: image }
-                                        : image && image.uri
-                                            ? { uri: image.uri }
-                                            : image
-                                }
-                                style={{ width: '100%', height: '100%' }}
-                                resizeMode={
-                                    typeof image === 'string' && imageOptions.includes(image)
-                                        ? 'contain'
-                                        : 'cover'
-                                }
-                            />
-                            {/* Placeholder for event image */}
-                            <View style={tw`flex-row gap-1.5 absolute top-2.5 right-2.5 bg-white rounded-lg px-2 py-1 shadow-md`}>
-                                <Camera width={16} height={16} style={tw`mt-0.2`} />
-                                <Text style={[tw`text-[13px] text-black`, { fontFamily: 'Nunito-ExtraBold' }]}>{'Choose image'}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* About this event */}
-                    <View style={tw`px-4 mb-3`}>
-                        <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
-                            <TextInput
-                                style={[
-                                    tw`text-white text-[15px] px-0 py-0 text-left leading-[1.4]`,
-                                    {
-                                        fontFamily: bio ? 'Nunito-ExtraBold' : 'Nunito-ExtraBold',
-                                        minHeight: 60,
-                                        textAlignVertical: 'top'
+                                    } else {
+                                        setShowEventDoneModal(true);
                                     }
-                                ]}
-                                placeholder="About this group..."
-                                placeholderTextColor="#9ca3af"
-                                multiline={true}
-                                value={bio}
-                                onChangeText={text => {
-                                    if (text.length <= 100) setBio(text);
                                 }}
-                                blurOnSubmit={true}
-                                returnKeyType="done"
-                                maxLength={100}
-                            />
-                            <View style={tw`flex-row justify-end items-center mt-0.5 -mr-1`}>
-                                <Text
-                                    style={[
-                                        tw`text-[12px] mr-0.5`,
-                                        { fontFamily: 'Nunito-Medium' },
-                                        bio.length >= 100 ? tw`text-rose-600` : tw`text-gray-400`
-                                    ]}
-                                >
-                                {bio.length}/100
-                                </Text>
-                                {bio.length > 0 && (
-                                    <TouchableOpacity
-                                        onPress={() => setBio('')}
-                                        style={tw`pl-1.5`}
-                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                                    >
-                                        <Ionicons name="close-circle" size={16} color="#9ca3af" />
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        </View>
-                    </View>
+                            >
+                                <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>{isEditing ? 'Update' : 'Done'}</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA] opacity-50`, { zIndex: 2 }]}
+                                disabled
+                            >
+                                <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Done</Text>
+                            </TouchableOpacity>
+                        );
+                    })()}
+                </View>
 
-                    <ImageModal
-                        visible={showImageModal}
-                        onClose={() => { setShowImageModal(false) }}
-                        imageOptions={imageOptions}
-                        onSelect={(img) => { setImage(img) }}
-                    />
-                    <EventDoneModal
-                        visible={showEventDoneModal}
-                        onClose={() => setShowEventDoneModal(false)}
-                        onPublish={async () => {
-                            setShowEventDoneModal(false);
-                            setToastVisible(true);
-                            const newId = await addGroup();
-                            if (newId) {
-                                await updateImage(newId);
-
-                                setTimeout(() => {
-                                    router.replace('/home/homepage');
-                                }, 500);
+                {/* Title input */}
+                <View style={[tw`px-4 py-3 mx-4 mb-3 items-center border border-white/10 rounded-xl bg-white/5`]}>
+                    <TextInput
+                        style={[
+                            tw`text-white text-[24px] w-full`,
+                            {
+                                fontFamily: 'Nunito-ExtraBold',
+                                textAlign: 'left',
+                                textAlignVertical: 'center',
                             }
-                        }}
-                        onContinueEdit={() => setShowEventDoneModal(false)}
+                        ]}
+                        value={title}
+                        onChangeText={setTitle}
+                        placeholder='your group title...'
+                        placeholderTextColor={'#9ca3af'}
+                        multiline={false}
+                        maxLength={60}
+                        returnKeyType="done"
                     />
                 </View>
-            </KeyboardAwareScrollView >
+
+                <View style={tw`flex-row items-center mx-4 mb-2.5`}>
+                    <TouchableOpacity style={tw`flex-row items-center gap-2 justify-center bg-[#064B55] ${publicEvent ? 'border border-white/10' : 'opacity-30'} rounded-full px-2 py-0.5 mr-1`}
+                        onPress={() => { setPublic(true) }}>
+                        <Public />
+                        <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Public</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={tw`flex-row items-center gap-2 justify-center bg-[#080B32] ${publicEvent ? 'opacity-30' : 'border border-purple-900'} rounded-full px-2 py-0.5`}
+                        onPress={() => { setPublic(false) }}>
+                        <Private />
+                        <Text style={[tw`text-[13px] text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Invite only</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Image picker */}
+                <View style={tw`px-4 mb-2`}>
+                    <TouchableOpacity style={[tw`rounded-xl overflow-hidden w-full items-center justify-center relative`, { aspectRatio: 1 / 1 }]}
+                        onPress={() => { setShowImageModal(true) }}>
+                        <Image
+                            source={
+                                typeof image === 'string'
+                                    ? { uri: image }
+                                    : image && image.uri
+                                        ? { uri: image.uri }
+                                        : image
+                            }
+                            style={{ width: '100%', height: '100%' }}
+                            resizeMode={
+                                typeof image === 'string' && imageOptions.includes(image)
+                                    ? 'contain'
+                                    : 'cover'
+                            }
+                        />
+                        {/* Placeholder for event image */}
+                        <View style={tw`flex-row gap-1.5 absolute top-2.5 right-2.5 bg-white rounded-lg px-2 py-1 shadow-md`}>
+                            <Camera width={16} height={16} style={tw`mt-0.2`} />
+                            <Text style={[tw`text-[13px] text-black`, { fontFamily: 'Nunito-ExtraBold' }]}>{'Choose image'}</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+
+                {/* About this event */}
+                <View style={tw`px-4 mb-3`}>
+                    <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
+                        <TextInput
+                            style={[
+                                tw`text-white text-[15px] px-0 py-0 text-left leading-[1.4]`,
+                                {
+                                    fontFamily: bio ? 'Nunito-ExtraBold' : 'Nunito-ExtraBold',
+                                    minHeight: 60,
+                                    textAlignVertical: 'top'
+                                }
+                            ]}
+                            placeholder="About this group..."
+                            placeholderTextColor="#9ca3af"
+                            multiline={true}
+                            value={bio}
+                            onChangeText={text => {
+                                if (text.length <= 100) setBio(text);
+                            }}
+                            blurOnSubmit={true}
+                            returnKeyType="done"
+                            maxLength={100}
+                        />
+                        <View style={tw`flex-row justify-end items-center mt-0.5 -mr-1`}>
+                            <Text
+                                style={[
+                                    tw`text-[12px] mr-0.5`,
+                                    { fontFamily: 'Nunito-Medium' },
+                                    bio.length >= 100 ? tw`text-rose-600` : tw`text-gray-400`
+                                ]}
+                            >
+                            {bio.length}/100
+                            </Text>
+                            {bio.length > 0 && (
+                                <TouchableOpacity
+                                    onPress={() => setBio('')}
+                                    style={tw`pl-1.5`}
+                                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                >
+                                    <Ionicons name="close-circle" size={16} color="#9ca3af" />
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </View>
+                </View>
+
+                <ImageModal
+                    visible={showImageModal}
+                    onClose={() => { setShowImageModal(false) }}
+                    imageOptions={imageOptions}
+                    onSelect={(img) => { setImage(img) }}
+                />
+                <EventDoneModal
+                    visible={showEventDoneModal}
+                    onClose={() => setShowEventDoneModal(false)}
+                    onPublish={async () => {
+                        setShowEventDoneModal(false);
+                        setToastVisible(true);
+                        const newId = await addGroup();
+                        if (newId) {
+                            await updateImage(newId);
+
+                            setTimeout(() => {
+                                router.replace('/home/homepage');
+                            }, 500);
+                        }
+                    }}
+                    onContinueEdit={() => setShowEventDoneModal(false)}
+                />
+                </KeyboardAwareScrollView>
+            </View>
         </View>
     );
 }
