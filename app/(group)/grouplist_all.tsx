@@ -152,7 +152,7 @@ export default function GroupListAll() {
         </View>
       </Animated.View>
 
-      <View style={tw`items-center`}> {/* Add top padding for header overlay */}
+      <View style={tw`items-center h-full`}> {/* Add top padding for header overlay */}
         <Animated.FlatList
           data={[...displayGroups, { id: 'create-group-btn' }]}
           keyExtractor={item => item.id}
