@@ -43,45 +43,45 @@ export default function GroupListAll() {
 
   const { user } = useUserStore();
 
-useEffect(() => {
-  if (!user?.id) return;
-  const fetchGroups = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('groups')
-      .select('id, title, bio, creator, group_image, public, member_count')
-      .order('member_count', { ascending: false })
-      .order('created_at', { ascending: false });
-    if (!error && data) setGroups(data);
-    setLoading(false);
-  };
-
-  const fetchPendingGroups = async () => {
-    // group_requests table only contains pending requests for user_id
-    const { data, error } = await supabase
-      .from('group_requests')
-      .select('group_id')
-      .eq('user_id', user.id);
-    if (!error && data && data.length > 0) {
-      const groupIds = data.map((req: { group_id: string }) => req.group_id);
-      if (groupIds.length === 0) {
-        setPendingGroups([]);
-        return;
-      }
-      const { data: groupsData, error: groupsError } = await supabase
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchGroups = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
         .from('groups')
         .select('id, title, bio, creator, group_image, public, member_count')
-        .in('id', groupIds);
-      if (!groupsError && groupsData) setPendingGroups(groupsData);
-      else setPendingGroups([]);
-    } else {
-      setPendingGroups([]);
-    }
-  };
+        .order('member_count', { ascending: false })
+        .order('created_at', { ascending: false });
+      if (!error && data) setGroups(data);
+      setLoading(false);
+    };
 
-  fetchGroups();
-  fetchPendingGroups();
-}, [user?.id]);
+    const fetchPendingGroups = async () => {
+      // group_requests table only contains pending requests for user_id
+      const { data, error } = await supabase
+        .from('group_requests')
+        .select('group_id')
+        .eq('user_id', user.id);
+      if (!error && data && data.length > 0) {
+        const groupIds = data.map((req: { group_id: string }) => req.group_id);
+        if (groupIds.length === 0) {
+          setPendingGroups([]);
+          return;
+        }
+        const { data: groupsData, error: groupsError } = await supabase
+          .from('groups')
+          .select('id, title, bio, creator, group_image, public, member_count')
+          .in('id', groupIds);
+        if (!groupsError && groupsData) setPendingGroups(groupsData);
+        else setPendingGroups([]);
+      } else {
+        setPendingGroups([]);
+      }
+    };
+
+    fetchGroups();
+    fetchPendingGroups();
+  }, [user?.id]);
 
   // Place featured groups at the top, then the rest (excluding featured)
   // Remove pending groups from display
@@ -97,37 +97,120 @@ useEffect(() => {
 
   return (
     <GradientBackground style={{ flex: 1 }}>
-      {/* Fixed Header */}
-      <View style={tw`flex-row items-center px-4 pt-14 pb-5 w-full z-10`}>
-        <Text style={[tw`text-white text-[24px] flex-1`, { fontFamily: 'Nunito-Black' }]}>Your groups</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/(group)/FeatureGroupsSelector')}
-          style={tw`px-4 py-2 bg-white/10 rounded-full`}
-          activeOpacity={0.7}
-        >
-          <Text style={[tw`text-[#7A5CFA] text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Animated Header - scrolls up and fades out */}
+      <Animated.View
+        style={{
+          paddingTop: 56,
+          paddingBottom: 0,
+          paddingHorizontal: 16,
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          opacity: scrollY.interpolate({ inputRange: [0, 60], outputRange: [1, 0], extrapolate: 'clamp' }),
+          transform: [
+            {
+              translateY: scrollY.interpolate({
+                inputRange: [0, 60],
+                outputRange: [0, -60],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 2,
+        }}
+      >
+        <View style={tw`flex-row items-center mb-2 w-full`}>
+          <Text style={[tw`text-white text-[24px] flex-1`, { fontFamily: 'Nunito-Black' }]}>Your groups</Text>
+          <TouchableOpacity
+            onPress={() => router.push('/(group)/FeatureGroupsSelector')}
+            style={tw`px-4 py-2 bg-white/10 rounded-full`}
+            activeOpacity={0.7}
+          >
+            <Text style={[tw`text-[#7A5CFA] text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Tab Bar below header */}
-      <View style={tw`pb-5 px-4 w-full justify-center items-center`}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={tw`gap-x-4`}>
+        {/* Tab Bar below header */}
+        <View style={tw`pb-4 px-4 w-full justify-center items-center flex-row gap-x-4`}>
           <TouchableOpacity
             style={tw`${activeTab === 'joined' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
             onPress={() => setActiveTab('joined')}
             activeOpacity={0.7}
           >
-            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Joined groups</Text>
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Joined groups</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={tw`${activeTab === 'requested' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
             onPress={() => setActiveTab('requested')}
             activeOpacity={0.7}
           >
-            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
           </TouchableOpacity>
-        </ScrollView>
-      </View>
+        </View>
+      </Animated.View>
+
+      {/* Compact Header (appears as you scroll) */}
+      <Animated.View
+        style={{
+          alignItems: 'center',
+          paddingHorizontal: 16,
+          paddingTop: 52,
+          paddingBottom: 8,
+          opacity: scrollY.interpolate({ inputRange: [0, 60], outputRange: [0, 1], extrapolate: 'clamp' }),
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 2,
+          overflow: 'hidden',
+        }}
+      >
+        <BlurView
+          intensity={30}
+          tint="dark"
+          style={[tw`absolute top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
+        />
+        <View
+          style={[tw`absolute bg-[#080B32] bg-opacity-80 top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
+        />
+        <View style={tw`flex-row w-full items-center mb-2`}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <BackIcon width={24} height={24} color="#fff" />
+          </TouchableOpacity>
+          <View style={tw`flex-row items-center w-full`}>
+            <Text style={[tw`text-white text-[16px] ml-2.5`, { fontFamily: 'Nunito-ExtraBold' }]}>Your groups</Text>
+            <View style={tw`flex-1`} />
+            <TouchableOpacity
+              onPress={() => router.push('/(group)/FeatureGroupsSelector')}
+              style={tw`mr-4.5 px-4 py-2 bg-white/10 rounded-full`}
+              activeOpacity={0.7}
+            >
+              <Text style={[tw`text-[#7A5CFA] text-[13px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Tab Bar below header */}
+        {/* <View style={tw`pb-2 px-4 w-full justify-center items-center flex-row gap-x-4`}>
+          <TouchableOpacity
+            style={tw`${activeTab === 'joined' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
+            onPress={() => setActiveTab('joined')}
+            activeOpacity={0.7}
+          >
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Joined groups</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={tw`${activeTab === 'requested' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
+            onPress={() => setActiveTab('requested')}
+            activeOpacity={0.7}
+          >
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
+          </TouchableOpacity>
+        </View> */}
+      </Animated.View>
 
       {/* Tab Content */}
       <View style={tw`items-center w-full flex-1`}>
@@ -137,7 +220,7 @@ useEffect(() => {
             keyExtractor={item => item.id}
             extraData={featuredGroupIds.join(',')}
             numColumns={numColumns}
-            contentContainerStyle={tw`pb-10`}
+            contentContainerStyle={tw`pb-10 pt-40`}
             columnWrapperStyle={tw`gap-x-4 mb-4`}
             showsVerticalScrollIndicator={false}
             onScroll={Animated.event(
@@ -186,22 +269,11 @@ useEffect(() => {
         ) : (
           <View style={tw`w-full px-4`}>
             {pendingGroups.length > 0 ? (
-              <View style={tw``}>
+              <View style={tw`mt-1`}>
                 {pendingGroups.map(pg => (
-                  <View key={pg.id} style={tw`bg-white/10 rounded-xl mb-2 px-4 py-3 flex-row items-center`}>
-                    {pg.group_image ? (
-                      <View style={tw`mr-3`}>
-                        <Animated.Image
-                          source={{ uri: pg.group_image }}
-                          style={[tw`rounded-lg`, { width: 40, height: 40 }]}
-                          resizeMode="cover"
-                        />
-                      </View>
-                    ) : null}
-                    <View style={tw`flex-1`}>
-                      <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>{pg.title}</Text>
-                      <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Regular' }]}>{pg.member_count} member{pg.member_count === 1 ? '' : 's'}</Text>
-                    </View>
+                  <View key={pg.id} style={tw`bg-white/10 rounded-xl mb-2 px-4 py-3`}>
+                    <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>{pg.title}</Text>
+                    {pg.bio ? <Text style={[tw`text-white text-[12px] mt-1`, { fontFamily: 'Nunito-Regular' }]}>{pg.bio}</Text> : null}
                   </View>
                 ))}
               </View>
