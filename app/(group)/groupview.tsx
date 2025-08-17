@@ -571,11 +571,8 @@ export default function GroupView() {
             ]}
             onPress={() => setTab('requests')}
           >
-            <Text style={[
-              tw`text-base`,
-              { fontFamily: "Nunito-ExtraBold", color: tab === 'requests' ? '#fff' : '#9ca3af' }
-            ]}>
-              Requests
+            <Text style={[tw`text-base`, { fontFamily: "Nunito-ExtraBold", color: tab === 'requests' ? '#fff' : '#9ca3af' }]}>
+              {requests.length > 0 ? `Requests (${requests.length})` : 'Requests'}
             </Text>
           </TouchableOpacity>}
         </View>
@@ -721,7 +718,7 @@ export default function GroupView() {
           ) : tab === 'requests' ? (
             <View>
               {requests.length === 0 ? (
-                <Text style={[tw`text-white text-[15px]`, { fontFamily: "Nunito-Medium", textAlign: 'center' }]}>No requests found.</Text>
+                <Text style={[tw`text-white text-[15px]`, { fontFamily: "Nunito-Medium", textAlign: 'center' }]}>No requests yet!</Text>
               ) : (
                 requests.map((req, idx) => (
                   <View key={req.id || idx} style={tw`flex-row items-center bg-black/20 rounded-xl p-3 mb-2`}>
