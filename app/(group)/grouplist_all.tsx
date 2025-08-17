@@ -3,7 +3,7 @@ import React from 'react';
 import { Animated } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
 import { View, Text, FlatList, TouchableOpacity, Dimensions } from 'react-native';
-import { View as RNView } from 'react-native';
+import { View as RNView, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
 import GradientBackground from '../components/GradientBackground';
@@ -28,6 +28,8 @@ export default function GroupListAll() {
   const scrollY = React.useRef(new Animated.Value(0)).current;
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pendingGroups, setPendingGroups] = useState<Group[]>([]);
+  const [activeTab, setActiveTab] = useState<'joined' | 'requested'>('joined');
   const navigation = useNavigation();
   const { featuredGroupIds, hydrate } = useAsyncFeaturedGroupsStore();
 
@@ -41,169 +43,162 @@ export default function GroupListAll() {
 
   const { user } = useUserStore();
 
-  useEffect(() => {
-    const fetchGroups = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
+useEffect(() => {
+  if (!user?.id) return;
+  const fetchGroups = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('groups')
+      .select('id, title, bio, creator, group_image, public, member_count')
+      .order('member_count', { ascending: false })
+      .order('created_at', { ascending: false });
+    if (!error && data) setGroups(data);
+    setLoading(false);
+  };
+
+  const fetchPendingGroups = async () => {
+    // group_requests table only contains pending requests for user_id
+    const { data, error } = await supabase
+      .from('group_requests')
+      .select('group_id')
+      .eq('user_id', user.id);
+    if (!error && data && data.length > 0) {
+      const groupIds = data.map((req: { group_id: string }) => req.group_id);
+      if (groupIds.length === 0) {
+        setPendingGroups([]);
+        return;
+      }
+      const { data: groupsData, error: groupsError } = await supabase
         .from('groups')
         .select('id, title, bio, creator, group_image, public, member_count')
-        // .or(
-        //   `creator.eq.${user.id},id.in.(${ // groups where user is a member
-        //   (
-        //     await supabase
-        //       .from('group_members')
-        //       .select('group_id')
-        //       .eq('user_id', user.id)
-        //   ).data?.map((gm: { group_id: string }) => gm.group_id).join(',') || ''
-        //   })`
-        // )
-        .order('member_count', { ascending: false })
-        .order('created_at', { ascending: false });
-      if (!error && data) setGroups(data);
-      setLoading(false);
-    };
-    fetchGroups();
-  }, []);
+        .in('id', groupIds);
+      if (!groupsError && groupsData) setPendingGroups(groupsData);
+      else setPendingGroups([]);
+    } else {
+      setPendingGroups([]);
+    }
+  };
+
+  fetchGroups();
+  fetchPendingGroups();
+}, [user?.id]);
 
   // Place featured groups at the top, then the rest (excluding featured)
+  // Remove pending groups from display
+  const pendingGroupIds = pendingGroups.map(g => g.id);
   const featuredGroups = featuredGroupIds
     .map(fid => groups.find(g => g.id === fid))
-    .filter(Boolean) as Group[];
-  const restGroups = groups.filter(g => !featuredGroupIds.includes(g.id));
+    .filter((g): g is Group => !!g)
+    .filter(g => !pendingGroupIds.includes(g.id));
+  const restGroups = groups
+    .filter(g => !featuredGroupIds.includes(g.id))
+    .filter(g => !pendingGroupIds.includes(g.id));
   const displayGroups = [...featuredGroups, ...restGroups];
 
   return (
     <GradientBackground style={{ flex: 1 }}>
-      {/* Animated Header - scrolls up and fades out */}
-      <Animated.View
-        style={{
-          paddingTop: 56,
-          paddingBottom: 0,
-          paddingHorizontal: 16,
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          opacity: scrollY.interpolate({ inputRange: [0, 60], outputRange: [1, 0], extrapolate: 'clamp' }),
-          transform: [
-            {
-              translateY: scrollY.interpolate({
-                inputRange: [0, 60],
-                outputRange: [0, -60],
-                extrapolate: 'clamp',
-              }),
-            },
-          ],
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 2,
-        }}
-      >
-        <View style={tw`flex-row items-center mb-2 w-full`}>
-          <Text style={[tw`text-white text-[24px] flex-1`, { fontFamily: 'Nunito-Black' }]}>Your groups</Text>
-          <TouchableOpacity
-            onPress={() => router.push('/(group)/FeatureGroupsSelector')}
-            style={tw`px-4 py-2 bg-white/10 rounded-full`}
-            activeOpacity={0.7}
-          >
-            <Text style={[tw`text-[#7A5CFA] text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
-
-      {/* Compact Header (appears as you scroll) */}
-      <Animated.View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 16,
-          paddingTop: 52,
-          paddingBottom: 8,
-          opacity: scrollY.interpolate({ inputRange: [0, 60], outputRange: [0, 1], extrapolate: 'clamp' }),
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 2,
-          overflow: 'hidden',
-        }}
-      >
-        <BlurView
-          intensity={30}
-          tint="dark"
-          style={[tw`absolute top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
-        />
-        <View
-          style={[tw`absolute bg-[#080B32] bg-opacity-80 top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
-        />
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <BackIcon width={24} height={24} color="#fff" />
+      {/* Fixed Header */}
+      <View style={tw`flex-row items-center px-4 pt-14 pb-4 w-full z-10`}>
+        <Text style={[tw`text-white text-[22px] flex-1`, { fontFamily: 'Nunito-Black' }]}>Your groups</Text>
+        <TouchableOpacity
+          onPress={() => router.push('/(group)/FeatureGroupsSelector')}
+          style={tw`px-4 py-2 bg-white/10 rounded-full`}
+          activeOpacity={0.7}
+        >
+          <Text style={[tw`text-[#7A5CFA] text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
         </TouchableOpacity>
-        <View style={tw`flex-row items-center w-full`}>
-          <Text style={[tw`text-white text-[16px] ml-2.5`, { fontFamily: 'Nunito-ExtraBold' }]}>Your groups</Text>
-          <View style={tw`flex-1`} />
+      </View>
+
+      {/* Tab Bar below header */}
+      <View style={tw`pb-4 px-4 w-full justify-center items-center`}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={tw`gap-x-4`}>
           <TouchableOpacity
-            onPress={() => router.push('/(group)/FeatureGroupsSelector')}
-            style={tw`mr-4.5 px-4 py-2 bg-white/10 rounded-full`}
+            style={tw`${activeTab === 'joined' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
+            onPress={() => setActiveTab('joined')}
             activeOpacity={0.7}
           >
-            <Text style={[tw`text-[#7A5CFA] text-[13px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Joined groups</Text>
           </TouchableOpacity>
-        </View>
-      </Animated.View>
+          <TouchableOpacity
+            style={tw`${activeTab === 'requested' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
+            onPress={() => setActiveTab('requested')}
+            activeOpacity={0.7}
+          >
+            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
 
-      <View style={tw`items-center h-full`}> {/* Add top padding for header overlay */}
-        <Animated.FlatList
-          data={[...displayGroups, { id: 'create-group-btn' }]}
-          keyExtractor={item => item.id}
-          extraData={featuredGroupIds.join(',')}
-          numColumns={numColumns}
-          contentContainerStyle={tw`pt-28.5 pb-10`}
-          columnWrapperStyle={tw`gap-x-4 mb-4`}
-          showsVerticalScrollIndicator={false}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: true }
-          )}
-          scrollEventThrottle={16}
-          renderItem={({ item }) => {
-            // ...existing code...
-            if (item.id === 'create-group-btn') {
+      {/* Tab Content */}
+      <View style={tw`items-center w-full flex-1`}>
+        {activeTab === 'joined' ? (
+          <Animated.FlatList
+            data={[...displayGroups, { id: 'create-group-btn' }]}
+            keyExtractor={item => item.id}
+            extraData={featuredGroupIds.join(',')}
+            numColumns={numColumns}
+            contentContainerStyle={tw`pb-10`}
+            columnWrapperStyle={tw`gap-x-4 mb-4`}
+            showsVerticalScrollIndicator={false}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: true }
+            )}
+            scrollEventThrottle={16}
+            renderItem={({ item }) => {
+              // ...existing code...
+              if (item.id === 'create-group-btn') {
+                return (
+                  <View style={{ width: cardWidth }}>
+                    <TouchableOpacity
+                      style={[tw`bg-white/10 rounded-xl justify-center items-center`, { width: cardWidth, aspectRatio: 1 / 1 }]}
+                      onPress={() => router.navigate('/(create)/group')}
+                      activeOpacity={0.7}
+                    >
+                      <View style={tw`flex-row items-center border border-white/50 rounded-full px-2.5 py-2`}>
+                        <Text style={[tw`text-white text-xl mr-1.5 -mt-0.5`, { fontFamily: 'Nunito-ExtraBold' }]}>+</Text>
+                        <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Create group</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                );
+              }
+              const group = item as Group;
               return (
                 <View style={{ width: cardWidth }}>
-                  <TouchableOpacity
-                    style={[tw`bg-white/10 rounded-xl justify-center items-center`, { width: cardWidth, aspectRatio: 1 / 1 }]}
-                    onPress={() => router.navigate('/(create)/group')}
-                    activeOpacity={0.7}
-                  >
-                    <View style={tw`flex-row items-center border border-white/50 rounded-full px-2.5 py-2`}>
-                      <Text style={[tw`text-white text-xl mr-1.5 -mt-0.5`, { fontFamily: 'Nunito-ExtraBold' }]}>+</Text>
-                      <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Create group</Text>
-                    </View>
-                  </TouchableOpacity>
+                  <GroupCard
+                    id={group.id}
+                    title={group.title}
+                    bio={group.bio}
+                    publicGroup={group.public}
+                    creator={group.creator}
+                    group_image={group.group_image}
+                    member_count={group.member_count}
+                    onPress={() => router.navigate({ pathname: '/(group)/groupview', params: { id: group.id } })}
+                  />
                 </View>
               );
+            }}
+            ListEmptyComponent={
+              loading ? <Text style={[tw`text-white text-center mt-10`, { fontFamily: 'Nunito-Bold' }]}>Loading...</Text> : <Text style={[tw`text-white text-center mt-10`, { fontFamily: 'Nunito-Bold' }]}>No groups found.</Text>
             }
-            const group = item as Group;
-            return (
-              <View style={{ width: cardWidth }}>
-                <GroupCard
-                  id={group.id}
-                  title={group.title}
-                  bio={group.bio}
-                  publicGroup={group.public}
-                  creator={group.creator}
-                  group_image={group.group_image}
-                  member_count={group.member_count}
-                  onPress={() => router.navigate({ pathname: '/(group)/groupview', params: { id: group.id } })}
-                />
+          />
+        ) : (
+          <View style={tw`w-full px-4`}>
+            {pendingGroups.length > 0 ? (
+              <View style={tw`mt-1`}>
+                {pendingGroups.map(pg => (
+                  <View key={pg.id} style={tw`bg-white/10 rounded-xl mb-2 px-4 py-3`}>
+                    <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>{pg.title}</Text>
+                    {pg.bio ? <Text style={[tw`text-white text-[12px] mt-1`, { fontFamily: 'Nunito-Regular' }]}>{pg.bio}</Text> : null}
+                  </View>
+                ))}
               </View>
-            );
-          }}
-          ListEmptyComponent={
-            loading ? <Text style={[tw`text-white text-center mt-10`, { fontFamily: 'Nunito-Bold' }]}>Loading...</Text> : <Text style={[tw`text-white text-center mt-10`, { fontFamily: 'Nunito-Bold' }]}>No groups found.</Text>
-          }
-        />
+            ) : (
+              <Text style={[tw`text-white text-[12px]`, { fontFamily: 'Nunito-Regular' }]}>No pending requests.</Text>
+            )}
+          </View>
+        )}
       </View>
     </GradientBackground>
   );
