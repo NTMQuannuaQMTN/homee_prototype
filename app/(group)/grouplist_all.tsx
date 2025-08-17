@@ -98,8 +98,8 @@ useEffect(() => {
   return (
     <GradientBackground style={{ flex: 1 }}>
       {/* Fixed Header */}
-      <View style={tw`flex-row items-center px-4 pt-14 pb-4 w-full z-10`}>
-        <Text style={[tw`text-white text-[22px] flex-1`, { fontFamily: 'Nunito-Black' }]}>Your groups</Text>
+      <View style={tw`flex-row items-center px-4 pt-14 pb-5 w-full z-10`}>
+        <Text style={[tw`text-white text-[24px] flex-1`, { fontFamily: 'Nunito-Black' }]}>Your groups</Text>
         <TouchableOpacity
           onPress={() => router.push('/(group)/FeatureGroupsSelector')}
           style={tw`px-4 py-2 bg-white/10 rounded-full`}
@@ -110,21 +110,21 @@ useEffect(() => {
       </View>
 
       {/* Tab Bar below header */}
-      <View style={tw`pb-4 px-4 w-full justify-center items-center`}>
+      <View style={tw`pb-5 px-4 w-full justify-center items-center`}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={tw`gap-x-4`}>
           <TouchableOpacity
             style={tw`${activeTab === 'joined' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
             onPress={() => setActiveTab('joined')}
             activeOpacity={0.7}
           >
-            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Joined groups</Text>
+            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Joined groups</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={tw`${activeTab === 'requested' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
             onPress={() => setActiveTab('requested')}
             activeOpacity={0.7}
           >
-            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
+            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -186,11 +186,22 @@ useEffect(() => {
         ) : (
           <View style={tw`w-full px-4`}>
             {pendingGroups.length > 0 ? (
-              <View style={tw`mt-1`}>
+              <View style={tw``}>
                 {pendingGroups.map(pg => (
-                  <View key={pg.id} style={tw`bg-white/10 rounded-xl mb-2 px-4 py-3`}>
-                    <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>{pg.title}</Text>
-                    {pg.bio ? <Text style={[tw`text-white text-[12px] mt-1`, { fontFamily: 'Nunito-Regular' }]}>{pg.bio}</Text> : null}
+                  <View key={pg.id} style={tw`bg-white/10 rounded-xl mb-2 px-4 py-3 flex-row items-center`}>
+                    {pg.group_image ? (
+                      <View style={tw`mr-3`}>
+                        <Animated.Image
+                          source={{ uri: pg.group_image }}
+                          style={[tw`rounded-lg`, { width: 40, height: 40 }]}
+                          resizeMode="cover"
+                        />
+                      </View>
+                    ) : null}
+                    <View style={tw`flex-1`}>
+                      <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>{pg.title}</Text>
+                      <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Regular' }]}>{pg.member_count} member{pg.member_count === 1 ? '' : 's'}</Text>
+                    </View>
                   </View>
                 ))}
               </View>
