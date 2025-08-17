@@ -117,6 +117,7 @@ export default function ImageModal({ visible, onClose, imageOptions, onSelect }:
         }
     }, [visible, imageOptions]);
 
+    // ...existing code...
     if (!isModalMounted) return null;
 
     const combinedTranslateY = Animated.add(slideAnim, pan.y);
@@ -165,7 +166,30 @@ export default function ImageModal({ visible, onClose, imageOptions, onSelect }:
                                     keyboardShouldPersistTaps="handled"
                                     nestedScrollEnabled={true}
                                     scrollEnabled={true}
+                                    showsVerticalScrollIndicator={false}
                                 >
+                                    {/* First square: Upload your own */}
+                                    <TouchableOpacity
+                                        onPress={pickImage}
+                                        style={{
+                                            margin: 6,
+                                            borderRadius: 12,
+                                            overflow: 'hidden',
+                                            borderWidth: 2,
+                                            borderColor: '#7A5CFA',
+                                            width: '45%',
+                                            aspectRatio: 1,
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            backgroundColor: '#1A1A40',
+                                        }}
+                                        activeOpacity={0.8}
+                                    >
+                                        <UploadIcon width={32} height={32} />
+                                        <Text style={{ color: '#fff', fontFamily: 'Nunito-ExtraBold', fontSize: 16, marginTop: 8, textAlign: 'center' }}>
+                                            Upload your image
+                                        </Text>
+                                    </TouchableOpacity>
                                     {shuffledImages.map((img, idx) => (
                                         <TouchableOpacity
                                             key={idx}
