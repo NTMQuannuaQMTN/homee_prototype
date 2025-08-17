@@ -5,17 +5,17 @@ import { Image, ImageBackground, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import tw from 'twrnc';
 import { useUserStore } from '../app/store/userStore';
-import CreateTab from '../assets/icons/createtab.svg';
-import CreateTabActive from '../assets/icons/createtab_active.svg';
 import HomeTab from '../assets/icons/hometab.svg';
 import HomeTabActive from '../assets/icons/hometab_active.svg';
 import DefaultAvatar from '../assets/icons/pfpdefault.svg';
+import { useImageStore } from './store/imageStore';
 
 export default function BotBar({ currentTab = 'home', selfView = false }: { currentTab?: 'home' | 'create' | 'profile' | 'noti', selfView?: boolean }) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, setUser } = useUserStore();
-  // Use the user store's profile_image immediately for fast initial load
+  const { setImages } = useImageStore();
+  
   const [avatarUri, setAvatarUri] = useState(user?.profile_image || '');
   const [userID, setUserID] = useState('');
 
@@ -63,6 +63,7 @@ export default function BotBar({ currentTab = 'home', selfView = false }: { curr
         {/* Center Add Button */}
         <TouchableOpacity
           onPress={() => {
+            setImages([]);
             if (currentTab !== 'create') router.navigate('/(create)/image');
           }}
           style={tw`flex-1 items-center justify-center`}
