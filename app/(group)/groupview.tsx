@@ -327,13 +327,14 @@ export default function GroupView() {
           minHeight: '100%',
           resizeMode: 'cover',
           zIndex: 0,
+          backgroundColor: '#000000', opacity: isDefault ? 0 : 0.5,
         }}
         blurRadius={8}
         onError={e => {
           console.log('Background image failed to load:', e.nativeEvent);
         }}
       />
-      <View style={tw`w-full h-full absolute top-0 left-0 bg-black bg-opacity-50`}/>
+      <View style={tw`w-full h-full absolute top-0 left-0`}/>
       <DraggableModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}

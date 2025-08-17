@@ -306,7 +306,7 @@ export default function CreateGroup() {
 
                 {/* About this event */}
                 <View style={tw`px-4 mb-3`}>
-                    <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
+                    <View style={tw`bg-white/10 border border-white/10 rounded-xl px-4 pt-3 pb-2`}>
                         <TextInput
                             style={[
                                 tw`text-white text-[15px] px-0 py-0 text-left leading-[1.4]`,

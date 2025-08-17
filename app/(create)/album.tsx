@@ -123,17 +123,7 @@ export default function CreateAlbum() {
 
     return (
         <View style={tw`w-full h-full`}>
-            <KeyboardAwareScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{ flexGrow: 1 }}
-                keyboardShouldPersistTaps="handled"
-                enableOnAndroid={true}
-                extraScrollHeight={0}
-                showsVerticalScrollIndicator={false}
-                resetScrollToCoords={{ x: 0, y: 0 }}
-                scrollEnabled={!showImageModal}
-            >
-                {/* Background image and overlay */}
+            {/* Background image and overlay */}
                 <Image
                     source={typeof groupImage === 'string' ? { uri: groupImage } : undefined}
                     style={{
@@ -153,168 +143,176 @@ export default function CreateAlbum() {
                     }}
                 />
                 <View style={tw`w-full h-full pt-3 bg-black bg-opacity-60`}>
-                    {/* Top bar */}
-                    <View style={tw`relative flex-row items-center px-4 mt-10 mb-2 h-10`}>
-                        {/* Back button - absolute left */}
-                        <TouchableOpacity
-                            onPress={() => router.back()}
-                            style={[tw`absolute left-3`, { zIndex: 2 }]}
-                        >
-                            <Back />
-                        </TouchableOpacity>
-                        {/* Centered title */}
-                        <View style={tw`flex-1 items-center justify-center`}>
-                            <Text style={[tw`text-white text-base`, { fontFamily: 'Nunito-ExtraBold' }]}>
-                                {id ? 'Update album' : groupID ? `Create album for group ${groupName}` : 'Create album'}
-                            </Text>
+                    <KeyboardAwareScrollView
+                        style={{ flex: 1 }}
+                        contentContainerStyle={{ flexGrow: 1 }}
+                        keyboardShouldPersistTaps="handled"
+                        enableOnAndroid={true}
+                        extraScrollHeight={0}
+                        showsVerticalScrollIndicator={false}
+                        resetScrollToCoords={{ x: 0, y: 0 }}
+                        scrollEnabled={!showImageModal}
+                    >
+                        {/* Top bar */}
+                        <View style={tw`relative flex-row items-center px-4 mt-10 mb-2 h-10`}>
+                            {/* Back button - absolute left */}
+                            <TouchableOpacity
+                                onPress={() => router.back()}
+                                style={[tw`absolute left-3`, { zIndex: 2 }]}
+                            >
+                                <Back />
+                            </TouchableOpacity>
+                            {/* Centered title */}
+                            <View style={tw`flex-1 items-center justify-center`}>
+                                <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>
+                                    {id ? 'Update album' : groupID ? `Create album` : 'Create album'}
+                                </Text>
+                            </View>
+                            {/* Done button - absolute right */}
+                            {/* Determine if all required fields are filled and if editing */}
+                            {(() => {
+                                const requiredFilled = title;
+                                const isEditing = id;
+                                return requiredFilled ? (
+                                    <TouchableOpacity
+                                        style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA]`, { zIndex: 2 }]}
+                                        onPress={async () => {
+                                            if (isEditing) {
+                                                setToastVisible(true);
+                                                addAlbum();
+                                            } else {
+                                                setShowEventDoneModal(true);
+                                            }
+                                        }}
+                                    >
+                                        <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>{isEditing ? 'Update' : 'Done'}</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA] opacity-50`, { zIndex: 2 }]}
+                                        disabled
+                                    >
+                                        <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Done</Text>
+                                    </TouchableOpacity>
+                                );
+                            })()}
                         </View>
-                        {/* Done button - absolute right */}
-                        {/* Determine if all required fields are filled and if editing */}
-                        {(() => {
-                            const requiredFilled = title;
-                            const isEditing = id;
-                            return requiredFilled ? (
-                                <TouchableOpacity
-                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7b61ff]`, { zIndex: 2 }]}
-                                    onPress={async () => {
-                                        if (isEditing) {
-                                            setToastVisible(true);
-                                            addAlbum();
-                                        } else {
-                                            setShowEventDoneModal(true);
-                                        }
-                                    }}
-                                >
-                                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>{isEditing ? 'Update' : 'Done'}</Text>
-                                </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity
-                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-gray-500/60`, { zIndex: 2 }]}
-                                    disabled
-                                >
-                                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Done</Text>
-                                </TouchableOpacity>
-                            );
-                        })()}
-                    </View>
 
-                    {/* Title input */}
-                    <View style={[tw`px-4 mb-4 items-center`]}>
-                        <TextInput
-                            style={[
-                                tw`text-white text-[24px] w-full`,
-                                {
-                                    fontFamily: 'Nunito-ExtraBold',
-                                    lineHeight: 28,
-                                    paddingTop: 4,
-                                    textAlign: 'center',
-                                    textAlignVertical: 'top',
-                                }
-                            ]}
-                            value={title}
-                            onChangeText={setTitle}
-                            placeholder='your album title'
-                            placeholderTextColor={'#9ca3af'}
-                            multiline={false}
-                            maxLength={60}
-                            returnKeyType="done"
-                        />
-                    </View>
-
-                    {/* About this event */}
-                    <View style={tw`px-4 mb-3`}>
-                        <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
+                        {/* Title input */}
+                        <View style={[tw`px-4 py-3 mx-4 mb-3 items-center border border-white/10 rounded-xl bg-white/5`]}>
                             <TextInput
                                 style={[
-                                    tw`text-white text-[13px] px-0 py-0 text-left leading-[1.25]`,
+                                    tw`text-white text-[24px] w-full`,
                                     {
-                                        fontFamily: bio ? 'Nunito-Medium' : 'Nunito-ExtraBold',
-                                        minHeight: 60,
-                                        textAlignVertical: 'top'
+                                        fontFamily: 'Nunito-ExtraBold',
+                                        textAlign: 'left',
+                                        textAlignVertical: 'center',
                                     }
                                 ]}
-                                placeholder="About this album..."
-                                placeholderTextColor="#9ca3af"
-                                multiline={true}
-                                value={bio}
-                                onChangeText={text => {
-                                    if (text.length <= 200) setBio(text);
-                                }}
-                                blurOnSubmit={true}
+                                value={title}
+                                onChangeText={setTitle}
+                                placeholder='your album title...'
+                                placeholderTextColor={'#9ca3af'}
+                                multiline={false}
+                                maxLength={60}
                                 returnKeyType="done"
-                                maxLength={200}
                             />
-                            <View style={tw`flex-row justify-end items-center mt-0.5 -mr-1`}>
-                                <Text
+                        </View>
+
+                        {/* About this event */}
+                        <View style={tw`px-4 mb-3`}>
+                            <View style={tw`bg-white/10 border border-white/10 rounded-xl px-4 pt-3 pb-2`}>
+                                <TextInput
                                     style={[
-                                        tw`text-[11px] mr-0.5`,
-                                        { fontFamily: 'Nunito-Medium' },
-                                        bio.length >= 200 ? tw`text-rose-600` : tw`text-gray-400`
+                                        tw`text-white text-[15px] px-0 py-0 text-left leading-[1.4]`,
+                                        {
+                                            fontFamily: bio ? 'Nunito-ExtraBold' : 'Nunito-ExtraBold',
+                                            minHeight: 60,
+                                            textAlignVertical: 'top'
+                                        }
                                     ]}
-                                >
-                                    {bio.length}/200
-                                </Text>
-                                {bio.length > 0 && (
-                                    <TouchableOpacity
-                                        onPress={() => setBio('')}
-                                        style={tw`pl-1.5`}
-                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                                    >
-                                        <Ionicons name="close-circle" size={16} color="#9ca3af" />
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        </View>
-                    </View>
-
-                    <View style={tw`px-4 mb-3`}>
-                        <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
-                            <Text style={[tw`text-white text-xs mb-2`, { fontFamily: 'Nunito-Bold' }]}>
-                                Choose a group
-                            </Text>
-                            <View style={tw`bg-white/10 rounded-lg border border-white/20`}>
-                                <TouchableOpacity
-                                    style={tw`flex-row items-center justify-between px-3 py-2`}
-                                    onPress={() => {
-                                        // Show a simple picker modal
-                                        Alert.alert(
-                                            "Select Group",
-                                            "",
-                                            userGroups.map(g => ({
-                                                text: g.title,
-                                                onPress: () => {
-                                                    setGroupID(g.id);
-                                                    setGroupName(g.title);
-                                                    setGroupImage(g.group_image);
-                                                }
-                                            }))
-                                        );
+                                    placeholder="About this album..."
+                                    placeholderTextColor="#9ca3af"
+                                    multiline={true}
+                                    value={bio}
+                                    onChangeText={text => {
+                                        if (text.length <= 100) setBio(text);
                                     }}
-                                >
-                                    <Text style={[
-                                        tw`text-white text-base`,
-                                        { fontFamily: groupName ? 'Nunito-Medium' : 'Nunito-Light' }
-                                    ]}>
-                                        {groupName ? groupName : "Select a group..."}
+                                    blurOnSubmit={true}
+                                    returnKeyType="done"
+                                    maxLength={100}
+                                />
+                                <View style={tw`flex-row justify-end items-center mt-0.5 -mr-1`}>
+                                    <Text
+                                        style={[
+                                            tw`text-[12px] mr-0.5`,
+                                            { fontFamily: 'Nunito-Medium' },
+                                            bio.length >= 100 ? tw`text-rose-600` : tw`text-gray-400`
+                                        ]}
+                                    >
+                                    {bio.length}/100
                                     </Text>
-                                    <Ionicons name="chevron-down" size={18} color="#fff" />
-                                </TouchableOpacity>
+                                    {bio.length > 0 && (
+                                        <TouchableOpacity
+                                            onPress={() => setBio('')}
+                                            style={tw`pl-1.5`}
+                                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                        >
+                                            <Ionicons name="close-circle" size={16} color="#9ca3af" />
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
                             </View>
                         </View>
-                    </View>
 
-                    <EventDoneModal
-                        visible={showEventDoneModal}
-                        onClose={() => setShowEventDoneModal(false)}
-                        onPublish={async () => {
-                            setShowEventDoneModal(false);
-                            setToastVisible(true);
-                            addAlbum();
-                        }}
-                        onContinueEdit={() => setShowEventDoneModal(false)}
-                    />
+                        <View style={tw`px-4 mb-3`}>
+                            <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
+                                <Text style={[tw`text-white text-xs mb-2`, { fontFamily: 'Nunito-Bold' }]}>
+                                    Choose a group
+                                </Text>
+                                <View style={tw`bg-white/10 rounded-lg border border-white/20`}>
+                                    <TouchableOpacity
+                                        style={tw`flex-row items-center justify-between px-3 py-2`}
+                                        onPress={() => {
+                                            // Show a simple picker modal
+                                            Alert.alert(
+                                                "Select Group",
+                                                "",
+                                                userGroups.map(g => ({
+                                                    text: g.title,
+                                                    onPress: () => {
+                                                        setGroupID(g.id);
+                                                        setGroupName(g.title);
+                                                        setGroupImage(g.group_image);
+                                                    }
+                                                }))
+                                            );
+                                        }}
+                                    >
+                                        <Text style={[
+                                            tw`text-white text-base`,
+                                            { fontFamily: groupName ? 'Nunito-Medium' : 'Nunito-Light' }
+                                        ]}>
+                                            {groupName ? groupName : "Select a group..."}
+                                        </Text>
+                                        <Ionicons name="chevron-down" size={18} color="#fff" />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+
+                        <EventDoneModal
+                            visible={showEventDoneModal}
+                            onClose={() => setShowEventDoneModal(false)}
+                            onPublish={async () => {
+                                setShowEventDoneModal(false);
+                                setToastVisible(true);
+                                addAlbum();
+                            }}
+                            onContinueEdit={() => setShowEventDoneModal(false)}
+                        />
+                    </KeyboardAwareScrollView>
                 </View>
-            </KeyboardAwareScrollView >
         </View>
     );
 }
