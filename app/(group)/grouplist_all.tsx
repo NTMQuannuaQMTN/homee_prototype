@@ -12,6 +12,7 @@ import GroupCard from './groupcard';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useAsyncFeaturedGroupsStore } from '../store/asyncFeaturedGroupsStore';
 import BackIcon from '../../assets/icons/back.svg';
+import IconFun from '../../assets/icons/icon-fun.svg';
 import { useUserStore } from '../store/userStore';
 
 interface Group {
