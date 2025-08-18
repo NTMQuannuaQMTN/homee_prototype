@@ -56,6 +56,14 @@ export default function GradientBackground({ children, style }: GradientBackgrou
           style={{ flex: 1, padding: 20 }}
         />
       </Animated.View>
+      {/* Black overlay for bg-black bg-opacity-60 */}
+      <View style={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        zIndex: 0,
+      }} />
       <View style={{ flex: 1 }}>{children}</View>
     </>
   );

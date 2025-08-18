@@ -10,6 +10,7 @@ import tw from 'twrnc';
 import { useUserStore } from '../store/userStore';
 
 import Back from '../../assets/icons/back.svg';
+import GradientBackground from '../components/GradientBackground';
 import Camera from '../../assets/icons/camera_icon.svg';
 import Private from '../../assets/icons/private.svg';
 import Public from '../../assets/icons/public.svg';
@@ -156,31 +157,51 @@ export default function CreateGroup() {
 
     return (
         <View style={tw`w-full h-full`}>
-            {/* Background image, absolutely positioned, does not scroll */}
-            <Image
-                source={
-                    typeof image === 'string'
-                        ? { uri: image }
-                        : image && image.uri
-                            ? { uri: image.uri }
-                            : image
-                }
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    resizeMode: 'cover',
-                    zIndex: 0,
-                }}
-                blurRadius={8}
-                onError={e => {
-                    console.log('Background image failed to load:', e.nativeEvent);
-                }}
-            />
+            {/* Background: Gradient if default image, else show image */}
+            {imageOptions.includes(image) ? (
+                <GradientBackground style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+                    <></>
+                </GradientBackground>
+            ) : (
+                <>
+                    <Image
+                        source={
+                            typeof image === 'string'
+                                ? { uri: image }
+                                : image && image.uri
+                                    ? { uri: image.uri }
+                                    : image
+                        }
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'cover',
+                            zIndex: 0,
+                            backgroundColor: '#000000',
+                            opacity: 1,
+                        }}
+                        blurRadius={8}
+                        onError={e => {
+                            console.log('Background image failed to load:', e.nativeEvent);
+                        }}
+                    />
+                    {/* Dark overlay for better text visibility */}
+                    <View style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        zIndex: 1,
+                    }} />
+                </>
+            )}
             {/* Foreground content scrolls, background does not */}
-            <View style={tw`w-full h-full pt-3 bg-black bg-opacity-60`}>
+            <View style={tw`w-full h-full pt-3`}>
                 <KeyboardAwareScrollView
                     style={{ flex: 1, zIndex: 1 }}
                     contentContainerStyle={{ flexGrow: 1 }}
