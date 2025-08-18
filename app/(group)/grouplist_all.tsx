@@ -3,6 +3,7 @@ import React from 'react';
 import { Animated } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
 import { View, Text, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import { Image } from 'react-native';
 import { View as RNView, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
@@ -30,6 +31,7 @@ export default function GroupListAll() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(false);
   const [pendingGroups, setPendingGroups] = useState<Group[]>([]);
+  const [pendingCreators, setPendingCreators] = useState<Record<string, string>>({}); // groupId -> profile_image
   const [activeTab, setActiveTab] = useState<'joined' | 'requested'>('joined');
   const navigation = useNavigation();
   const { featuredGroupIds, hydrate } = useAsyncFeaturedGroupsStore();
@@ -67,16 +69,47 @@ export default function GroupListAll() {
         const groupIds = data.map((req: { group_id: string }) => req.group_id);
         if (groupIds.length === 0) {
           setPendingGroups([]);
+          setPendingCreators({});
           return;
         }
         const { data: groupsData, error: groupsError } = await supabase
           .from('groups')
           .select('id, title, bio, creator, group_image, public, member_count')
           .in('id', groupIds);
-        if (!groupsError && groupsData) setPendingGroups(groupsData);
-        else setPendingGroups([]);
+        if (!groupsError && groupsData) {
+          setPendingGroups(groupsData);
+          // Fetch creator profile images
+          const creatorIds = Array.from(new Set(groupsData.map((g: any) => g.creator)));
+          if (creatorIds.length > 0) {
+            const { data: creatorsData, error: creatorsError } = await supabase
+              .from('users')
+              .select('id, profile_image')
+              .in('id', creatorIds);
+            if (!creatorsError && creatorsData) {
+              // Map creator id to profile_image
+              const creatorMap: Record<string, string> = {};
+              creatorsData.forEach((c: any) => {
+                creatorMap[c.id] = c.profile_image;
+              });
+              // Map groupId to creator profile_image
+              const groupCreatorMap: Record<string, string> = {};
+              groupsData.forEach((g: any) => {
+                groupCreatorMap[g.id] = creatorMap[g.creator] || '';
+              });
+              setPendingCreators(groupCreatorMap);
+            } else {
+              setPendingCreators({});
+            }
+          } else {
+            setPendingCreators({});
+          }
+        } else {
+          setPendingGroups([]);
+          setPendingCreators({});
+        }
       } else {
         setPendingGroups([]);
+        setPendingCreators({});
       }
     };
 
@@ -130,7 +163,7 @@ export default function GroupListAll() {
             style={tw`px-4 py-2 bg-white/10 rounded-full`}
             activeOpacity={0.7}
           >
-            <Text style={[tw`text-[#7A5CFA] text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
+            <Text style={[tw`text-[#7A5CFA] text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select top 5</Text>
           </TouchableOpacity>
         </View>
 
@@ -189,28 +222,11 @@ export default function GroupListAll() {
               style={tw`mr-4.5 px-4 py-2 bg-white/10 rounded-full`}
               activeOpacity={0.7}
             >
-              <Text style={[tw`text-[#7A5CFA] text-[13px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select features</Text>
+              <Text style={[tw`text-[#7A5CFA] text-[13px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select top 5</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Tab Bar below header */}
-        {/* <View style={tw`pb-2 px-4 w-full justify-center items-center flex-row gap-x-4`}>
-          <TouchableOpacity
-            style={tw`${activeTab === 'joined' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
-            onPress={() => setActiveTab('joined')}
-            activeOpacity={0.7}
-          >
-            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Joined groups</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={tw`${activeTab === 'requested' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
-            onPress={() => setActiveTab('requested')}
-            activeOpacity={0.7}
-          >
-            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
-          </TouchableOpacity>
-        </View> */}
       </Animated.View>
 
       {/* Tab Content */}
@@ -281,10 +297,37 @@ export default function GroupListAll() {
             {pendingGroups.length > 0 ? (
               <View style={tw``}>
                 {pendingGroups.map(pg => (
-                  <View key={pg.id} style={tw`bg-white/10 rounded-xl mb-2 px-4 py-3`}>
-                    <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>{pg.title}</Text>
-                    {pg.bio ? <Text style={[tw`text-white text-[12px] mt-1`, { fontFamily: 'Nunito-Regular' }]}>{pg.bio}</Text> : null}
-                  </View>
+                  <TouchableOpacity
+                    key={pg.id}
+                    style={tw`bg-white/10 rounded-xl mb-2 px-4 py-3 flex-row items-center`}
+                    activeOpacity={0.7}
+                    onPress={() => router.navigate({ pathname: '/(group)/groupview', params: { id: pg.id } })}
+                  >
+                    <View style={[tw`mr-4`, { position: 'relative', width: 48, height: 48 }]}> {/* w-12 h-12 = 48px */}
+                      <Image
+                        source={{ uri: pg.group_image }}
+                        style={tw`w-12 h-12 rounded-lg bg-white/20`}
+                        resizeMode="cover"
+                      />
+                      {pendingCreators[pg.id] ? (
+                        <Image
+                          source={{ uri: pendingCreators[pg.id] }}
+                          resizeMode="cover"
+                          style={[tw`w-6 h-6 rounded-full border border-[#7A5CFA] shadow-lg`, {
+                            position: 'absolute',
+                            bottom: -6,
+                            right: -6,
+                          }]}
+                        />
+                      ) : null}
+                    </View>
+                    <View style={tw`flex-1`}>
+                      <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]}>{pg.title}</Text>
+                      <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}> 
+                        {pg.member_count} {pg.member_count === 1 ? 'member' : 'members'}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             ) : (
