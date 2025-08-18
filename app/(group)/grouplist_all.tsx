@@ -123,7 +123,7 @@ export default function GroupListAll() {
           zIndex: 2,
         }}
       >
-        <View style={tw`flex-row items-center mb-2 w-full`}>
+        <View style={tw`flex-row items-center mb-4 w-full`}>
           <Text style={[tw`text-white text-[24px] flex-1`, { fontFamily: 'Nunito-Black' }]}>Your groups</Text>
           <TouchableOpacity
             onPress={() => router.push('/(group)/FeatureGroupsSelector')}
@@ -175,7 +175,7 @@ export default function GroupListAll() {
           style={[tw`absolute top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
         />
         <View
-          style={[tw`absolute bg-[#080B32] bg-opacity-80 top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
+          style={[tw`absolute bg-[#080B32] bg-opacity-70 top-0 left-0 bottom-0 right-0`, { zIndex: -1 }]}
         />
         <View style={tw`flex-row w-full items-center mb-2`}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -268,9 +268,18 @@ export default function GroupListAll() {
             }
           />
         ) : (
-          <View style={tw`w-full px-4`}>
+          <Animated.ScrollView
+            style={tw`w-full`}
+            contentContainerStyle={tw`pb-10 pt-40 px-4`}
+            showsVerticalScrollIndicator={false}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: true }
+            )}
+            scrollEventThrottle={16}
+          >
             {pendingGroups.length > 0 ? (
-              <View style={tw`mt-1`}>
+              <View style={tw``}>
                 {pendingGroups.map(pg => (
                   <View key={pg.id} style={tw`bg-white/10 rounded-xl mb-2 px-4 py-3`}>
                     <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>{pg.title}</Text>
@@ -281,7 +290,7 @@ export default function GroupListAll() {
             ) : (
               <Text style={[tw`text-white text-[12px]`, { fontFamily: 'Nunito-Regular' }]}>No pending requests.</Text>
             )}
-          </View>
+          </Animated.ScrollView>
         )}
       </View>
     </GradientBackground>
