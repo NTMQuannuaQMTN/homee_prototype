@@ -176,13 +176,15 @@ export default function GroupListAll() {
           >
             <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Joined groups</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={tw`${activeTab === 'requested' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
-            onPress={() => setActiveTab('requested')}
-            activeOpacity={0.7}
-          >
-            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
-          </TouchableOpacity>
+          {pendingGroups.length > 0 && (
+            <TouchableOpacity
+              style={tw`${activeTab === 'requested' ? 'bg-[#7A5CFA]' : ''} px-6 py-2 rounded-full`}
+              onPress={() => setActiveTab('requested')}
+              activeOpacity={0.7}
+            >
+              <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Requested</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </Animated.View>
 
