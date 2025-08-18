@@ -106,9 +106,9 @@ export default function FeatureGroupsSelector({ groups: propGroups, onSave, onCa
         </View>
         {notEnoughGroups ? (
           <View style={tw`flex-1 justify-center items-center -mt-15`}>
-            <IconReverse width={100} height={100} style={tw``} />
+            <IconReverse width={100} height={100} style={tw`mb-3`} />
             <Text style={[tw`text-white text-[22px] text-center mb-1.5`, { fontFamily: 'Nunito-ExtraBold' }]}>Oops, not yet!</Text>
-            <Text style={[tw`text-white text-[16px] text-center mx-4`, { fontFamily: 'Nunito-Medium' }]}>Come back and select your preferred groups once you've joined 5 groups!</Text>
+            <Text style={[tw`text-white text-[16px] text-center mx-4`, { fontFamily: 'Nunito-Medium' }]}>Come back and select groups to be featured once you've joined 5 groups!</Text>
           </View>
         ) : (
           <>
