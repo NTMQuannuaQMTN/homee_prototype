@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions, Alert, Animated } from "react-native";
+import { Share as RNShare } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from "react";
 import tw from "twrnc";
@@ -13,6 +14,7 @@ import ThreeDotsIcon from '../../assets/icons/threedots.svg';
 import { useUserStore } from "../store/userStore";
 import AlbumCard from "../(album)/albumcard";
 import DraggableModal from "../components/DraggableModal";
+import { Ionicons } from '@expo/vector-icons';
 
 interface Group {
   id: string;
@@ -434,7 +436,21 @@ export default function GroupView() {
                 <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={() => { }} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
+            <TouchableOpacity
+              onPress={async () => {
+                try {
+                  // Share group link instead of image
+                  const groupUrl = `https://homee.app/group/${group.id}`;
+                  const message = `Join me in "${group.title}" on Homee to share photos together!\n${groupUrl}`;
+                  await RNShare.share({
+                    message,
+                  });
+                } catch (error) {
+                  Alert.alert('Error', 'Could not open share dialog.');
+                }
+              }}
+              style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}
+            >
               <ShareIcon width={20} height={20} />
               <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Invite</Text>
             </TouchableOpacity>
@@ -572,8 +588,10 @@ export default function GroupView() {
             ]}
             onPress={() => setTab('requests')}
           >
-            <Text style={[tw`text-base`, { fontFamily: "Nunito-ExtraBold", color: tab === 'requests' ? '#fff' : '#9ca3af' }]}>
-              {requests.length > 0 ? `Requests (${requests.length})` : 'Requests'}
+            <Text style={[tw`text-base flex-row items-center`, { fontFamily: "Nunito-ExtraBold", color: tab === 'requests' ? '#fff' : '#9ca3af' }]}>Requests
+              {requests.length > 0 && (
+                <Ionicons name="ellipse" size={10} color="#E11D48" style={{ marginLeft: 2.5, marginTop: 1 }} />
+              )}
             </Text>
           </TouchableOpacity>}
         </View>
@@ -674,7 +692,6 @@ export default function GroupView() {
                     }
                     return allMembers.map((member, idx) => {
                       const isCreator = member.id === creatorInfo.id;
-                      const isCurrentUser = member.id === user?.id;
                       return (
                         <TouchableOpacity
                           key={member.id || idx}
@@ -687,28 +704,6 @@ export default function GroupView() {
                             style={tw`w-8 h-8 rounded-full mr-2 shadow-lg`}
                           />
                           <Text style={[tw`text-white text-[16px] mr-2.5`, { fontFamily: "Nunito-ExtraBold" }]}>{member.name}</Text>
-                          {/* Status: show for creator (if not me) and other members, hidden for current user */}
-                          {!isCurrentUser && (
-                            <View style={tw`ml-auto`}>
-                              {friendStats[member.id] === 'friend' ? (
-                                <TouchableOpacity style={tw`bg-[#7A5CFA] rounded-full px-3 py-1.5`} activeOpacity={0.7}>
-                                  <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Friends</Text>
-                                </TouchableOpacity>
-                              ) : friendStats[member.id] === 'requesting' ? (
-                                <TouchableOpacity style={tw`bg-white/20 rounded-full px-3 py-1.5`} activeOpacity={0.7}>
-                                  <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Requested</Text>
-                                </TouchableOpacity>
-                              ) : friendStats[member.id] === 'requested' ? (
-                                <TouchableOpacity style={tw`bg-yellow-600 rounded-full px-3 py-1.5`} activeOpacity={0.7}>
-                                  <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Accept?</Text>
-                                </TouchableOpacity>
-                              ) : (
-                                <TouchableOpacity style={tw`bg-white/20 rounded-full px-3 py-1.5`} activeOpacity={0.7}>
-                                  <Text style={[tw`text-white text-[14px]`, { fontFamily: "Nunito-ExtraBold" }]}>Add friend</Text>
-                                </TouchableOpacity>
-                              )}
-                            </View>
-                          )}
                         </TouchableOpacity>
                       );
                     });
