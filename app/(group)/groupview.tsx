@@ -589,9 +589,10 @@ export default function GroupView() {
             ]}
             onPress={() => setTab('requests')}
           >
-            <Text style={[tw`text-base flex-row items-center`, { fontFamily: "Nunito-ExtraBold", color: tab === 'requests' ? '#fff' : '#9ca3af' }]}>Requests
+            <Text style={[tw`text-base flex-row items-center`, { fontFamily: "Nunito-ExtraBold", color: tab === 'requests' ? '#fff' : '#9ca3af' }]}>
+              Requests
               {requests.length > 0 && (
-                <Ionicons name="ellipse" size={10} color="#E11D48" style={{ marginLeft: 2.5, marginTop: 1 }} />
+                <Ionicons name="ellipse" size={10} color="#E11D48" style={{ marginLeft: 4, marginTop: 1 }} />
               )}
             </Text>
           </TouchableOpacity>}
