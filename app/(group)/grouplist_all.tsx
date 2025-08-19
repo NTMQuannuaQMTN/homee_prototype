@@ -228,7 +228,7 @@ export default function GroupListAll() {
               style={tw`mr-4.5 px-4 py-2 bg-white/10 rounded-full`}
               activeOpacity={0.7}
             >
-              <Text style={[tw`text-[#7A5CFA] text-[13px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select top 5</Text>
+              <Text style={[tw`text-[#7A5CFA] text-[13px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Select favorite</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import tw from "twrnc";
 import { supabase } from "@/utils/supabase";
 import GradientBackground from "../components/GradientBackground";
+import GoldGradient from "../components/GoldGradient";
 import defaultImages from "../(create)/defaultimage";
 import BackIcon from '../../assets/icons/back.svg';
 import EditIcon from '../../assets/icons/edit-icon.svg';
@@ -484,14 +485,9 @@ export default function GroupView() {
             {/* Top left corner: creator/join/joined button */}
             <View style={{ position: 'absolute', top: 12, left: 12, zIndex: 2 }}>
               {creator ? (
-                <LinearGradient
-                  colors={["#A57C01", "#D4AF37", "#B8860B", "#996515"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={[tw`rounded-full px-3 py-1.5`, { alignItems: 'center', justifyContent: 'center' }]}
-                >
+                <GoldGradient style={tw`rounded-full px-3 py-1.5 items-center justify-center`}>
                   <Text style={[tw`text-white text-base`, { fontFamily: "Nunito-ExtraBold" }]}>Creator</Text>
-                </LinearGradient>
+                </GoldGradient>
               ) : (
                 <TouchableOpacity onPress={toggleJoin}>
                   <Text

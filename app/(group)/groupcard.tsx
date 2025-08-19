@@ -1,6 +1,8 @@
 import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import tw from "twrnc";
 import defaultImages from "../(create)/defaultimage";
+import GoldGradient from "../components/GoldGradient";
+import { useAsyncFeaturedGroupsStore } from '../store/asyncFeaturedGroupsStore';
 
 interface GroupCardProps {
   id: string;
@@ -12,11 +14,16 @@ interface GroupCardProps {
   group_image: string;
   member_count: number;
   onPress?: () => void;
+  featured?: boolean; // If true, show GoldGradient behind title
 }
 
-export default function GroupCard({ id, title, bio, creator, group_image, publicGroup, member_count, onPress }: GroupCardProps) {
+export default function GroupCard({ id, title, bio, creator, group_image, publicGroup, member_count, onPress, featured }: GroupCardProps) {
   const width = Dimensions.get('screen').width;
   const cardWidth = width / 2 - 20;
+
+  // Get featured group IDs from store
+  const featuredGroupIds = useAsyncFeaturedGroupsStore(state => state.featuredGroupIds);
+  const isFeatured = featuredGroupIds.includes(id);
 
   // Default image logic: match group.tsx and imageModal.tsx
   let isDefault = false;
@@ -61,24 +68,42 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
             style={tw`w-full h-full absolute`}
             resizeMode="cover"
           />
-          <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
-            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
-              {title}
-            </Text>
-          </View>
+          {isFeatured ? (
+            <GoldGradient style={tw`absolute bottom-0 left-0 right-0 pb-2.5 pt-2 px-2.5`}>
+              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
+                {title}
+              </Text>
+            </GoldGradient>
+          ) : (
+            <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
+              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
+                {title}
+              </Text>
+            </View>
+          )}
         </View>
       ) : (
-        <Image
-          source={{ uri: group_image }}
-          style={tw`w-full h-full`}
-          resizeMode="cover"
-        />
+        <>
+          <Image
+            source={{ uri: group_image }}
+            style={tw`w-full h-full`}
+            resizeMode="cover"
+          />
+          {isFeatured ? (
+            <GoldGradient style={tw`absolute bottom-0 left-0 right-0 pb-2.5 pt-2 px-2.5`}>
+              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
+                {title}
+              </Text>
+            </GoldGradient>
+          ) : (
+            <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
+              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
+                {title}
+              </Text>
+            </View>
+          )}
+        </>
       )}
-      <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
-        <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
-          {title}
-        </Text>
-      </View>
     </TouchableOpacity>
   );
 }
