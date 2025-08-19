@@ -736,7 +736,7 @@ export default function EditProfile() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
-                    tw`bg-white/5 rounded-full py-2.5 w-full items-center mt-2.5`,
+                    tw`bg-white/10 rounded-full py-2.5 w-full items-center mt-2.5`,
                   ]}
                   onPress={() => router.replace({ pathname: '/(profile)/profile', params: { user_id: user?.id } })}
                   activeOpacity={0.85}

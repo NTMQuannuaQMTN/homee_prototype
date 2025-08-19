@@ -1,13 +1,14 @@
 import { supabase } from '@/utils/supabase';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
+import GradientBackground from '../components/GradientBackground';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Text, TouchableOpacity, View, Share } from 'react-native';
 import tw from 'twrnc';
 import { useUserStore } from '../store/userStore';
 
 import Back from '../../assets/icons/back.svg';
+import IconReverse from '../../assets/icons/icon-reverse.svg';
 
 export default function FriendsList() {
     const router = useRouter();
@@ -87,13 +88,8 @@ export default function FriendsList() {
     }, []);
 
     return (
-        <LinearGradient
-            colors={["#080B32", "#0E1241", "#291C56", "#392465", "#51286A"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={{ flex: 1 }}
-        >
-            <View style={tw`relative flex-row items-center px-4 mt-10 pt-3 mb-1.5 h-10`}>
+        <GradientBackground style={{ flex: 1 }}>
+            <View style={tw`relative flex-row items-center px-4 mt-14 mb-1.5`}>
                 {/* Back button - absolute left */}
                 <TouchableOpacity
                     onPress={() => router.back()}
@@ -103,8 +99,8 @@ export default function FriendsList() {
                 </TouchableOpacity>
                 {/* Centered title */}
                 <View style={tw`flex-1 items-center justify-center`}>
-                    <Text style={[tw`text-white text-base`, { fontFamily: 'Nunito-ExtraBold' }]}>Friends</Text>
-                    <Text style={[tw`text-gray-400 text-xs -mt-0.5`, { fontFamily: 'Nunito-Medium' }]}>
+                    <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Friends</Text>
+                    <Text style={[tw`text-gray-400 text-sm`, { fontFamily: 'Nunito-Medium' }]}>
                         {friends.length} friend{friends.length === 1 ? '' : 's'}
                     </Text>
                 </View>
@@ -116,14 +112,25 @@ export default function FriendsList() {
                     <Text style={[tw`text-white text-center mt-10`, { fontFamily: 'Nunito-ExtraBold' }]}>Loading...</Text>
                 ) : friends.length === 0 ? (
                     <View style={tw`-mt-20 flex-1 justify-center items-center`}>
-                        <Text style={[tw`text-white text-center text-[17px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Oops, no friends yet 😔</Text>
-                        <Text style={[tw`text-white text-center text-[15px] mt-0.5`, { fontFamily: 'Nunito-Medium' }]}>Your friends might be on Sizzl. Let's explore!</Text>
+                        <IconReverse width={80} height={80} style={tw`mb-2`} />
+                        <Text style={[tw`text-white text-center text-[22px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Oops, no friends yet 😔</Text>
+                        <Text style={[tw`text-white text-center text-[16px] mt-2 px-4`, { fontFamily: 'Nunito-Medium' }]}>Start inviting people to Homee to share memories together!</Text>
                         <TouchableOpacity
-                            style={tw`mt-5 bg-[#7A5CFA] items-center justify-center px-6 py-2 rounded-xl`}
+                            style={tw`mt-5 bg-[#7A5CFA] items-center justify-center px-6 py-2.5 rounded-xl`}
                             activeOpacity={0.7}
-                            onPress={() => router.replace('/(community)/explorefriends')}
+                            onPress={async () => {
+                                try {
+                                    await Share.share({
+                                        message: 'Join me on Homee! Download the app here: https://homee.app',
+                                        // url: 'https://homee.app',
+                                        title: 'Homee - Share memories together!'
+                                    });
+                                } catch (error) {
+                                    Alert.alert('Error', 'Unable to share the app link.');
+                                }
+                            }}
                         >
-                            <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Start exploring!</Text>
+                            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Invite friends</Text>
                         </TouchableOpacity>
                     </View>
                 ) : (
@@ -150,6 +157,6 @@ export default function FriendsList() {
                     ))
                 )}
             </View>
-        </LinearGradient>
+        </GradientBackground>
     );
 }

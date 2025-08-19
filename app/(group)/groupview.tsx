@@ -11,6 +11,7 @@ import BackIcon from '../../assets/icons/back.svg';
 import EditIcon from '../../assets/icons/edit-icon.svg';
 import ShareIcon from '../../assets/icons/share-icon.svg';
 import ThreeDotsIcon from '../../assets/icons/threedots.svg';
+import IconFun from '../../assets/icons/icon-fun.svg';
 import { useUserStore } from "../store/userStore";
 import AlbumCard from "../(album)/albumcard";
 import DraggableModal from "../components/DraggableModal";
@@ -714,7 +715,13 @@ export default function GroupView() {
           ) : tab === 'requests' ? (
             <View>
               {requests.length === 0 ? (
-                <Text style={[tw`text-white text-[15px]`, { fontFamily: "Nunito-Medium", textAlign: 'center' }]}>No requests yet!</Text>
+                <>
+                  <View style={tw`items-center mb-2`}>
+                    <IconFun width={80} height={80} />
+                  </View>
+                  <Text style={[tw`text-white text-[22px]`, { fontFamily: "Nunito-ExtraBold", textAlign: 'center' }]}>No requests yet!</Text>
+                  <Text style={[tw`text-white text-[16px] px-4`, { fontFamily: "Nunito-Medium", textAlign: 'center' }]}>People's requests to join your group will appear here!</Text>
+                </>
               ) : (
                 requests.map((req, idx) => (
                   <View key={req.id || idx} style={tw`flex-row items-center bg-black/20 rounded-xl p-3 mb-2`}>
