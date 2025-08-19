@@ -46,15 +46,11 @@ export default function CreateImage() {
           ...result.assets.map(asset => ({
             uri: asset.uri,
             caption: "",
-            group: { id: '', title: '' },
-            album: []
           }))
         ]);
         console.log(...result.assets.map(asset => ({
           uri: asset.uri,
           caption: "",
-          group: { id: '', title: '' },
-          album: []
         })));
       }
     } catch (e) {
@@ -79,7 +75,6 @@ export default function CreateImage() {
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setImages([...images, {
           uri: result.assets[0].uri, caption: "",
-          group: { id: '', title: '' }, album: []
         }]);
       }
     } catch (e) {
