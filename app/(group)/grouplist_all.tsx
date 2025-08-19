@@ -21,6 +21,7 @@ interface Group {
   title: string;
   bio?: string;
   creator: string;
+  created_at?: string;
   public: boolean;
   group_image: string;
   member_count: number;
@@ -52,7 +53,7 @@ export default function GroupListAll() {
       setLoading(true);
       const { data, error } = await supabase
         .from('groups')
-        .select('id, title, bio, creator, group_image, public, member_count')
+        .select('id, title, bio, creator, group_image, public, member_count, created_at')
         .order('member_count', { ascending: false })
         .order('created_at', { ascending: false });
       if (!error && data) setGroups(data);
@@ -74,7 +75,7 @@ export default function GroupListAll() {
         }
         const { data: groupsData, error: groupsError } = await supabase
           .from('groups')
-          .select('id, title, bio, creator, group_image, public, member_count')
+          .select('id, title, bio, creator, group_image, public, member_count, created_at')
           .in('id', groupIds);
         if (!groupsError && groupsData) {
           setPendingGroups(groupsData);
@@ -278,6 +279,7 @@ export default function GroupListAll() {
                     bio={group.bio}
                     publicGroup={group.public}
                     creator={group.creator}
+                    created_at={group.created_at}
                     group_image={group.group_image}
                     member_count={group.member_count}
                     onPress={() => router.navigate({ pathname: '/(group)/groupview', params: { id: group.id } })}
