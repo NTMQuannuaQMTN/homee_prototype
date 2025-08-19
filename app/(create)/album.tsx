@@ -318,7 +318,7 @@ export default function CreateAlbum() {
                                 </TouchableOpacity>
                             ) : (
                                 <TouchableOpacity
-                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA] opacity-50`, { zIndex: 2 }]}
+                                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA] opacity-30`, { zIndex: 2 }]}
                                     disabled
                                 >
                                     <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Done</Text>
@@ -350,7 +350,7 @@ export default function CreateAlbum() {
 
                     <View style={tw`px-4 mb-3`}>
                         <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
-                            <Text style={[tw`text-white text-xs mb-2`, { fontFamily: 'Nunito-Bold' }]}>
+                            <Text style={[tw`text-white text-[15px] mb-2`, { fontFamily: 'Nunito-ExtraBold' }]}>
                                 Choose a group
                             </Text>
                             <View style={tw`bg-white/10 rounded-lg border border-white/20`}>
