@@ -13,7 +13,7 @@ interface Group {
     title: string;
     bio?: string;
     creator: string;
-    //   created: string;
+    created_at: string;
     public: boolean;
     group_image: string;
     member_count: number;
@@ -33,7 +33,7 @@ export default function GroupList() {
         setLoading(true);
         const { data, error } = await supabase
             .from('groups')
-            .select('id, title, bio, creator, group_image, public, member_count')
+            .select('id, title, bio, creator, group_image, public, member_count, created_at')
             .order('member_count', { ascending: false })
             .order('created_at', { ascending: false })
             .or(
@@ -127,6 +127,7 @@ export default function GroupList() {
                         publicGroup={group.public}
                         creator={group.creator}
                         group_image={group.group_image}
+                        created_at={group.created_at}
                         member_count={group.member_count}
                         onPress={() => {
                             router.navigate({

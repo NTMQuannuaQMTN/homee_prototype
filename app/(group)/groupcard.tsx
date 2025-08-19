@@ -10,20 +10,31 @@ interface GroupCardProps {
   bio?: string;
   creator: string;
   publicGroup: boolean;
-//   created: string;
+  created_at?: string;
   group_image: string;
   member_count: number;
   onPress?: () => void;
   featured?: boolean; // If true, show GoldGradient behind title
 }
 
-export default function GroupCard({ id, title, bio, creator, group_image, publicGroup, member_count, onPress, featured }: GroupCardProps) {
+export default function GroupCard({ id, title, bio, creator, group_image, publicGroup, member_count, onPress, featured, created_at }: GroupCardProps) {
   const width = Dimensions.get('screen').width;
   const cardWidth = width / 2 - 20;
 
   // Get featured group IDs from store
   const featuredGroupIds = useAsyncFeaturedGroupsStore(state => state.featuredGroupIds);
   const isFeatured = featuredGroupIds.includes(id);
+
+  // Calculate days since created
+  let daysSinceCreated = '-';
+  if (created_at) {
+    const createdDate = new Date(created_at);
+    const now = new Date();
+    if (!isNaN(createdDate.getTime())) {
+      const diff = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+      daysSinceCreated = diff >= 0 ? diff.toString() : '-';
+    }
+  }
 
   // Default image logic: match group.tsx and imageModal.tsx
   let isDefault = false;
@@ -61,6 +72,12 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
       onPress={onPress}
       activeOpacity={0.7}
     >
+      {/* Days Since Created badge */}
+      <View style={tw`absolute top-2 left-2 z-10`}>
+        <GoldGradient style={tw`px-2 py-1 rounded-lg`}>
+          <Text style={[tw`text-white text-[12px]`, { fontFamily: 'Nunito-Black' }]}>{daysSinceCreated} days</Text>
+        </GoldGradient>
+      </View>
       {isDefault ? (
         <View style={tw`flex-1 justify-center items-center shadow-lg`}>
           <Image
