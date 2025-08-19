@@ -64,7 +64,7 @@ export default function AlbumCard({ id, title, onPress }: AlbumCardProps) {
                         ]}
                     />
                 ))}
-                <Text style={[tw`text-white text-[16px] text-center`, { fontFamily: 'Nunito-ExtraBold' }]} numberOfLines={2}>
+                <Text style={[tw`text-white text-[16px] text-center`, { fontFamily: 'Nunito-ExtraBold' }]} numberOfLines={1}>
                     {title}
                 </Text>
             </View>

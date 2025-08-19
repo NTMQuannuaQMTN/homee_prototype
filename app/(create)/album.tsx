@@ -113,9 +113,8 @@ export default function CreateAlbum() {
         if (isValid && !draftErr) {
             setShowSuccessToast(true);
             if (dataEvent) {
-                setID(dataEvent[0].id);
+                return dataEvent[0].id;
             }
-            router.back();
         } else {
             Alert.alert('error bitch');
             return null;
@@ -146,6 +145,103 @@ export default function CreateAlbum() {
             }
         } catch (e) {
             // handle error
+        }
+    }
+
+    const addImagesToAlbum = async (albumId: string) => {
+        let imgURL = '';
+        // Upload all images in the image store to Supabase and associate them with the album
+        try {
+            for (let i = 0; i < images.length; i++) {
+                let imageId = '';
+                // Try to add a row in the "images" table for this image
+                const { data: imageData, error: imageError } = await supabase
+                    .from('images')
+                    .insert([{
+                        album: albumId,
+                        caption: images[i].caption || "",
+                        user_id: user.id
+                    }])
+                    .select('id')
+                    .maybeSingle();
+
+                if (imageError) {
+                    // Log the error and the attempted insert data for debugging
+                    console.error('Error inserting image row:', imageError);
+                    console.log('Tried to insert:', {
+                        album: albumId,
+                        caption: images[i].caption || "",
+                        user_id: user.id
+                    });
+                } else if (!imageData || !imageData.id) {
+                    console.error('No imageData returned from insert:', imageData);
+                } else {
+                    imageId = imageData.id;
+                    console.log('Inserted image row with id:', imageId);
+                }
+
+                if (typeof images[i].uri === 'string' && (images[i].uri.startsWith('http://') || images[i].uri.startsWith('https://'))) {
+                    imgURL = images[i].uri;
+                } else {
+                    try {
+                        // Get file info and determine file extension
+                        const fileUri = images[i].uri;
+                        const fileExtension = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
+                        const fileName = `image/${albumId}/${imageId}.${fileExtension}`;
+
+                        // Read file as ArrayBuffer for proper binary upload
+                        const fileArrayBuffer = await FileSystem.readAsStringAsync(fileUri, {
+                            encoding: FileSystem.EncodingType.Base64,
+                        });
+
+                        // Convert base64 to Uint8Array
+                        const byteCharacters = atob(fileArrayBuffer);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const uint8Array = new Uint8Array(byteNumbers);
+
+                        const { error: uploadError } = await supabase.storage
+                            .from('homee-img')
+                            .upload(fileName, uint8Array, {
+                                contentType: `image/${fileExtension === 'jpg' ? 'jpeg' : fileExtension}`,
+                                upsert: true
+                            });
+
+                        if (uploadError) {
+                            console.error('Upload error:', uploadError);
+                            return;
+                        }
+
+                        const { data: urlData } = await supabase.storage
+                            .from('homee-img')
+                            .getPublicUrl(fileName);
+
+                        const publicUrl = urlData?.publicUrl;
+                        imgURL = publicUrl;
+                    } catch (err) {
+                        console.error('Image upload exception:', err);
+                        Alert.alert('Image upload failed');
+                    }
+                }
+
+                // update the image row with the new imgURL
+                if (imgURL && imageId) {
+                    const { error: updateError } = await supabase
+                        .from('images')
+                        .update({ image: imgURL })
+                        .eq('id', imageId);
+                    if (updateError) {
+                        console.error('Error updating image URL:', updateError);
+                    }
+                }
+
+                router.back();
+            }
+        } catch (err) {
+            console.error('Image upload exception:', err);
+            Alert.alert('Image upload failed');
         }
     }
 
@@ -396,7 +492,12 @@ export default function CreateAlbum() {
                         onPublish={async () => {
                             setShowEventDoneModal(false);
                             setToastVisible(true);
-                            addAlbum();
+                            const newId = await addAlbum();
+                            // wait until there is album id, add images
+                            if (newId) {
+                                console.log('oka');
+                                await addImagesToAlbum(newId);
+                            }
                         }}
                         onContinueEdit={() => setShowEventDoneModal(false)}
                     />

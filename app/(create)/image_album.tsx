@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, Image, Dimensions, TouchableOpacity, ScrollView, Animated, TextInput } from "react-native";
 import tw from "twrnc";
 import { useImageStore } from "../store/imageStore";
@@ -15,32 +15,11 @@ export default function ImageAlbum() {
     const width = Dimensions.get('window').width;
     const height = Dimensions.get('window').height;
 
-    const pickImage = async () => {
-        try {
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: false,
-                quality: 0.8,
-                allowsMultipleSelection: true,
-                selectionLimit: 0, // 0 means unlimited in Expo SDK 49+
-            });
-            if (!result.canceled && result.assets && result.assets.length > 0) {
-                setImages([
-                    ...images,
-                    ...result.assets.map(asset => ({
-                        uri: asset.uri,
-                        caption: "",
-                    }))
-                ]);
-                console.log(...result.assets.map(asset => ({
-                    uri: asset.uri,
-                    caption: "",
-                })));
-            }
-        } catch (e) {
-            // handle error
+    useEffect(() => {
+        if (images.length < 1) {
+            router.back();
         }
-    };
+    }, [images]);
 
     return (
         <View style={tw`flex-1 bg-[#080B32]`}>
@@ -92,7 +71,7 @@ export default function ImageAlbum() {
                 scrollEventThrottle={16}
                 renderItem={({ item }) => {
                     let scale, img;
-                    scale = 1 - 0.1 * Math.abs(slide - item);
+                    scale = 1 - 0.1 * (slide - item) * (slide - item);
                     img = (item !== images.length) ? images[item].uri : '';
 
                     return (
