@@ -162,7 +162,7 @@ export default function FeatureGroupsSelector({ groups: propGroups, onSave, onCa
               <TouchableOpacity onPress={handleSave} style={tw`py-2.5 bg-[#7A5CFA] rounded-full mb-2`}>
                 <Text style={[tw`text-white text-center text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Save</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleCancel} style={tw`py-2.5 bg-white/5 rounded-full`}>
+              <TouchableOpacity onPress={handleCancel} style={tw`py-2.5 bg-white/10 rounded-full`}>
                 <Text style={[tw`text-white text-center text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Cancel</Text>
               </TouchableOpacity>
             </View>
