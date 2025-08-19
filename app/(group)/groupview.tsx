@@ -736,8 +736,8 @@ export default function GroupView() {
                   <View style={tw`items-center mb-2`}>
                     <IconFun width={80} height={80} />
                   </View>
-                  <Text style={[tw`text-white text-[22px]`, { fontFamily: "Nunito-ExtraBold", textAlign: 'center' }]}>No requests yet!</Text>
-                  <Text style={[tw`text-white text-[16px] px-4`, { fontFamily: "Nunito-Medium", textAlign: 'center' }]}>People's requests to join your group will appear here!</Text>
+                  <Text style={[tw`text-white text-[22px] mb-2`, { fontFamily: "Nunito-ExtraBold", textAlign: 'center' }]}>No requests yet!</Text>
+                  <Text style={[tw`text-white text-[16px] px-10`, { fontFamily: "Nunito-Medium", textAlign: 'center' }]}>People's requests to join your group will appear here!</Text>
                 </>
               ) : (
                 requests.map((req, idx) => (
