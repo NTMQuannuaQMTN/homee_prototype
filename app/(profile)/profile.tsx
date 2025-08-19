@@ -157,11 +157,12 @@ export default function ProfilePage() {
 
 
 
-  // Fetch user data from Supabase 'users' table and set user view
+  // Fetch user data and correct friend count from Supabase
   const fetchUser = async (isRefresh = false) => {
     if (!isRefresh) setLoading(true);
     else setRefreshing(true);
     try {
+      // Fetch user profile
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -175,7 +176,12 @@ export default function ProfilePage() {
           Alert.alert('Error', 'Failed to load profile.');
         }
       } else {
-        setUserView(data);
+        // Fetch correct friend count from friends table
+        const { count: friendCount, error: friendCountError } = await supabase
+          .from('friends')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', data.id);
+        setUserView({ ...data, friend_count: friendCount ?? 0 });
       }
     } catch (err) {
       setUserView(null);
