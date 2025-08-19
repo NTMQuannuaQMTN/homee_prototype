@@ -16,6 +16,7 @@ import { useUserStore } from "../store/userStore";
 import AlbumCard from "../(album)/albumcard";
 import DraggableModal from "../components/DraggableModal";
 import { Ionicons } from '@expo/vector-icons';
+import IconSad from '../../assets/icons/icon-sad.svg';
 
 interface Group {
   id: string;
@@ -437,24 +438,27 @@ export default function GroupView() {
                 <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity
-              onPress={async () => {
-                try {
-                  // Share group link instead of image
-                  const groupUrl = `https://homee.app/group/${group.id}`;
-                  const message = `Join me in "${group.title}" on Homee to share photos together!\n${groupUrl}`;
-                  await RNShare.share({
-                    message,
-                  });
-                } catch (error) {
-                  Alert.alert('Error', 'Could not open share dialog.');
-                }
-              }}
-              style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}
-            >
-              <ShareIcon width={20} height={20} />
-              <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Invite</Text>
-            </TouchableOpacity>
+            {/* Show Invite button only if public group, or user is member, or creator */}
+            { (group.public || reqStat === 'Joined' || creator) && (
+              <TouchableOpacity
+                onPress={async () => {
+                  try {
+                    // Share group link instead of image
+                    const groupUrl = `https://homee.app/group/${group.id}`;
+                    const message = `Join me in "${group.title}" on Homee to share photos together!\n${groupUrl}`;
+                    await RNShare.share({
+                      message,
+                    });
+                  } catch (error) {
+                    Alert.alert('Error', 'Could not open share dialog.');
+                  }
+                }}
+                style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}
+              >
+                <ShareIcon width={20} height={20} />
+                <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Invite</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <ThreeDotsIcon width={20} height={20} />
             </TouchableOpacity>
@@ -598,24 +602,35 @@ export default function GroupView() {
         </View>
         <View style={tw`px-6 pb-10`}>
           {tab === 'album' ? (
-            <View style={tw`flex-row flex-wrap gap-4`}>
-              {albums && albums.map(album => (
-                <AlbumCard key={album.id}
-                  id={album.id}
-                  title={album.title}
-                  onPress={() => { router.navigate({ pathname: '/(album)/albumview', params: { id: album.id } }) }} />
-              ))}
-              {(reqStat === 'Joined' || creator) &&
-                <TouchableOpacity
-                  style={[tw`bg-white/10 rounded-xl justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
-                  onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title, img: group.group_image } })}
-                >
-                  <View style={tw`flex-row items-center border border-white/50 rounded-full px-2.5 py-2`}>
-                    <Text style={[tw`text-white text-xl mr-1.5 -mt-0.5`, { fontFamily: 'Nunito-ExtraBold' }]}>+</Text>
-                    <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Create album</Text>
-                  </View>
-                </TouchableOpacity>}
-            </View>
+            // If group is private and user is not a member or creator, hide albums
+            (!group.public && reqStat !== 'Joined' && !creator) ? (
+              <View style={tw`items-center justify-center py-10`}>
+                <View style={tw``}>
+                  <IconSad width={100} height={100} />
+                </View>
+                <Text style={[tw`text-white text-[22px] mb-1.5`, { fontFamily: 'Nunito-ExtraBold', textAlign: 'center' }]}>Invite only group</Text>
+                <Text style={[tw`text-white text-[16px] px-4`, { fontFamily: 'Nunito-Medium', textAlign: 'center' }]}>You must join this group to view its albums.</Text>
+              </View>
+            ) : (
+              <View style={tw`flex-row flex-wrap gap-4`}>
+                {albums && albums.map(album => (
+                  <AlbumCard key={album.id}
+                    id={album.id}
+                    title={album.title}
+                    onPress={() => { router.navigate({ pathname: '/(album)/albumview', params: { id: album.id } }) }} />
+                ))}
+                {(reqStat === 'Joined' || creator) &&
+                  <TouchableOpacity
+                    style={[tw`bg-white/10 rounded-xl justify-center items-center`, { width: (width - 64) / 2, height: (width - 64) / 2 }]}
+                    onPress={() => router.navigate({ pathname: '/(create)/album', params: { groupId: id as string, name: group.title, img: group.group_image } })}
+                  >
+                    <View style={tw`flex-row items-center border border-white/50 rounded-full px-2.5 py-2`}>
+                      <Text style={[tw`text-white text-xl mr-1.5 -mt-0.5`, { fontFamily: 'Nunito-ExtraBold' }]}>+</Text>
+                      <Text style={[tw`text-white text-[15px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Create album</Text>
+                    </View>
+                  </TouchableOpacity>}
+              </View>
+            )
           ) : tab === 'details' ? (
             <View>
               {/* Bio box: full width, row 1 */}
@@ -683,7 +698,9 @@ export default function GroupView() {
                   );
                 })()}
                 <View style={tw`flex-col`}>
-                  {(() => {
+                  {(!group.public && reqStat !== 'Joined' && !creator) ? (
+                    <Text style={[tw`text-gray-400 text-[14px]`, { fontFamily: "Nunito-Medium", textAlign: 'left' }]}>You must join this group to view its members.</Text>
+                  ) : (() => {
                     // Combine creator and members, remove duplicates by id
                     const allMembers = [creatorInfo, ...members.filter(m => m.id !== creatorInfo.id)];
                     if (allMembers.length === 0 || !allMembers[0].id) {
