@@ -81,25 +81,29 @@ export default function GroupListAll() {
           // Fetch creator profile images
           const creatorIds = Array.from(new Set(groupsData.map((g: any) => g.creator)));
           if (creatorIds.length > 0) {
-            const { data: creatorsData, error: creatorsError } = await supabase
-              .from('users')
-              .select('id, profile_image')
-              .in('id', creatorIds);
-            if (!creatorsError && creatorsData) {
-              // Map creator id to profile_image
-              const creatorMap: Record<string, string> = {};
-              creatorsData.forEach((c: any) => {
-                creatorMap[c.id] = c.profile_image;
-              });
-              // Map groupId to creator profile_image
-              const groupCreatorMap: Record<string, string> = {};
-              groupsData.forEach((g: any) => {
-                groupCreatorMap[g.id] = creatorMap[g.creator] || '';
-              });
-              setPendingCreators(groupCreatorMap);
-            } else {
-              setPendingCreators({});
+        const { data: creatorsData, error: creatorsError } = await supabase
+          .from('users')
+          .select('id, profile_image')
+          .in('id', creatorIds);
+        if (!creatorsError && creatorsData) {
+          // Map creator id to profile_image
+          const creatorMap: Record<string, string> = {};
+          creatorsData.forEach((c: any) => {
+            if (c && c.id) {
+              creatorMap[c.id] = c.profile_image || '';
             }
+          });
+          // Map groupId to creator profile_image (ensure correct mapping)
+          const groupCreatorMap: Record<string, string> = {};
+          groupsData.forEach((g: any) => {
+            // Defensive: check creator exists and has a profile image
+            const img = g.creator && creatorMap[g.creator] ? creatorMap[g.creator] : '';
+            groupCreatorMap[g.id] = img;
+          });
+          setPendingCreators(groupCreatorMap);
+        } else {
+          setPendingCreators({});
+        }
           } else {
             setPendingCreators({});
           }
