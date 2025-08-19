@@ -52,18 +52,19 @@ export default function AlbumCard({ id, title, onPress }: AlbumCardProps) {
         >
             <View style={tw`flex-1 justify-end`}>
                 {/* Display up to 3 images, stacked with rotation */}
-                {displayImages.slice(0,3).map((img, idx) => (
-                    <Image
+                {[0, 1, 2].map((idx) => {
+                    const img = displayImages[2 - idx];
+                    return <Image
                         key={idx}
                         source={typeof img === 'string' ? { uri: img } : img}
                         style={[
                             tw`absolute rounded-lg shadow-xl`,
-                            idx === 0 && { left: '65%', top: '35%', width: (width - 64) / 4, height: (width - 64) / 4, transform: [{translateX: '-50%'}, {translateY: '-50%'}, {rotateZ: '10deg'}] },
-                            idx === 1 && { left: '35%', top: '40%', width: (width - 64) / 4, height: (width - 64) / 4, transform: [{translateX: '-50%'}, {translateY: '-50%'}, {rotateZ: '-10deg'}] },
-                            idx === 2 && { left: '50%', top: '52%', width: (width - 50) / 3.8, height: (width - 50) / 3.8, transform: [{translateX: '-50%'}, {translateY: '-50%'}] },
+                            idx === 0 && { left: '65%', top: '35%', width: (width - 64) / 4, height: (width - 64) / 4, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '10deg' }] },
+                            idx === 1 && { left: '35%', top: '40%', width: (width - 64) / 4, height: (width - 64) / 4, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '-10deg' }] },
+                            idx === 2 && { left: '50%', top: '52%', width: (width - 50) / 3.8, height: (width - 50) / 3.8, transform: [{ translateX: '-50%' }, { translateY: '-50%' }] },
                         ]}
                     />
-                ))}
+                })}
                 <Text style={[tw`text-white text-[16px] text-center`, { fontFamily: 'Nunito-ExtraBold' }]} numberOfLines={1}>
                     {title}
                 </Text>

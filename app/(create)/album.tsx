@@ -403,7 +403,7 @@ export default function CreateAlbum() {
                             >
                                 <View style={tw`flex-1 justify-end`}>
                                     {[0, 1, 2].map(idx => {
-                                        const img = images[idx];
+                                        const img = images[2 - idx];
                                         if (img) {
                                             return (
                                                 <Image
