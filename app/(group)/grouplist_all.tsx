@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import React from 'react';
 import { Animated } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
@@ -15,6 +15,7 @@ import { useAsyncFeaturedGroupsStore } from '../store/asyncFeaturedGroupsStore';
 import BackIcon from '../../assets/icons/back.svg';
 import IconFun from '../../assets/icons/icon-fun.svg';
 import { useUserStore } from '../store/userStore';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Group {
   id: string;
@@ -45,81 +46,83 @@ export default function GroupListAll() {
   const router = useRouter();
 
   const { user } = useUserStore();
+  const fetchGroups = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('groups')
+      .select('id, title, bio, creator, group_image, public, member_count')
+      .order('member_count', { ascending: false })
+      .order('created_at', { ascending: false });
+    if (!error && data) setGroups(data);
+    setLoading(false);
+  };
 
-  useEffect(() => {
-    if (!user?.id) return;
-    const fetchGroups = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
+  const fetchPendingGroups = async () => {
+    // group_requests table only contains pending requests for user_id
+    const { data, error } = await supabase
+      .from('group_requests')
+      .select('group_id')
+      .eq('user_id', user.id);
+    if (!error && data && data.length > 0) {
+      const groupIds = data.map((req: { group_id: string }) => req.group_id);
+      if (groupIds.length === 0) {
+        setPendingGroups([]);
+        setPendingCreators({});
+        return;
+      }
+      const { data: groupsData, error: groupsError } = await supabase
         .from('groups')
         .select('id, title, bio, creator, group_image, public, member_count')
-        .order('member_count', { ascending: false })
-        .order('created_at', { ascending: false });
-      if (!error && data) setGroups(data);
-      setLoading(false);
-    };
-
-    const fetchPendingGroups = async () => {
-      // group_requests table only contains pending requests for user_id
-      const { data, error } = await supabase
-        .from('group_requests')
-        .select('group_id')
-        .eq('user_id', user.id);
-      if (!error && data && data.length > 0) {
-        const groupIds = data.map((req: { group_id: string }) => req.group_id);
-        if (groupIds.length === 0) {
-          setPendingGroups([]);
-          setPendingCreators({});
-          return;
-        }
-        const { data: groupsData, error: groupsError } = await supabase
-          .from('groups')
-          .select('id, title, bio, creator, group_image, public, member_count')
-          .in('id', groupIds);
-        if (!groupsError && groupsData) {
-          setPendingGroups(groupsData);
-          // Fetch creator profile images
-          const creatorIds = Array.from(new Set(groupsData.map((g: any) => g.creator)));
-          if (creatorIds.length > 0) {
-        const { data: creatorsData, error: creatorsError } = await supabase
-          .from('users')
-          .select('id, profile_image')
-          .in('id', creatorIds);
-        if (!creatorsError && creatorsData) {
-          // Map creator id to profile_image
-          const creatorMap: Record<string, string> = {};
-          creatorsData.forEach((c: any) => {
-            if (c && c.id) {
-              creatorMap[c.id] = c.profile_image || '';
-            }
-          });
-          // Map groupId to creator profile_image (ensure correct mapping)
-          const groupCreatorMap: Record<string, string> = {};
-          groupsData.forEach((g: any) => {
-            // Defensive: check creator exists and has a profile image
-            const img = g.creator && creatorMap[g.creator] ? creatorMap[g.creator] : '';
-            groupCreatorMap[g.id] = img;
-          });
-          setPendingCreators(groupCreatorMap);
-        } else {
-          setPendingCreators({});
-        }
+        .in('id', groupIds);
+      if (!groupsError && groupsData) {
+        setPendingGroups(groupsData);
+        // Fetch creator profile images
+        const creatorIds = Array.from(new Set(groupsData.map((g: any) => g.creator)));
+        if (creatorIds.length > 0) {
+          const { data: creatorsData, error: creatorsError } = await supabase
+            .from('users')
+            .select('id, profile_image')
+            .in('id', creatorIds);
+          if (!creatorsError && creatorsData) {
+            // Map creator id to profile_image
+            const creatorMap: Record<string, string> = {};
+            creatorsData.forEach((c: any) => {
+              if (c && c.id) {
+                creatorMap[c.id] = c.profile_image || '';
+              }
+            });
+            // Map groupId to creator profile_image (ensure correct mapping)
+            const groupCreatorMap: Record<string, string> = {};
+            groupsData.forEach((g: any) => {
+              // Defensive: check creator exists and has a profile image
+              const img = g.creator && creatorMap[g.creator] ? creatorMap[g.creator] : '';
+              groupCreatorMap[g.id] = img;
+            });
+            setPendingCreators(groupCreatorMap);
           } else {
             setPendingCreators({});
           }
         } else {
-          setPendingGroups([]);
           setPendingCreators({});
         }
       } else {
         setPendingGroups([]);
         setPendingCreators({});
       }
-    };
+    } else {
+      setPendingGroups([]);
+      setPendingCreators({});
+    }
+  };
+
+  useEffect(() => {
+    if (!user?.id) return;
 
     fetchGroups();
     fetchPendingGroups();
   }, [user?.id]);
+
+  useFocusEffect(useCallback(() => { fetchGroups(); fetchPendingGroups(); }, []));
 
   // Place featured groups at the top, then the rest (excluding featured)
   // Remove pending groups from display
@@ -329,7 +332,7 @@ export default function GroupListAll() {
                     </View>
                     <View style={tw`flex-1`}>
                       <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]}>{pg.title}</Text>
-                      <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}> 
+                      <Text style={[tw`text-white text-[13px]`, { fontFamily: 'Nunito-Medium' }]}>
                         {pg.member_count} {pg.member_count === 1 ? 'member' : 'members'}
                       </Text>
                     </View>

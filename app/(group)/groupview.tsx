@@ -274,7 +274,7 @@ export default function GroupView() {
       <View style={tw`flex-1 justify-center items-center bg-[#080B32]`}>
         {/* ActivityIndicator removed as requested */}
       </View>
-    );  
+    );
   }
 
   if (!group) {
@@ -339,7 +339,7 @@ export default function GroupView() {
           console.log('Background image failed to load:', e.nativeEvent);
         }}
       />
-      <View style={tw`w-full h-full absolute top-0 left-0`}/>
+      <View style={tw`w-full h-full absolute top-0 left-0`} />
       <DraggableModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -434,13 +434,13 @@ export default function GroupView() {
           </TouchableOpacity>
           <View style={tw`flex-row items-center gap-x-2`}>
             {creator && (
-              <TouchableOpacity onPress={() => { }} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
+              <TouchableOpacity onPress={() => { router.navigate({ pathname: '/(create)/group', params: { idGroup: group.id } }) }} style={tw`flex-row items-center bg-white/10 rounded-full px-3 py-1.5`}>
                 <EditIcon width={18} height={18} />
                 <Text style={[tw`text-white ml-1.5 text-[14px]`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit</Text>
               </TouchableOpacity>
             )}
             {/* Show Invite button only if public group, or user is member, or creator */}
-            { (group.public || reqStat === 'Joined' || creator) && (
+            {(group.public || reqStat === 'Joined' || creator) && (
               <TouchableOpacity
                 onPress={async () => {
                   try {
@@ -481,7 +481,7 @@ export default function GroupView() {
                 resizeMode="cover"
               />
             )}
-            <View style={tw`absolute w-full h-full bg-black bg-opacity-50 top-0 left-0 rounded-xl`}/>
+            <View style={tw`absolute w-full h-full bg-black bg-opacity-50 top-0 left-0 rounded-xl`} />
             {/* Top left corner: creator/join/joined button */}
             <View style={{ position: 'absolute', top: 12, left: 12, zIndex: 2 }}>
               {creator ? (

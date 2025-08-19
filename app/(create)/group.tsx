@@ -19,17 +19,42 @@ import EventDoneModal from './eventdonemodal';
 import ImageModal from './imageModal';
 
 export default function CreateGroup() {
-    const params = useLocalSearchParams();
+    const {idGroup} = useLocalSearchParams();
     const [title, setTitle] = useState('');
     const [publicEvent, setPublic] = useState(true);
     const imageOptions = defaultImages;
     const [image, setImage] = useState(imageOptions[Math.floor(Math.random() * imageOptions.length)]);
-    const [id, setID] = useState('');
+    const [id, setID] = useState(idGroup || '');
     const [imageURL, setImageURL] = useState('');
 
     const { user } = useUserStore();
     const [bio, setBio] = useState('');
     const [showImageModal, setShowImageModal] = useState(false);
+
+    useEffect(() => {
+        const fetchGroupData = async () => {
+            if (!idGroup) return;
+            const { data, error } = await supabase
+                .from('groups')
+                .select('title, public, bio, group_image')
+                .eq('id', idGroup)
+                .single();
+            if (error) {
+                Alert.alert('Error', 'Failed to fetch group data: ' + error.message);
+                return;
+            }
+            if (data) {
+                setTitle(data.title || '');
+                setPublic(data.public ?? true);
+                setBio(data.bio || '');
+                if (data.group_image) {
+                    setImageURL(data.group_image);
+                    setImage(data.group_image);
+                }
+            }
+        };
+        fetchGroupData();
+    }, [idGroup]);
 
     const addGroup = async () => {
         // Check if event title, date, RSVP deadline, and location are available
