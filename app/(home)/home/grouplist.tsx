@@ -1,12 +1,13 @@
 import { router } from "expo-router";
 import { View, Text, Touchable, TouchableOpacity, ScrollView, Dimensions } from "react-native";
 import tw from "twrnc";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAsyncFeaturedGroupsStore } from "@/app/store/asyncFeaturedGroupsStore";
 import { supabase } from "@/utils/supabase";
 import GroupCard from "@/app/(group)/groupcard";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useUserStore } from "@/app/store/userStore";
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Group {
     id: string;
@@ -68,6 +69,15 @@ export default function GroupList() {
         fetchGroups();
         // eslint-disable-next-line
     }, [user, featuredGroupIds.join(",")]);
+
+    // The issue is likely that fetchGroups is not re-run after updating the group image,
+    // so the list still shows the old image URL from the previous fetch.
+    // To ensure the latest image is shown, refetch groups when returning to this screen.
+    useFocusEffect(
+        useCallback(() => {
+            fetchGroups();
+        }, [])
+    );
 
     // Listen for group deletion event from groupview.tsx
     useEffect(() => {
