@@ -1,21 +1,9 @@
 import { create } from "zustand";
 
-type Group = {
-  id: string;
-  title: string;
-};
-
-type Album = {
-  id: string;
-  title: string;
-};
-
 
 type UploadedImage = {
   uri: string;
   caption?: string;
-  group?: Group;
-  album?: Album[];
 };
 
 type ImageStoreState = {

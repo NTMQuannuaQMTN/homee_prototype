@@ -4,7 +4,7 @@ import * as FileSystem from 'expo-file-system';
 import { Image as ExpoImage } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Animated, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Animated, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import tw from 'twrnc';
 import { useUserStore } from '../store/userStore';
@@ -16,6 +16,7 @@ import Public from '../../assets/icons/public.svg';
 import defaultImages from './defaultimage';
 import EventDoneModal from './eventdonemodal';
 import ImageModal from './imageModal';
+import { useImageStore } from '../store/imageStore';
 
 export default function CreateAlbum() {
     const { groupId, name, img } = useLocalSearchParams();
@@ -28,6 +29,7 @@ export default function CreateAlbum() {
     const [bio, setBio] = useState('');
     const [showImageModal, setShowImageModal] = useState(false);
     const { user } = useUserStore();
+    const {images, setImages, addImage, removeImage} = useImageStore();
 
     useEffect(() => {
         const fetchUserGroups = async () => {
@@ -298,6 +300,45 @@ export default function CreateAlbum() {
                                         <Ionicons name="chevron-down" size={18} color="#fff" />
                                     </TouchableOpacity>
                                 </View>
+                            </View>
+                        </View>
+
+                        <View style={tw`px-4 mb-3`}>
+                            <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
+                                <Text style={[tw`text-white text-xs mb-2`, { fontFamily: 'Nunito-Bold' }]}>
+                                    Upload images
+                                </Text>
+                                <TouchableOpacity
+                                    style={tw`bg-[#7A5CFA] px-6 py-3 rounded-lg items-center mb-2`}
+                                    onPress={() => {
+                                        // Navigate to image upload screen or open image picker
+                                        // You may want to use a navigation or modal here
+                                        // For now, let's assume navigation to /image
+                                        router.push('/(create)/image');
+                                    }}
+                                >
+                                    <Text style={[tw`text-white text-base`, { fontFamily: 'Nunito-Bold' }]}>
+                                        Add Images
+                                    </Text>
+                                </TouchableOpacity>
+                                {/* Show thumbnails of selected images if any */}
+                                {images && images.length > 0 && (
+                                    <ScrollView
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                        style={tw`mt-2`}
+                                        contentContainerStyle={tw`flex-row gap-2`}
+                                    >
+                                        {images.map((img, idx) => (
+                                            <Image
+                                                key={img.uri || idx}
+                                                source={{ uri: img.uri }}
+                                                style={tw`w-16 h-16 rounded-lg mr-2 bg-gray-700`}
+                                                resizeMode="cover"
+                                            />
+                                        ))}
+                                    </ScrollView>
+                                )}
                             </View>
                         </View>
 
