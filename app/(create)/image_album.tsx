@@ -24,28 +24,50 @@ export default function ImageAlbum() {
     return (
         <View style={tw`flex-1 bg-[#080B32]`}>
             {/* Top bar */}
-            <View style={tw`relative flex-row items-center px-4 mt-10 mb-2 h-10`}>
-                {/* Back button - absolute left */}
+            <View style={tw`relative flex-row items-center px-4 mt-13 mb-2 h-10`}>
+                {/* Back button and title - left */}
                 <TouchableOpacity
                     onPress={() => router.back()}
-                    style={[tw`absolute left-3`, { zIndex: 2 }]}
+                    style={[tw`flex-row items-center`, { zIndex: 2 }]}
                 >
                     <Back />
                 </TouchableOpacity>
-                {/* Centered title */}
-                <View style={tw`flex-1 items-center justify-center`}>
-                    <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-ExtraBold' }]}>
-                        View images
-                    </Text>
+                {/* Done and Edit buttons - right */}
+                <View style={[tw`absolute right-4 flex-row items-center`, { zIndex: 2 }]}> 
+                    <TouchableOpacity
+                        style={[tw`rounded-full px-4 py-1.5 bg-white/10 mr-2`]}
+                        onPress={async () => {
+                            try {
+                                const result = await ImagePicker.launchImageLibraryAsync({
+                                    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                                    allowsEditing: false,
+                                    quality: 0.8,
+                                    allowsMultipleSelection: true,
+                                    selectionLimit: 0, // 0 means unlimited in Expo SDK 49+
+                                });
+                                if (!result.canceled && result.assets && result.assets.length > 0) {
+                                    setImages([
+                                        ...images,
+                                        ...result.assets.map(asset => ({
+                                            uri: asset.uri,
+                                            caption: "",
+                                        }))
+                                    ]);
+                                }
+                            } catch (e) {
+                                // Optionally handle error
+                            }
+                        }}
+                    >
+                        <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Edit selection</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[tw`rounded-full px-4 py-1.5 bg-[#7A5CFA]`]}
+                        onPress={() => router.back()}
+                    >
+                        <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Done</Text>
+                    </TouchableOpacity>
                 </View>
-                {/* Done button - absolute right */}
-                {/* Determine if all required fields are filled and if editing */}
-                <TouchableOpacity
-                    style={[tw`absolute right-4 rounded-full px-4 py-1 bg-[#7A5CFA]`, { zIndex: 2 }]}
-                    onPress={() => router.back()}
-                >
-                    <Text style={[tw`text-white`, { fontFamily: 'Nunito-ExtraBold' }]}>Done</Text>
-                </TouchableOpacity>
             </View>
             <Animated.FlatList
                 data={images.map((_, idx) => idx)}
