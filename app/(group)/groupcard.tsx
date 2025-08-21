@@ -3,6 +3,10 @@ import tw from "twrnc";
 import defaultImages from "../(create)/defaultimage";
 import GoldGradient from "../components/GoldGradient";
 import { useAsyncFeaturedGroupsStore } from '../store/asyncFeaturedGroupsStore';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { LinearGradient } from 'expo-linear-gradient';
+
+import StarIcon from '../../assets/icons/staricon.svg'; // Assuming you have a star icon
 
 interface GroupCardProps {
   id: string;
@@ -85,19 +89,21 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
             style={tw`w-full h-full absolute`}
             resizeMode="cover"
           />
-          {isFeatured ? (
-            <GoldGradient style={tw`absolute bottom-0 left-0 right-0 pb-2.5 pt-2 px-2.5`}>
-              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
-                {title}
-              </Text>
-            </GoldGradient>
-          ) : (
-            <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
-              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
-                {title}
-              </Text>
-            </View>
-          )}
+          <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5 flex-row items-center`}>
+            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black', flex: 1 }]} numberOfLines={1}>
+              {title}
+            </Text>
+            {isFeatured && (
+              <LinearGradient
+                colors={["#FFD700", "#FFB300"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ borderRadius: 12, marginLeft: 6, padding: 2 }}
+              >
+                <StarIcon width={20} height={20} />
+              </LinearGradient>
+            )}
+          </View>
         </View>
       ) : (
         <>
@@ -106,19 +112,14 @@ export default function GroupCard({ id, title, bio, creator, group_image, public
             style={tw`w-full h-full`}
             resizeMode="cover"
           />
-          {isFeatured ? (
-            <GoldGradient style={tw`absolute bottom-0 left-0 right-0 pb-2.5 pt-2 px-2.5`}>
-              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
-                {title}
-              </Text>
-            </GoldGradient>
-          ) : (
-            <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5`}>
-              <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black' }]} numberOfLines={1}>
-                {title}
-              </Text>
-            </View>
-          )}
+          <View style={tw`absolute bottom-0 left-0 right-0 bg-black/60 pb-2.5 pt-2 px-2.5 flex-row items-center`}>
+            {isFeatured && (
+                <StarIcon width={20} height={20} style={tw`mr-1`} />
+            )}
+            <Text style={[tw`text-white text-[16px]`, { fontFamily: 'Nunito-Black', flex: 1 }]} numberOfLines={1}>
+              {title}
+            </Text>
+          </View>
         </>
       )}
     </TouchableOpacity>
