@@ -381,7 +381,7 @@ export default function CreateAlbum() {
 
                     <View style={tw`px-4 mb-3`}>
                         <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
-                            <Text style={[tw`text-white text-xs mb-2`, { fontFamily: 'Nunito-Bold' }]}>
+                            <Text style={[tw`text-white text-[15px] mb-2`, { fontFamily: 'Nunito-ExtraBold' }]}>
                                 Upload images
                             </Text>
                             <TouchableOpacity
@@ -406,8 +406,8 @@ export default function CreateAlbum() {
                                                     source={typeof img === 'string' ? { uri: img } : img}
                                                     style={[
                                                         tw`absolute rounded-lg shadow-xl`,
-                                                        idx === 0 && { left: '65%', top: '35%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '10deg' }] },
-                                                        idx === 1 && { left: '35%', top: '45%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '-10deg' }] },
+                                                        idx === 0 && { left: '65%', top: '35%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '10deg' }], opacity: 0.4 },
+                                                        idx === 1 && { left: '35%', top: '45%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '-10deg' }], opacity: 0.7 },
                                                         idx === 2 && { left: '50%', top: '60%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }] },
                                                     ]}
                                                 />
@@ -417,9 +417,9 @@ export default function CreateAlbum() {
                                                 <View
                                                     key={idx}
                                                     style={[
-                                                        tw`absolute rounded-lg shadow-xl bg-gray-700 items-center justify-center`,
-                                                        idx === 0 && { left: '65%', top: '35%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '10deg' }] },
-                                                        idx === 1 && { left: '35%', top: '45%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '-10deg' }] },
+                                                        tw`absolute rounded-lg shadow-xl bg-gray-500 items-center justify-center`,
+                                                        idx === 0 && { left: '65%', top: '35%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '10deg' }], opacity: 0.4 },
+                                                        idx === 1 && { left: '35%', top: '45%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }, { rotateZ: '-10deg' }], opacity: 0.7 },
                                                         idx === 2 && { left: '50%', top: '60%', width: width / 2, height: width / 2, transform: [{ translateX: '-50%' }, { translateY: '-50%' }] },
                                                     ]}
                                                 >
@@ -432,6 +432,14 @@ export default function CreateAlbum() {
                                     })}
                                 </View>
                             </TouchableOpacity>
+                            {/* Show number of selected images below the image group only if there are images */}
+                            {images.length > 0 && (
+                                <View style={tw`items-center`}>
+                                    <Text style={[tw`text-white text-[15px] -mt-2 mb-4`, { fontFamily: 'Nunito-ExtraBold' }]}>
+                                        {images.length} image{images.length === 1 ? '' : 's'} uploaded
+                                    </Text>
+                                </View>
+                            )}
                         </View>
                     </View>
 
