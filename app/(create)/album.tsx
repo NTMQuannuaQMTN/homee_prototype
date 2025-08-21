@@ -5,10 +5,12 @@ import * as ImagePicker from "expo-image-picker";
 import { Image as ExpoImage } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Animated, Dimensions, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Animated, Dimensions, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import tw from 'twrnc';
 import { useUserStore } from '../store/userStore';
+import DraggableModal from '../components/DraggableModal';
+import GroupCard from '../(group)/groupcard';
 
 import Back from '../../assets/icons/back.svg';
 import Camera from '../../assets/icons/camera_icon.svg';
@@ -29,6 +31,7 @@ export default function CreateAlbum() {
     const [id, setID] = useState('');
     const [bio, setBio] = useState('');
     const [showImageModal, setShowImageModal] = useState(false);
+    const [showGroupModal, setShowGroupModal] = useState(false);
     const { user } = useUserStore();
     const { images, setImages } = useImageStore();
 
@@ -82,7 +85,8 @@ export default function CreateAlbum() {
     const addAlbum = async () => {
         // Check if event title, date, RSVP deadline, and location are available
         if (!title) {
-            Alert.alert('Please fill in all required fields, including location.');
+            setToastVisible(true);
+            // Optionally set a toast message state if you want to show a custom message
             return null;
         }
 
@@ -116,7 +120,8 @@ export default function CreateAlbum() {
                 return dataEvent[0].id;
             }
         } else {
-            Alert.alert('error bitch');
+            setToastVisible(true);
+            // Optionally set a toast message state if you want to show a custom message
             return null;
         }
     }
@@ -144,7 +149,8 @@ export default function CreateAlbum() {
                 })));
             }
         } catch (e) {
-            // handle error
+            setToastVisible(true);
+            // Optionally set a toast message state if you want to show a custom message
         }
     }
 
@@ -222,7 +228,8 @@ export default function CreateAlbum() {
                         imgURL = publicUrl;
                     } catch (err) {
                         console.error('Image upload exception:', err);
-                        Alert.alert('Image upload failed');
+                        setToastVisible(true);
+                        // Optionally set a toast message state if you want to show a custom message
                     }
                 }
 
@@ -241,7 +248,8 @@ export default function CreateAlbum() {
             }
         } catch (err) {
             console.error('Image upload exception:', err);
-            Alert.alert('Image upload failed');
+            setToastVisible(true);
+            // Optionally set a toast message state if you want to show a custom message
         }
     }
 
@@ -328,7 +336,7 @@ export default function CreateAlbum() {
                     </View>
 
                     {/* Title input */}
-                    <View style={[tw`px-4 py-3 mx-4 mb-3 items-center border border-white/10 rounded-xl bg-white/5`]}>
+                    <View style={[tw`px-4 py-3 mx-4 mb-3 items-center border border-white/20 rounded-xl bg-white/10`]}>
                         <TextInput
                             style={[
                                 tw`text-white text-[24px] w-full`,
@@ -349,27 +357,13 @@ export default function CreateAlbum() {
                     </View>
 
                     <View style={tw`px-4 mb-3`}>
-                        <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 pt-3 pb-2`}>
-                            <Text style={[tw`text-white text-[15px] mb-2`, { fontFamily: 'Nunito-ExtraBold' }]}>
-                                Choose a group
-                            </Text>
+                        <View style={tw`bg-white/10 border border-white/20 rounded-xl px-4 py-3`}>
+                            <Text style={[tw`text-white text-[15px] mb-2`, { fontFamily: 'Nunito-ExtraBold' }]}>Select group</Text>
                             <View style={tw`bg-white/10 rounded-lg border border-white/20`}>
                                 <TouchableOpacity
                                     style={tw`flex-row items-center justify-between px-3 py-2`}
                                     onPress={() => {
-                                        // Show a simple picker modal
-                                        Alert.alert(
-                                            "Select Group",
-                                            "",
-                                            userGroups.map(g => ({
-                                                text: g.title,
-                                                onPress: () => {
-                                                    setGroupID(g.id);
-                                                    setGroupName(g.title);
-                                                    setGroupImage(g.group_image);
-                                                }
-                                            }))
-                                        );
+                                        router.push('/(create)/album_groupselection');
                                     }}
                                 >
                                     <Text style={[
@@ -382,6 +376,7 @@ export default function CreateAlbum() {
                                 </TouchableOpacity>
                             </View>
                         </View>
+                        {/* Group selection modal replaced by navigation to album_groupselection */}
                     </View>
 
                     <View style={tw`px-4 mb-3`}>
@@ -437,52 +432,6 @@ export default function CreateAlbum() {
                                     })}
                                 </View>
                             </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    {/* About this event */}
-                    <View style={tw`px-4 mb-3`}>
-                        <View style={tw`bg-white/10 border border-white/10 rounded-xl px-4 pt-3 pb-2`}>
-                            <TextInput
-                                style={[
-                                    tw`text-white text-[15px] px-0 py-0 text-left leading-[1.4]`,
-                                    {
-                                        fontFamily: bio ? 'Nunito-ExtraBold' : 'Nunito-ExtraBold',
-                                        minHeight: 60,
-                                        textAlignVertical: 'top'
-                                    }
-                                ]}
-                                placeholder="About this album..."
-                                placeholderTextColor="#9ca3af"
-                                multiline={true}
-                                value={bio}
-                                onChangeText={text => {
-                                    if (text.length <= 100) setBio(text);
-                                }}
-                                blurOnSubmit={true}
-                                returnKeyType="done"
-                                maxLength={100}
-                            />
-                            <View style={tw`flex-row justify-end items-center mt-0.5 -mr-1`}>
-                                <Text
-                                    style={[
-                                        tw`text-[12px] mr-0.5`,
-                                        { fontFamily: 'Nunito-Medium' },
-                                        bio.length >= 100 ? tw`text-rose-600` : tw`text-gray-400`
-                                    ]}
-                                >
-                                    {bio.length}/100
-                                </Text>
-                                {bio.length > 0 && (
-                                    <TouchableOpacity
-                                        onPress={() => setBio('')}
-                                        style={tw`pl-1.5`}
-                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                                    >
-                                        <Ionicons name="close-circle" size={16} color="#9ca3af" />
-                                    </TouchableOpacity>
-                                )}
-                            </View>
                         </View>
                     </View>
 
