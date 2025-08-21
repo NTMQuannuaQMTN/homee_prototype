@@ -368,7 +368,7 @@ export default function CreateAlbum() {
                                 >
                                     <Text style={[
                                         tw`text-white text-base`,
-                                        { fontFamily: groupName ? 'Nunito-Medium' : 'Nunito-Light' }
+                                        { fontFamily: groupName ? 'Nunito-ExtraBold' : 'Nunito-Light' }
                                     ]}>
                                         {groupName ? groupName : "Select a group..."}
                                     </Text>
@@ -435,9 +435,14 @@ export default function CreateAlbum() {
                             {/* Show number of selected images below the image group only if there are images */}
                             {images.length > 0 && (
                                 <View style={tw`items-center`}>
-                                    <Text style={[tw`text-white text-[15px] -mt-2 mb-4`, { fontFamily: 'Nunito-ExtraBold' }]}>
-                                        {images.length} image{images.length === 1 ? '' : 's'} uploaded
-                                    </Text>
+                                    <TouchableOpacity
+                                        onPress={() => router.push('/(create)/image_album')}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Text style={[tw`text-white bg-black/20 px-4 py-2 rounded-xl text-[15px] -mt-2 mb-4`, { fontFamily: 'Nunito-ExtraBold' }]}> 
+                                            {images.length} image{images.length === 1 ? '' : 's'} uploaded
+                                        </Text>
+                                    </TouchableOpacity>
                                 </View>
                             )}
                         </View>
