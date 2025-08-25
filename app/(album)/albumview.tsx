@@ -71,7 +71,7 @@ export default function AlbumView() {
     });
 
     const width = Dimensions.get("window").width;
-    const imageSize = (width - 48) / 3; // 3 images per row, 16px padding
+    const imageSize = (width - 40) / 2; // 3 images per row, 16px padding
 
     return (
         <SafeAreaView style={tw`flex-1 bg-[#080B32]`}>
@@ -142,7 +142,7 @@ export default function AlbumView() {
             <FlatList
                 data={images}
                 keyExtractor={item => item.id}
-                numColumns={3}
+                numColumns={2}
                 contentContainerStyle={tw`px-4`}
                 renderItem={({ item }) => (
                     <View style={{ marginBottom: 12, marginRight: 8, width: imageSize }}>
