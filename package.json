@@ -48,6 +48,7 @@
     "react-native-gesture-handler": "~2.24.0",
     "react-native-google-places-autocomplete": "^2.5.7",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
+    "react-native-masonry-list": "^2.16.2",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-qrcode-svg": "^6.3.15",
     "react-native-reanimated": "~3.17.4",

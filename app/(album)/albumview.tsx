@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import { View, Text, FlatList, Image, Dimensions, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from "react-native";
 import { supabase } from "@/utils/supabase";
 import tw from "twrnc";
 import { useLocalSearchParams, router } from "expo-router";
@@ -71,7 +71,7 @@ export default function AlbumView() {
     });
 
     const width = Dimensions.get("window").width;
-    const imageSize = (width - 40) / 2; // 3 images per row, 16px padding
+    const imageSize = (width - 40) / 2;
 
     return (
         <SafeAreaView style={tw`flex-1 bg-[#080B32]`}>
@@ -138,28 +138,60 @@ export default function AlbumView() {
                 );
             })()}
 
-            {/* Freely display all images in a grid */}
-            <FlatList
-                data={images}
-                keyExtractor={item => item.id}
-                numColumns={2}
-                contentContainerStyle={tw`px-4`}
-                renderItem={({ item }) => (
-                    <View style={{ marginBottom: 12, marginRight: 8, width: imageSize }}>
-                        <Image
-                            source={{ uri: item.image }}
-                            style={{
-                                width: imageSize,
-                                height: imageSize,
-                                borderRadius: 10,
-                                backgroundColor: "#222"
-                            }}
-                            resizeMode="cover"
-                        />
-                    </View>
-                )}
-                showsVerticalScrollIndicator={false}
-            />
+            {(() => {
+                const [aspectRatios, setAspectRatios] = React.useState<{ [id: string]: number }>({});
+
+                // Helper to handle onLoad and update aspect ratio
+                const handleImageLoad = (id: string) => (e: any) => {
+                    const { width, height } = e.nativeEvent.source;
+                    if (width && height) {
+                        setAspectRatios(prev => {
+                            // Only update if not already set (avoid unnecessary re-renders)
+                            if (prev[id]) return prev;
+                            return { ...prev, [id]: width / height };
+                        });
+                    }
+                };
+
+                // Split images into two columns
+                const leftImages = images.filter((_, idx) => idx % 2 === 0);
+                const rightImages = images.filter((_, idx) => idx % 2 === 1);
+
+                // Helper to render an image with its aspect ratio
+                const renderImage = (item: typeof images[0]) => {
+                    const aspectRatio = aspectRatios[item.id] || 1;
+                    return (
+                        <View key={item.id} style={{ marginBottom: 12 }}>
+                            <Image
+                                source={{ uri: item.image }}
+                                style={{
+                                    width: imageSize,
+                                    aspectRatio,
+                                    borderRadius: 10,
+                                    backgroundColor: "#222",
+                                }}
+                                resizeMode="cover"
+                                onLoad={handleImageLoad(item.id)}
+                            />
+                        </View>
+                    );
+                };
+
+                // Add ScrollView here
+                return (
+                    <ScrollView style={tw`flex-1`} contentContainerStyle={{ paddingBottom: 24 }}>
+                        <View style={tw`flex-row px-4`}>
+                            <View style={{ flex: 1, marginRight: 4 }}>
+                                {leftImages.map(renderImage)}
+                            </View>
+                            <View style={{ flex: 1, marginLeft: 4 }}>
+                                {rightImages.map(renderImage)}
+                            </View>
+                        </View>
+                    </ScrollView>
+                );
+            })()}
+            
             {loading && (
                 <View style={tw`absolute inset-0 justify-center items-center bg-black/40`}>
                     <ActivityIndicator size="large" color="#fff" />
